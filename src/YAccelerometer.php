@@ -42,7 +42,7 @@ class YAccelerometer extends YSensor
 
     //--- (YAccelerometer implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, $val): int
     {
         switch ($name) {
         case 'bandwidth':
