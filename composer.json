@@ -1,0 +1,29 @@
+{
+  "name": "yoctopuce/yoctoapi",
+  "description": "Official Yoctopuce Library for PHP.",
+  "license": "proprietary",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Yoctopuce",
+      "email": "dev@yoctopuce.com",
+      "homepage": "https://www.yoctopuce.com/",
+      "role": "Developer"
+    }
+  ],
+  "support": {
+    "email": "support@yoctopuce.com",
+    "source": "https://github.com/yoctopuce/yoctolib_php",
+    "docs": "https://www.yoctopuce.com/EN/doc/reference/yoctolib-php-EN.html"
+  },
+  "homepage": "https://www.yoctopuce.com/",
+  "require": {
+    "ext-iconv": "*",
+    "php": ">=8.0.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Yoctopuce\\YoctoAPI\\": "src"
+    }
+  }
+}
