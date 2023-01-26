@@ -532,7 +532,7 @@ class YFunction
 
     // Store and parse a an API request for current function
     //
-    protected function _parse($yreq, $msValidity)
+    protected function _parse(YAPI_YReq $yreq, float $msValidity): void
     {
         // save the whole structure for backward-compatibility
         $yreq->result["_expiration"] = YAPI::GetTickCount() + $msValidity;
@@ -549,7 +549,7 @@ class YFunction
 
     // Return the value of an attribute from function cache, after reloading it from device if needed
     // Note: the function cache is a typed (parsed) cache, contrarily to the agnostic device cache
-    protected function _getAttr($str_attr)
+    protected function _getAttr(string $str_attr)
     {
         if ($this->_cache['_expiration'] <= YAPI::GetTickCount()) {
             // no valid cached value, reload from device
@@ -589,7 +589,7 @@ class YFunction
 
     // Change the value of an attribute on a device, and update cache on the fly
     // Note: the function cache is a typed (parsed) cache, contrarily to the agnostic device cache
-    protected function _setAttr($str_attr, $str_newval)
+    protected function _setAttr(string $str_attr, string $str_newval): int
     {
         if (!isset($str_newval)) {
             $this->_throw(YAPI::INVALID_ARGUMENT, "Undefined value to set for attribute $str_attr", null);
@@ -846,7 +846,7 @@ class YFunction
      *
      * On failure, throws an exception or returns a negative error code.
      */
-    public function load($msValidity)
+    public function load(float $msValidity): int
     {
         $yreq = YAPI::funcRequest($this->_className, $this->_func, '');
         if ($yreq->errorType != YAPI::SUCCESS) {

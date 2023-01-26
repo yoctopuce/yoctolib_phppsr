@@ -187,7 +187,7 @@ class YAPI
 
         self::$_fnByType['Module'] = new YFunctionType('Module');
 
-        register_shutdown_function('self::flushConnections');
+        register_shutdown_function('YAPI::flushConnections');
     }
 
     // numeric strpos helper

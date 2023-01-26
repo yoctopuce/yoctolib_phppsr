@@ -69,7 +69,7 @@ class YLightSensor extends YSensor
      *
      * On failure, throws an exception or returns a negative error code.
      */
-    public function calibrate(float $calibratedVal)
+    public function calibrate(float $calibratedVal): int
     {
         $rest_val = strval(round($calibratedVal * 65536.0));
         return $this->_setAttr("currentValue",$rest_val);

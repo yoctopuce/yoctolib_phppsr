@@ -268,7 +268,7 @@ class YRefFrame extends YFunction
      * in order to define the reference frame for the compass and the
      * pitch/roll tilt sensors.
      *
-     * @return MOUNTPOSITION  a value among the YRefFrame::MOUNTPOSITION enumeration
+     * @return int  a value among the YRefFrame::MOUNTPOSITION enumeration
      *         (YRefFrame::MOUNTPOSITION_BOTTOM,  YRefFrame::MOUNTPOSITION_TOP,
      *         YRefFrame::MOUNTPOSITION_FRONT,    YRefFrame::MOUNTPOSITION_RIGHT,
      *         YRefFrame::MOUNTPOSITION_REAR,     YRefFrame::MOUNTPOSITION_LEFT),
@@ -291,7 +291,7 @@ class YRefFrame extends YFunction
      * in order to define the reference frame for the compass and the
      * pitch/roll tilt sensors.
      *
-     * @return MOUNTORIENTATION  a value among the enumeration YRefFrame::MOUNTORIENTATION
+     * @return int  a value among the enumeration YRefFrame::MOUNTORIENTATION
      *         (YRefFrame::MOUNTORIENTATION_TWELVE, YRefFrame::MOUNTORIENTATION_THREE,
      *         YRefFrame::MOUNTORIENTATION_SIX,     YRefFrame::MOUNTORIENTATION_NINE)
      *         corresponding to the orientation of the "X" arrow on the device,
@@ -318,12 +318,12 @@ class YRefFrame extends YFunction
      * and horizontally, you must select its reference orientation (parallel to
      * the earth surface) so that the measures are made relative to this position.
      *
-     * @param MOUNTPOSITION $position : a value among the YRefFrame::MOUNTPOSITION enumeration
+     * @param int $position : a value among the YRefFrame::MOUNTPOSITION enumeration
      *         (YRefFrame::MOUNTPOSITION_BOTTOM,  YRefFrame::MOUNTPOSITION_TOP,
      *         YRefFrame::MOUNTPOSITION_FRONT,    YRefFrame::MOUNTPOSITION_RIGHT,
      *         YRefFrame::MOUNTPOSITION_REAR,     YRefFrame::MOUNTPOSITION_LEFT),
      *         corresponding to the installation in a box, on one of the six faces.
-     * @param MOUNTORIENTATION $orientation : a value among the enumeration YRefFrame::MOUNTORIENTATION
+     * @param int $orientation : a value among the enumeration YRefFrame::MOUNTORIENTATION
      *         (YRefFrame::MOUNTORIENTATION_TWELVE, YRefFrame::MOUNTORIENTATION_THREE,
      *         YRefFrame::MOUNTORIENTATION_SIX,     YRefFrame::MOUNTORIENTATION_NINE)
      *         corresponding to the orientation of the "X" arrow on the device,

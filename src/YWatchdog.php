@@ -48,7 +48,7 @@ class YWatchdog extends YFunction
     protected float $_maxTimeOnStateB = self::MAXTIMEONSTATEB_INVALID; // Time
     protected int $_output = self::OUTPUT_INVALID;         // OnOff
     protected float $_pulseTimer = self::PULSETIMER_INVALID;     // Time
-    protected  $_delayedPulseTimer = self::DELAYEDPULSETIMER_INVALID; // DelayedPulse
+    protected mixed $_delayedPulseTimer = self::DELAYEDPULSETIMER_INVALID; // DelayedPulse
     protected float $_countdown = self::COUNTDOWN_INVALID;      // Time
     protected int $_autoStart = self::AUTOSTART_INVALID;      // OnOff
     protected int $_running = self::RUNNING_INVALID;        // OnOff
@@ -351,13 +351,13 @@ class YWatchdog extends YFunction
      *
      * On failure, throws an exception or returns a negative error code.
      */
-    public function pulse(int $ms_duration)
+    public function pulse(int $ms_duration): int
     {
         $rest_val = strval($ms_duration);
         return $this->_setAttr("pulseTimer",$rest_val);
     }
 
-    public function get_delayedPulseTimer(): ?YDelayedPulse
+    public function get_delayedPulseTimer(): mixed
     {
         // $res                    is a YDelayedPulse;
         if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
@@ -369,7 +369,7 @@ class YWatchdog extends YFunction
         return $res;
     }
 
-    public function set_delayedPulseTimer(YDelayedPulse $newval): int
+    public function set_delayedPulseTimer(mixed $newval): int
     {
         $rest_val = $newval["target"].':'.$newval["ms"];
         return $this->_setAttr("delayedPulseTimer", $rest_val);
@@ -385,7 +385,7 @@ class YWatchdog extends YFunction
      *
      * On failure, throws an exception or returns a negative error code.
      */
-    public function delayedPulse(int $ms_delay,int $ms_duration)
+    public function delayedPulse(int $ms_delay,int $ms_duration): int
     {
         $rest_val = $ms_delay.':'.$ms_duration;
         return $this->_setAttr("delayedPulseTimer",$rest_val);
@@ -494,7 +494,7 @@ class YWatchdog extends YFunction
      *
      * On failure, throws an exception or returns a negative error code.
      */
-    public function resetWatchdog()
+    public function resetWatchdog(): int
     {
         $rest_val = '1';
         return $this->_setAttr("running",$rest_val);
@@ -730,12 +730,12 @@ class YWatchdog extends YFunction
     return $this->set_pulseTimer($newval);
 }
 
-    public function delayedPulseTimer(): YDelayedPulse
+    public function delayedPulseTimer(): mixed
 {
     return $this->get_delayedPulseTimer();
 }
 
-    public function setDelayedPulseTimer(YDelayedPulse $newval)
+    public function setDelayedPulseTimer(mixed $newval)
 {
     return $this->set_delayedPulseTimer($newval);
 }

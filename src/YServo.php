@@ -30,7 +30,7 @@ class YServo extends YFunction
     protected int $_enabled = self::ENABLED_INVALID;        // Bool
     protected int $_range = self::RANGE_INVALID;          // Percent
     protected int $_neutral = self::NEUTRAL_INVALID;        // MicroSeconds
-    protected  $_move = self::MOVE_INVALID;           // Move
+    protected mixed $_move = self::MOVE_INVALID;           // Move
     protected int $_positionAtPowerOn = self::POSITIONATPOWERON_INVALID; // Int
     protected int $_enabledAtPowerOn = self::ENABLEDATPOWERON_INVALID; // Bool
 
@@ -223,7 +223,7 @@ class YServo extends YFunction
         return $this->_setAttr("neutral", $rest_val);
     }
 
-    public function get_move(): ?YMove
+    public function get_move(): mixed
     {
         // $res                    is a YMove;
         if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
@@ -235,7 +235,7 @@ class YServo extends YFunction
         return $res;
     }
 
-    public function set_move(YMove $newval): int
+    public function set_move(mixed $newval): int
     {
         $rest_val = $newval["target"].':'.$newval["ms"];
         return $this->_setAttr("move", $rest_val);
@@ -251,7 +251,7 @@ class YServo extends YFunction
      *
      * On failure, throws an exception or returns a negative error code.
      */
-    public function move(int $target,int $ms_duration)
+    public function move(int $target,int $ms_duration): int
     {
         $rest_val = $target.':'.$ms_duration;
         return $this->_setAttr("move",$rest_val);
@@ -407,7 +407,7 @@ class YServo extends YFunction
     return $this->set_neutral($newval);
 }
 
-    public function setMove(YMove $newval)
+    public function setMove(mixed $newval)
 {
     return $this->set_move($newval);
 }

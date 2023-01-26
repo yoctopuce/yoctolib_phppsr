@@ -890,7 +890,7 @@ class YNetwork extends YFunction
      *
      * On failure, throws an exception or returns a negative error code.
      */
-    public function callbackLogin(string $username,string $password)
+    public function callbackLogin(string $username,string $password): int
     {
         $rest_val = sprintf("%s:%s", $username, $password);
         return $this->_setAttr("callbackCredentials",$rest_val);
