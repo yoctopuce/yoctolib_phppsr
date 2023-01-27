@@ -922,7 +922,7 @@ class YI2cPort extends YFunction
                 $idx = $idx + 255;
             }
             if ($rcvCount - $idx > 2) {
-                $msg = sprintf('%sxx*%02X', $msg, $rcvCount - $idx);
+                $msg = sprintf('%sxx*%02X', $msg, ($rcvCount - $idx));
                 $idx = $rcvCount;
             }
         }
@@ -983,7 +983,7 @@ class YI2cPort extends YFunction
                 $idx = $idx + 255;
             }
             if ($rcvCount - $idx > 2) {
-                $msg = sprintf('%sxx*%02X', $msg, $rcvCount - $idx);
+                $msg = sprintf('%sxx*%02X', $msg, ($rcvCount - $idx));
                 $idx = $rcvCount;
             }
         }

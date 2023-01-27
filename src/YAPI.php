@@ -187,7 +187,7 @@ class YAPI
 
         self::$_fnByType['Module'] = new YFunctionType('Module');
 
-        register_shutdown_function('YAPI::flushConnections');
+        register_shutdown_function('Yoctopuce\YoctoAPI\YAPI::flushConnections');
     }
 
     // numeric strpos helper
@@ -1555,7 +1555,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "1.10.PATCH_WITH_BUILD";
+        return "1.10.52948";
     }
 
     /**
