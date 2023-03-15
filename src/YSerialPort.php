@@ -61,7 +61,7 @@ class YSerialPort extends YFunction
 
     //--- (end of generated code: YSerialPort attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (generated code: YSerialPort constructor)
         parent::__construct($str_func);
@@ -72,7 +72,7 @@ class YSerialPort extends YFunction
 
     //--- (generated code: YSerialPort implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'rxCount':
@@ -127,6 +127,7 @@ class YSerialPort extends YFunction
      * @return int  an integer corresponding to the total number of bytes received since last reset
      *
      * On failure, throws an exception or returns YSerialPort::RXCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_rxCount(): int
     {
@@ -146,6 +147,7 @@ class YSerialPort extends YFunction
      * @return int  an integer corresponding to the total number of bytes transmitted since last reset
      *
      * On failure, throws an exception or returns YSerialPort::TXCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_txCount(): int
     {
@@ -165,6 +167,7 @@ class YSerialPort extends YFunction
      * @return int  an integer corresponding to the total number of communication errors detected since last reset
      *
      * On failure, throws an exception or returns YSerialPort::ERRCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_errCount(): int
     {
@@ -184,6 +187,7 @@ class YSerialPort extends YFunction
      * @return int  an integer corresponding to the total number of messages received since last reset
      *
      * On failure, throws an exception or returns YSerialPort::RXMSGCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_rxMsgCount(): int
     {
@@ -203,6 +207,7 @@ class YSerialPort extends YFunction
      * @return int  an integer corresponding to the total number of messages send since last reset
      *
      * On failure, throws an exception or returns YSerialPort::TXMSGCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_txMsgCount(): int
     {
@@ -223,6 +228,7 @@ class YSerialPort extends YFunction
      * Modbus protocols)
      *
      * On failure, throws an exception or returns YSerialPort::LASTMSG_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_lastMsg(): string
     {
@@ -242,6 +248,7 @@ class YSerialPort extends YFunction
      * @return string  a string corresponding to the name of the job file currently in use
      *
      * On failure, throws an exception or returns YSerialPort::CURRENTJOB_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_currentJob(): string
     {
@@ -264,6 +271,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_currentJob(string $newval): int
     {
@@ -277,6 +285,7 @@ class YSerialPort extends YFunction
      * @return string  a string corresponding to the job file to use when the device is powered on
      *
      * On failure, throws an exception or returns YSerialPort::STARTUPJOB_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_startupJob(): string
     {
@@ -300,6 +309,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_startupJob(string $newval): int
     {
@@ -313,6 +323,7 @@ class YSerialPort extends YFunction
      * @return int  an integer corresponding to the maximum number of tasks in a job that the device can handle
      *
      * On failure, throws an exception or returns YSerialPort::JOBMAXTASK_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_jobMaxTask(): int
     {
@@ -332,6 +343,7 @@ class YSerialPort extends YFunction
      * @return int  an integer corresponding to maximum size allowed for job files
      *
      * On failure, throws an exception or returns YSerialPort::JOBMAXSIZE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_jobMaxSize(): int
     {
@@ -345,6 +357,9 @@ class YSerialPort extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -357,6 +372,9 @@ class YSerialPort extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -378,6 +396,7 @@ class YSerialPort extends YFunction
      * @return string  a string corresponding to the type of protocol used over the serial line, as a string
      *
      * On failure, throws an exception or returns YSerialPort::PROTOCOL_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_protocol(): string
     {
@@ -412,6 +431,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_protocol(string $newval): int
     {
@@ -428,6 +448,7 @@ class YSerialPort extends YFunction
      * YSerialPort::VOLTAGELEVEL_SDI12 corresponding to the voltage level used on the serial line
      *
      * On failure, throws an exception or returns YSerialPort::VOLTAGELEVEL_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_voltageLevel(): int
     {
@@ -458,6 +479,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_voltageLevel(int $newval): int
     {
@@ -477,6 +499,7 @@ class YSerialPort extends YFunction
      *         "9600,8N1"
      *
      * On failure, throws an exception or returns YSerialPort::SERIALMODE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_serialMode(): string
     {
@@ -507,6 +530,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_serialMode(string $newval): int
     {
@@ -542,7 +566,7 @@ class YSerialPort extends YFunction
      *
      * @return YSerialPort  a YSerialPort object allowing you to drive the serial port.
      */
-    public static function FindSerialPort(string $func): ?YSerialPort
+    public static function FindSerialPort(string $func): YSerialPort
     {
         // $obj                    is a YSerialPort;
         $obj = YFunction::_FindFromCache('SerialPort', $func);
@@ -553,6 +577,9 @@ class YSerialPort extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function sendCommand(string $text): int
     {
         return $this->set_command($text);
@@ -570,6 +597,7 @@ class YSerialPort extends YFunction
      * @return string  a string with a single line of text
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function readLine(): string
     {
@@ -616,6 +644,7 @@ class YSerialPort extends YFunction
      *         Binary messages are converted to hexadecimal representation.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function readMessages(string $pattern, int $maxWait): array
     {
@@ -689,6 +718,9 @@ class YSerialPort extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function end_tell(): int
     {
         // $availPosStr            is a str;
@@ -714,6 +746,7 @@ class YSerialPort extends YFunction
      *         Additional lines can be obtained by calling readLine or readMessages.
      *
      * On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
     public function queryLine(string $query, int $maxWait): string
     {
@@ -761,6 +794,7 @@ class YSerialPort extends YFunction
      *         Additional frames can be obtained by calling readHex or readMessages.
      *
      * On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
     public function queryHex(string $hexString, int $maxWait): string
     {
@@ -806,6 +840,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function uploadJob(string $jobfile, string $jsonDef): int
     {
@@ -823,6 +858,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function selectJob(string $jobfile): int
     {
@@ -835,6 +871,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function reset(): int
     {
@@ -854,6 +891,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeByte(int $code): int
     {
@@ -868,6 +906,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeStr(string $text): int
     {
@@ -905,6 +944,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeBin(string $buff): int
     {
@@ -919,6 +959,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeArray(array $byteList): int
     {
@@ -948,6 +989,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeHex(string $hexString): int
     {
@@ -981,6 +1023,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeLine(string $text): int
     {
@@ -1018,6 +1061,7 @@ class YSerialPort extends YFunction
      * @return int  the next byte
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function readByte(): int
     {
@@ -1089,6 +1133,7 @@ class YSerialPort extends YFunction
      * @return string  a string with receive buffer contents
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function readStr(int $nChars): string
     {
@@ -1125,6 +1170,7 @@ class YSerialPort extends YFunction
      * @return string  a binary object with receive buffer contents
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function readBin(int $nChars): string
     {
@@ -1167,6 +1213,7 @@ class YSerialPort extends YFunction
      * @return Integer[]  a sequence of bytes with receive buffer contents
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function readArray(int $nChars): array
     {
@@ -1213,6 +1260,7 @@ class YSerialPort extends YFunction
      * @return string  a string with receive buffer contents, encoded in hexadecimal
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function readHex(int $nBytes): string
     {
@@ -1260,6 +1308,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function sendBreak(int $duration): int
     {
@@ -1275,6 +1324,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_RTS(int $val): int
     {
@@ -1288,6 +1338,7 @@ class YSerialPort extends YFunction
      * @return int  1 if the CTS line is high, 0 if the CTS line is low.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function get_CTS(): int
     {
@@ -1315,6 +1366,7 @@ class YSerialPort extends YFunction
      *         Binary messages are converted to hexadecimal representation.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function snoopMessages(int $maxWait): array
     {
@@ -1356,6 +1408,7 @@ class YSerialPort extends YFunction
      *         the YSnoopingRecord object that describes the message
      *         sent or received.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function registerSnoopingCallback(mixed $callback): int
     {
@@ -1370,6 +1423,9 @@ class YSerialPort extends YFunction
         return 0;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _internalEventHandler(string $advstr): int
     {
         // $url                    is a str;
@@ -1414,6 +1470,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeStxEtx(string $text): int
     {
@@ -1433,6 +1490,7 @@ class YSerialPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeMODBUS(string $hexString): int
     {
@@ -1450,6 +1508,7 @@ class YSerialPort extends YFunction
      * @return Integer[]  the received reply, as a vector of bytes.
      *
      * On failure, throws an exception or returns an empty array (or a MODBUS error reply).
+     * @throws YAPI_Exception on error
      */
     public function queryMODBUS(int $slaveNo, array $pduBytes): array
     {
@@ -1519,6 +1578,7 @@ class YSerialPort extends YFunction
      * @return Integer[]  a vector of integers, each corresponding to one bit.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function modbusReadBits(int $slaveNo, int $pduAddr, int $nBits): array
     {
@@ -1575,6 +1635,7 @@ class YSerialPort extends YFunction
      * @return Integer[]  a vector of integers, each corresponding to one bit.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function modbusReadInputBits(int $slaveNo, int $pduAddr, int $nBits): array
     {
@@ -1631,6 +1692,7 @@ class YSerialPort extends YFunction
      * @return Integer[]  a vector of integers, each corresponding to one 16-bit register value.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function modbusReadRegisters(int $slaveNo, int $pduAddr, int $nWords): array
     {
@@ -1678,6 +1740,7 @@ class YSerialPort extends YFunction
      * @return Integer[]  a vector of integers, each corresponding to one 16-bit input value.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function modbusReadInputRegisters(int $slaveNo, int $pduAddr, int $nWords): array
     {
@@ -1724,6 +1787,7 @@ class YSerialPort extends YFunction
      * @return int  the number of bits/coils affected on the device (1)
      *
      * On failure, throws an exception or returns zero.
+     * @throws YAPI_Exception on error
      */
     public function modbusWriteBit(int $slaveNo, int $pduAddr, int $value): int
     {
@@ -1762,6 +1826,7 @@ class YSerialPort extends YFunction
      * @return int  the number of bits/coils affected on the device
      *
      * On failure, throws an exception or returns zero.
+     * @throws YAPI_Exception on error
      */
     public function modbusWriteBits(int $slaveNo, int $pduAddr, array $bits): int
     {
@@ -1825,6 +1890,7 @@ class YSerialPort extends YFunction
      * @return int  the number of registers affected on the device (1)
      *
      * On failure, throws an exception or returns zero.
+     * @throws YAPI_Exception on error
      */
     public function modbusWriteRegister(int $slaveNo, int $pduAddr, int $value): int
     {
@@ -1860,6 +1926,7 @@ class YSerialPort extends YFunction
      * @return int  the number of registers affected on the device
      *
      * On failure, throws an exception or returns zero.
+     * @throws YAPI_Exception on error
      */
     public function modbusWriteRegisters(int $slaveNo, int $pduAddr, array $values): int
     {
@@ -1913,6 +1980,7 @@ class YSerialPort extends YFunction
      * @return Integer[]  a vector of integers, each corresponding to one 16-bit register value read.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function modbusWriteAndReadRegisters(int $slaveNo, int $pduWriteAddr, array $values, int $pduReadAddr, int $nReadWords): array
     {
@@ -1964,102 +2032,162 @@ class YSerialPort extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function rxCount(): int
 {
     return $this->get_rxCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function txCount(): int
 {
     return $this->get_txCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function errCount(): int
 {
     return $this->get_errCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function rxMsgCount(): int
 {
     return $this->get_rxMsgCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function txMsgCount(): int
 {
     return $this->get_txMsgCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function lastMsg(): string
 {
     return $this->get_lastMsg();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function currentJob(): string
 {
     return $this->get_currentJob();
 }
 
-    public function setCurrentJob(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCurrentJob(string $newval): int
 {
     return $this->set_currentJob($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function startupJob(): string
 {
     return $this->get_startupJob();
 }
 
-    public function setStartupJob(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setStartupJob(string $newval): int
 {
     return $this->set_startupJob($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function jobMaxTask(): int
 {
     return $this->get_jobMaxTask();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function jobMaxSize(): int
 {
     return $this->get_jobMaxSize();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function protocol(): string
 {
     return $this->get_protocol();
 }
 
-    public function setProtocol(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setProtocol(string $newval): int
 {
     return $this->set_protocol($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function voltageLevel(): int
 {
     return $this->get_voltageLevel();
 }
 
-    public function setVoltageLevel(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setVoltageLevel(int $newval): int
 {
     return $this->set_voltageLevel($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function serialMode(): string
 {
     return $this->get_serialMode();
 }
 
-    public function setSerialMode(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setSerialMode(string $newval): int
 {
     return $this->set_serialMode($newval);
 }
@@ -2070,7 +2198,7 @@ class YSerialPort extends YFunction
      * If you want to find a specific a serial port, use SerialPort.findSerialPort()
      * and a hardwareID or a logical name.
      *
-     * @return YSerialPort  a pointer to a YSerialPort object, corresponding to
+     * @return ?YSerialPort  a pointer to a YSerialPort object, corresponding to
      *         a serial port currently online, or a null pointer
      *         if there are no more serial ports to enumerate.
      */
@@ -2092,11 +2220,11 @@ class YSerialPort extends YFunction
      * Use the method YSerialPort::nextSerialPort() to iterate on
      * next serial ports.
      *
-     * @return YSerialPort  a pointer to a YSerialPort object, corresponding to
+     * @return ?YSerialPort  a pointer to a YSerialPort object, corresponding to
      *         the first serial port currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstSerialPort()
+    public static function FirstSerialPort(): ?YSerialPort
     {
         $next_hwid = YAPI::getFirstHardwareId('SerialPort');
         if ($next_hwid == null) {
@@ -2107,4 +2235,5 @@ class YSerialPort extends YFunction
 
     //--- (end of generated code: YSerialPort implementation)
 
-};
+}
+

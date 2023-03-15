@@ -44,7 +44,7 @@ class YRelay extends YFunction
 
     //--- (end of YRelay attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YRelay constructor)
         parent::__construct($str_func);
@@ -55,7 +55,7 @@ class YRelay extends YFunction
 
     //--- (YRelay implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'state':
@@ -93,6 +93,7 @@ class YRelay extends YFunction
      * the idle position, B for the active position)
      *
      * On failure, throws an exception or returns YRelay::STATE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_state(): int
     {
@@ -115,6 +116,7 @@ class YRelay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_state(int $newval): int
     {
@@ -131,6 +133,7 @@ class YRelay extends YFunction
      *         B for the active position, UNCHANGED to leave the relay state as is)
      *
      * On failure, throws an exception or returns YRelay::STATEATPOWERON_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_stateAtPowerOn(): int
     {
@@ -157,6 +160,7 @@ class YRelay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_stateAtPowerOn(int $newval): int
     {
@@ -172,6 +176,7 @@ class YRelay extends YFunction
      *         A before automatically switching back in to B state
      *
      * On failure, throws an exception or returns YRelay::MAXTIMEONSTATEA_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_maxTimeOnStateA(): float
     {
@@ -198,6 +203,7 @@ class YRelay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_maxTimeOnStateA(float $newval): int
     {
@@ -212,6 +218,7 @@ class YRelay extends YFunction
      * @return float  an integer
      *
      * On failure, throws an exception or returns YRelay::MAXTIMEONSTATEB_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_maxTimeOnStateB(): float
     {
@@ -238,6 +245,7 @@ class YRelay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_maxTimeOnStateB(float $newval): int
     {
@@ -252,6 +260,7 @@ class YRelay extends YFunction
      * relays, when used as a simple switch (single throw)
      *
      * On failure, throws an exception or returns YRelay::OUTPUT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_output(): int
     {
@@ -274,6 +283,7 @@ class YRelay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_output(int $newval): int
     {
@@ -290,6 +300,7 @@ class YRelay extends YFunction
      *         (state A), during a measured pulse generation
      *
      * On failure, throws an exception or returns YRelay::PULSETIMER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pulseTimer(): float
     {
@@ -303,6 +314,9 @@ class YRelay extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_pulseTimer(float $newval): int
     {
         $rest_val = strval($newval);
@@ -318,6 +332,7 @@ class YRelay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function pulse(int $ms_duration): int
     {
@@ -325,6 +340,9 @@ class YRelay extends YFunction
         return $this->_setAttr("pulseTimer",$rest_val);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_delayedPulseTimer(): mixed
     {
         // $res                    is a YDelayedPulse;
@@ -337,6 +355,9 @@ class YRelay extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_delayedPulseTimer(mixed $newval): int
     {
         $rest_val = $newval["target"].':'.$newval["ms"];
@@ -352,6 +373,7 @@ class YRelay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function delayedPulse(int $ms_delay,int $ms_duration): int
     {
@@ -368,6 +390,7 @@ class YRelay extends YFunction
      *         When there is no scheduled pulse, returns zero
      *
      * On failure, throws an exception or returns YRelay::COUNTDOWN_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_countdown(): float
     {
@@ -409,7 +432,7 @@ class YRelay extends YFunction
      *
      * @return YRelay  a YRelay object allowing you to drive the relay.
      */
-    public static function FindRelay(string $func): ?YRelay
+    public static function FindRelay(string $func): YRelay
     {
         // $obj                    is a YRelay;
         $obj = YFunction::_FindFromCache('Relay', $func);
@@ -426,6 +449,7 @@ class YRelay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function toggle(): int
     {
@@ -456,76 +480,121 @@ class YRelay extends YFunction
         }
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function state(): int
 {
     return $this->get_state();
 }
 
-    public function setState(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setState(int $newval): int
 {
     return $this->set_state($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function stateAtPowerOn(): int
 {
     return $this->get_stateAtPowerOn();
 }
 
-    public function setStateAtPowerOn(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setStateAtPowerOn(int $newval): int
 {
     return $this->set_stateAtPowerOn($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function maxTimeOnStateA(): float
 {
     return $this->get_maxTimeOnStateA();
 }
 
-    public function setMaxTimeOnStateA(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMaxTimeOnStateA(float $newval): int
 {
     return $this->set_maxTimeOnStateA($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function maxTimeOnStateB(): float
 {
     return $this->get_maxTimeOnStateB();
 }
 
-    public function setMaxTimeOnStateB(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMaxTimeOnStateB(float $newval): int
 {
     return $this->set_maxTimeOnStateB($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function output(): int
 {
     return $this->get_output();
 }
 
-    public function setOutput(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setOutput(int $newval): int
 {
     return $this->set_output($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pulseTimer(): float
 {
     return $this->get_pulseTimer();
 }
 
-    public function setPulseTimer(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPulseTimer(float $newval): int
 {
     return $this->set_pulseTimer($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function delayedPulseTimer(): mixed
 {
     return $this->get_delayedPulseTimer();
 }
 
-    public function setDelayedPulseTimer(mixed $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setDelayedPulseTimer(mixed $newval): int
 {
     return $this->set_delayedPulseTimer($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function countdown(): float
 {
     return $this->get_countdown();
@@ -537,7 +606,7 @@ class YRelay extends YFunction
      * If you want to find a specific a relay, use Relay.findRelay()
      * and a hardwareID or a logical name.
      *
-     * @return YRelay  a pointer to a YRelay object, corresponding to
+     * @return ?YRelay  a pointer to a YRelay object, corresponding to
      *         a relay currently online, or a null pointer
      *         if there are no more relays to enumerate.
      */
@@ -559,11 +628,11 @@ class YRelay extends YFunction
      * Use the method YRelay::nextRelay() to iterate on
      * next relays.
      *
-     * @return YRelay  a pointer to a YRelay object, corresponding to
+     * @return ?YRelay  a pointer to a YRelay object, corresponding to
      *         the first relay currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstRelay()
+    public static function FirstRelay(): ?YRelay
     {
         $next_hwid = YAPI::getFirstHardwareId('Relay');
         if ($next_hwid == null) {

@@ -41,9 +41,9 @@ class YDataLogger extends YFunction
     protected int $_clearHistory = self::CLEARHISTORY_INVALID;   // Bool
 
     //--- (end of generated code: YDataLogger attributes)
-    protected $dataLoggerURL = null;
+    protected ?string $dataLoggerURL = null;
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (generated code: YDataLogger constructor)
         parent::__construct($str_func);
@@ -54,7 +54,7 @@ class YDataLogger extends YFunction
 
     // Internal function to retrieve datalogger memory
     //
-    public function getData($runIdx, $timeIdx, &$loadval)
+    public function getData(int $runIdx, ?int $timeIdx, string &$loadval): int
     {
         if (is_null($this->dataLoggerURL)) {
             $this->dataLoggerURL = "/logger.json";
@@ -84,7 +84,7 @@ class YDataLogger extends YFunction
 
     //--- (generated code: YDataLogger implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'currentRunIndex':
@@ -121,6 +121,7 @@ class YDataLogger extends YFunction
      *         powered on with the dataLogger enabled at some point
      *
      * On failure, throws an exception or returns YDataLogger::CURRENTRUNINDEX_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_currentRunIndex(): int
     {
@@ -140,6 +141,7 @@ class YDataLogger extends YFunction
      * @return float  an integer corresponding to the Unix timestamp for current UTC time, if known
      *
      * On failure, throws an exception or returns YDataLogger::TIMEUTC_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_timeUTC(): float
     {
@@ -161,6 +163,7 @@ class YDataLogger extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_timeUTC(float $newval): int
     {
@@ -175,6 +178,7 @@ class YDataLogger extends YFunction
      * YDataLogger::RECORDING_PENDING corresponding to the current activation state of the data logger
      *
      * On failure, throws an exception or returns YDataLogger::RECORDING_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_recording(): int
     {
@@ -198,6 +202,7 @@ class YDataLogger extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_recording(int $newval): int
     {
@@ -212,6 +217,7 @@ class YDataLogger extends YFunction
      * activation state of the data logger on power up
      *
      * On failure, throws an exception or returns YDataLogger::AUTOSTART_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_autoStart(): int
     {
@@ -238,6 +244,7 @@ class YDataLogger extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_autoStart(int $newval): int
     {
@@ -252,6 +259,7 @@ class YDataLogger extends YFunction
      * if the data logger is synchronised with the localization beacon
      *
      * On failure, throws an exception or returns YDataLogger::BEACONDRIVEN_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_beaconDriven(): int
     {
@@ -276,6 +284,7 @@ class YDataLogger extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_beaconDriven(int $newval): int
     {
@@ -289,6 +298,7 @@ class YDataLogger extends YFunction
      * @return int  an integer corresponding to the percentage of datalogger memory in use
      *
      * On failure, throws an exception or returns YDataLogger::USAGE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_usage(): int
     {
@@ -302,6 +312,9 @@ class YDataLogger extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_clearHistory(): int
     {
         // $res                    is a enumBOOL;
@@ -314,6 +327,9 @@ class YDataLogger extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_clearHistory(int $newval): int
     {
         $rest_val = strval($newval);
@@ -348,7 +364,7 @@ class YDataLogger extends YFunction
      *
      * @return YDataLogger  a YDataLogger object allowing you to drive the data logger.
      */
-    public static function FindDataLogger(string $func): ?YDataLogger
+    public static function FindDataLogger(string $func): YDataLogger
     {
         // $obj                    is a YDataLogger;
         $obj = YFunction::_FindFromCache('DataLogger', $func);
@@ -366,6 +382,7 @@ class YDataLogger extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function forgetAllDataStreams(): int
     {
@@ -383,12 +400,16 @@ class YDataLogger extends YFunction
      * @return YDataSet[]  a list of YDataSet object.
      *
      * On failure, throws an exception or returns an empty list.
+     * @throws YAPI_Exception on error
      */
     public function get_dataSets(): array
     {
         return $this->parse_dataSets($this->_download('logger.json'));
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function parse_dataSets(string $json): array
     {
         $dslist = [];           // strArr;
@@ -407,62 +428,98 @@ class YDataLogger extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function currentRunIndex(): int
 {
     return $this->get_currentRunIndex();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function timeUTC(): float
 {
     return $this->get_timeUTC();
 }
 
-    public function setTimeUTC(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setTimeUTC(float $newval): int
 {
     return $this->set_timeUTC($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function recording(): int
 {
     return $this->get_recording();
 }
 
-    public function setRecording(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setRecording(int $newval): int
 {
     return $this->set_recording($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function autoStart(): int
 {
     return $this->get_autoStart();
 }
 
-    public function setAutoStart(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setAutoStart(int $newval): int
 {
     return $this->set_autoStart($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function beaconDriven(): int
 {
     return $this->get_beaconDriven();
 }
 
-    public function setBeaconDriven(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setBeaconDriven(int $newval): int
 {
     return $this->set_beaconDriven($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function usage(): int
 {
     return $this->get_usage();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function clearHistory(): int
 {
     return $this->get_clearHistory();
 }
 
-    public function setClearHistory(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setClearHistory(int $newval): int
 {
     return $this->set_clearHistory($newval);
 }
@@ -473,7 +530,7 @@ class YDataLogger extends YFunction
      * If you want to find a specific a data logger, use DataLogger.findDataLogger()
      * and a hardwareID or a logical name.
      *
-     * @return YDataLogger  a pointer to a YDataLogger object, corresponding to
+     * @return ?YDataLogger  a pointer to a YDataLogger object, corresponding to
      *         a data logger currently online, or a null pointer
      *         if there are no more data loggers to enumerate.
      */
@@ -495,11 +552,11 @@ class YDataLogger extends YFunction
      * Use the method YDataLogger::nextDataLogger() to iterate on
      * next data loggers.
      *
-     * @return YDataLogger  a pointer to a YDataLogger object, corresponding to
+     * @return ?YDataLogger  a pointer to a YDataLogger object, corresponding to
      *         the first data logger currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstDataLogger()
+    public static function FirstDataLogger(): ?YDataLogger
     {
         $next_hwid = YAPI::getFirstHardwareId('DataLogger');
         if ($next_hwid == null) {

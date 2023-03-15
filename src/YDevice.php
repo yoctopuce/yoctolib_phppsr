@@ -19,30 +19,26 @@ namespace Yoctopuce\YoctoAPI;
 class YDevice
 {
     // private attributes, to be used within yocto_api only
-    protected $_rootUrl;
-    protected $_serialNumber;
-    protected $_logicalName;
-    protected $_productName;
-    protected $_productId;
-    protected $_lastTimeRef;
-    protected $_lastDuration;
-    protected $_beacon;
-    protected $_deviceTime;
-    protected $_devYdx;
-    protected $_cache;
-    protected $_functions;
-    /**
-     * @var YTcpReq
-     */
-    protected $_ongoingReq;
-    public $_lastErrorType;
-    public $_lastErrorMsg;
-    private $_logNeedPulling;
-    private $_logIsPulling;
-    private $_logCallback;
-    private $_logpos;
+    protected string $_rootUrl;
+    protected string $_serialNumber;
+    protected string $_logicalName;
+    protected string $_productName;
+    protected int $_productId;
+    protected float $_lastTimeRef;
+    protected float $_lastDuration;
+    protected int $_beacon;
+    protected int $_devYdx;
+    protected array $_cache;
+    protected array $_functions;
+    protected ?YTcpReq $_ongoingReq;
+    public int $_lastErrorType;
+    public string $_lastErrorMsg;
+    private bool $_logNeedPulling;
+    private bool $_logIsPulling;
+    private mixed $_logCallback;
+    private int $_logpos;
 
-    function __construct($str_rooturl, $obj_wpRec = null, $obj_ypRecs = null)
+    function __construct(string $str_rooturl, ?array $obj_wpRec = null, ?array $obj_ypRecs = null)
     {
         $this->_rootUrl = $str_rooturl;
         $this->_serialNumber = '';
@@ -55,7 +51,13 @@ class YDevice
         $this->_functions = array();
         $this->_lastErrorType = YAPI::SUCCESS;
         $this->_lastErrorMsg = 'no error';
-
+        $this->_ongoingReq = null;
+        $this->_logCallback = null;
+        $this->_logIsPulling = false;
+        $this->_lastTimeRef = 0;
+        $this->_lastDuration = 0;
+        $this->_logNeedPulling = false;
+        $this->_logpos = 0;
         if (!is_null($obj_wpRec)) {
             // preload values from white pages, if provided
             $this->_serialNumber = $obj_wpRec['serialNumber'];
@@ -75,13 +77,13 @@ class YDevice
     // Throw an exception, keeping track of it in the object itself
 
     /**
-     * @param $int_errType
-     * @param $str_errMsg
-     * @param $obj_retVal
+     * @param int $int_errType
+     * @param string $str_errMsg
+     * @param mixed $obj_retVal
      * @return mixed
      * @throws YAPI_Exception
      */
-    protected function _throw($int_errType, $str_errMsg, $obj_retVal)
+    protected function _throw(int $int_errType, string $str_errMsg, mixed $obj_retVal): mixed
     {
         $this->_lastErrorType = $int_errType;
         $this->_lastErrorMsg = $str_errMsg;
@@ -94,7 +96,7 @@ class YDevice
     }
 
     // Update device cache and YAPI function lists from yp records
-    protected function _updateFromYP($obj_ypRecs)
+    protected function _updateFromYP(array $obj_ypRecs): void
     {
         $funidx = 0;
         foreach ($obj_ypRecs as $ypRec) {
@@ -114,65 +116,65 @@ class YDevice
     }
 
     // Return the root URL used to access a device (including the trailing slash)
-    public function getRootUrl()
+    public function getRootUrl(): string
     {
         return $this->_rootUrl;
     }
 
     // Return the serial number of the device, as found during discovery
-    public function getSerialNumber()
+    public function getSerialNumber(): string
     {
         return $this->_serialNumber;
     }
 
     // Return the logical name of the device, as found during discovery
-    public function getLogicalName()
+    public function getLogicalName(): string
     {
         return $this->_logicalName;
     }
 
     // Return the product name of the device, as found during discovery
-    public function getProductName()
+    public function getProductName(): string
     {
         return $this->_productName;
     }
 
     // Return the product Id of the device, as found during discovery
-    public function getProductId()
+    public function getProductId(): int
     {
         return $this->_productId;
     }
 
     // Return the beacon state of the device, as found during discovery
-    public function getBeacon()
+    public function getBeacon(): int
     {
         return $this->_beacon;
     }
 
-    public function getLastTimeRef()
+    public function getLastTimeRef(): float
     {
         return $this->_lastTimeRef;
     }
 
-    public function getLastDuration()
+    public function getLastDuration(): float
     {
         return $this->_lastDuration;
     }
 
-    public function setTimeRef($float_timestamp, $float_duration)
+    public function setTimeRef(float $float_timestamp, float $float_duration)
     {
         $this->_lastTimeRef = $float_timestamp;
         $this->_lastDuration = $float_duration;
     }
 
 
-    public function triggerLogPull()
+    public function triggerLogPull(): void
     {
         if ($this->_logCallback == null || $this->_logIsPulling) {
             return;
         }
         $this->_logIsPulling = true;
-        $request = "GET logs.txt?pos=" . $this->_logpos;
+        $request = "GET /logs.txt?pos=" . $this->_logpos;
         $yreq = YAPI::devRequest($this->_rootUrl, $request);
         if ($yreq->errorType != YAPI::SUCCESS) {
             return;
@@ -202,12 +204,12 @@ class YDevice
         $this->_logIsPulling = false;
     }
 
-    public function setDeviceLogPending()
+    public function setDeviceLogPending(): void
     {
         $this->_logNeedPulling = true;
     }
 
-    public function registerLogCallback($obj_callback)
+    public function registerLogCallback(?callable $obj_callback): void
     {
         $this->_logCallback = $obj_callback;
         if ($obj_callback != null) {
@@ -216,13 +218,13 @@ class YDevice
     }
 
     // Return the hub-specific devYdx of the device, as found during discovery
-    public function getDevYdx()
+    public function getDevYdx(): int
     {
         return $this->_devYdx;
     }
 
     // Return a string that describes the device (serial number, logical name or root URL)
-    public function describe()
+    public function describe(): string
     {
         $res = $this->_rootUrl;
         if ($this->_serialNumber != '') {
@@ -239,7 +241,7 @@ class YDevice
      *(called by devRequest)
      * @param YTcpReq $tcpreq
      */
-    public function prepRequest($tcpreq)
+    public function prepRequest(YTcpReq $tcpreq): void
     {
         if (!is_null($this->_ongoingReq)) {
             while (!$this->_ongoingReq->eof()) {
@@ -253,7 +255,7 @@ class YDevice
      * Get the whole REST API string for a device, from cache if possible
      * @return YAPI_YReq
      */
-    public function requestAPI()
+    public function requestAPI(): YAPI_YReq
     {
         if ($this->_cache['_expiration'] > YAPI::GetTickCount()) {
             return new YAPI_YReq($this->_serialNumber . ".module",
@@ -282,7 +284,7 @@ class YDevice
             $this->_cache['_json'] = $yreq->result;
             $this->_cache['_precooked'] = $json_req;
         }
-        $this->_cache['_expiration'] = YAPI::GetTickCount() + YAPI::$defaultCacheValidity;
+        $this->_cacheExpiration = YAPI::GetTickCount() + YAPI::$defaultCacheValidity;
 
         return new YAPI_YReq($this->_serialNumber . ".module",
             YAPI::SUCCESS, 'no error', $this->_cache['_json'], $this->_cache['_precooked']);
@@ -292,7 +294,7 @@ class YDevice
 
     // Reload a device API (store in cache), and update YAPI function lists accordingly
     // Intended to be called within UpdateDeviceList only
-    public function refresh()
+    public function refresh(): int
     {
         $yreq = $this->requestAPI();
         if ($yreq->errorType != YAPI::SUCCESS) {
@@ -352,7 +354,7 @@ class YDevice
     }
 
     // Force the REST API string in cache to expire immediately
-    public function dropCache()
+    public function dropCache(): void
     {
         $this->_cache['_expiration'] = 0;
     }
@@ -364,7 +366,7 @@ class YDevice
      *
      * On failure, throws an exception or returns a negative error code.
      */
-    public function functionCount()
+    public function functionCount(): int
     {
         $funcPos = 0;
         foreach ($this->_functions as $fundef) {
@@ -376,14 +378,14 @@ class YDevice
     /**
      * Retrieves the hardware identifier of the <i>n</i>th function on the module.
      *
-     * @param functionIndex : the index of the function for which the information is desired, starting at
+     * @param int $functionIndex : the index of the function for which the information is desired, starting at
      * 0 for the first function.
      *
      * @return string : a string corresponding to the unambiguous hardware identifier of the requested module function
      *
      * On failure, throws an exception or returns an empty string.
      */
-    public function functionId($functionIndex)
+    public function functionId(int $functionIndex): string
     {
         $funcPos = 0;
         foreach ($this->_functions as $fundef) {
@@ -395,7 +397,7 @@ class YDevice
         return '';
     }
 
-    public function functionBaseType($functionIndex)
+    public function functionBaseType(int $functionIndex): string
     {
         $fid = $this->functionId($functionIndex);
         if ($fid != '') {
@@ -409,7 +411,7 @@ class YDevice
         return 'Function';
     }
 
-    public function functionType($functionIndex)
+    public function functionType(int $functionIndex): string
     {
         $fid = $this->functionId($functionIndex);
         if ($fid != '') {
@@ -426,14 +428,14 @@ class YDevice
     /**
      * Retrieves the logical name of the <i>n</i>th function on the module.
      *
-     * @param functionIndex : the index of the function for which the information is desired, starting at
+     * @param $functionIndex : the index of the function for which the information is desired, starting at
      * 0 for the first function.
      *
      * @return string:  a string corresponding to the logical name of the requested module function
      *
      * On failure, throws an exception or returns an empty string.
      */
-    public function functionName($functionIndex)
+    public function functionName(int $functionIndex): string
     {
         $funcPos = 0;
         foreach ($this->_functions as $fundef) {
@@ -448,7 +450,7 @@ class YDevice
     /**
      * Retrieves the advertised value of the <i>n</i>th function on the module.
      *
-     * @param functionIndex : the index of the function for which the information is desired, starting at
+     * @param int functionIndex : the index of the function for which the information is desired, starting at
      * 0 for the first function.
      *
      * @return string : a short string (up to 6 characters) corresponding to the advertised value of the requested
@@ -456,7 +458,7 @@ class YDevice
      *
      * On failure, throws an exception or returns an empty string.
      */
-    public function functionValue($functionIndex)
+    public function functionValue(int $functionIndex): string
     {
         $fid = $this->functionId($functionIndex);
         if ($fid != '') {
@@ -474,7 +476,7 @@ class YDevice
      *
      * On failure, throws an exception or returns an empty string.
      */
-    public function functionIdByFunYdx($funYdx)
+    public function functionIdByFunYdx(int $funYdx): string
     {
         if (isset($this->_functions[$funYdx])) {
             return $this->_functions[$funYdx][0];

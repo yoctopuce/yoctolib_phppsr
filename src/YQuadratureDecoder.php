@@ -25,7 +25,7 @@ class YQuadratureDecoder extends YSensor
 
     //--- (end of YQuadratureDecoder attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YQuadratureDecoder constructor)
         parent::__construct($str_func);
@@ -36,7 +36,7 @@ class YQuadratureDecoder extends YSensor
 
     //--- (YQuadratureDecoder implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'speed':
@@ -62,6 +62,7 @@ class YQuadratureDecoder extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_currentValue(float $newval): int
     {
@@ -75,6 +76,7 @@ class YQuadratureDecoder extends YSensor
      * @return float  a floating point number corresponding to the cycle frequency, in Hz
      *
      * On failure, throws an exception or returns YQuadratureDecoder::SPEED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_speed(): float
     {
@@ -95,6 +97,7 @@ class YQuadratureDecoder extends YSensor
      * the current activation state of the quadrature decoder
      *
      * On failure, throws an exception or returns YQuadratureDecoder::DECODING_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_decoding(): int
     {
@@ -119,6 +122,7 @@ class YQuadratureDecoder extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_decoding(int $newval): int
     {
@@ -132,6 +136,7 @@ class YQuadratureDecoder extends YSensor
      * @return int  an integer corresponding to the edge count per full cycle configuration setting
      *
      * On failure, throws an exception or returns YQuadratureDecoder::EDGESPERCYCLE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_edgesPerCycle(): int
     {
@@ -155,6 +160,7 @@ class YQuadratureDecoder extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_edgesPerCycle(int $newval): int
     {
@@ -190,7 +196,7 @@ class YQuadratureDecoder extends YSensor
      *
      * @return YQuadratureDecoder  a YQuadratureDecoder object allowing you to drive the quadrature decoder.
      */
-    public static function FindQuadratureDecoder(string $func): ?YQuadratureDecoder
+    public static function FindQuadratureDecoder(string $func): YQuadratureDecoder
     {
         // $obj                    is a YQuadratureDecoder;
         $obj = YFunction::_FindFromCache('QuadratureDecoder', $func);
@@ -201,32 +207,50 @@ class YQuadratureDecoder extends YSensor
         return $obj;
     }
 
-    public function setCurrentValue(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCurrentValue(float $newval): int
 {
     return $this->set_currentValue($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function speed(): float
 {
     return $this->get_speed();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function decoding(): int
 {
     return $this->get_decoding();
 }
 
-    public function setDecoding(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setDecoding(int $newval): int
 {
     return $this->set_decoding($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function edgesPerCycle(): int
 {
     return $this->get_edgesPerCycle();
 }
 
-    public function setEdgesPerCycle(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setEdgesPerCycle(int $newval): int
 {
     return $this->set_edgesPerCycle($newval);
 }
@@ -237,7 +261,7 @@ class YQuadratureDecoder extends YSensor
      * If you want to find a specific a quadrature decoder, use QuadratureDecoder.findQuadratureDecoder()
      * and a hardwareID or a logical name.
      *
-     * @return YQuadratureDecoder  a pointer to a YQuadratureDecoder object, corresponding to
+     * @return ?YQuadratureDecoder  a pointer to a YQuadratureDecoder object, corresponding to
      *         a quadrature decoder currently online, or a null pointer
      *         if there are no more quadrature decoders to enumerate.
      */
@@ -259,11 +283,11 @@ class YQuadratureDecoder extends YSensor
      * Use the method YQuadratureDecoder::nextQuadratureDecoder() to iterate on
      * next quadrature decoders.
      *
-     * @return YQuadratureDecoder  a pointer to a YQuadratureDecoder object, corresponding to
+     * @return ?YQuadratureDecoder  a pointer to a YQuadratureDecoder object, corresponding to
      *         the first quadrature decoder currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstQuadratureDecoder()
+    public static function FirstQuadratureDecoder(): ?YQuadratureDecoder
     {
         $next_hwid = YAPI::getFirstHardwareId('QuadratureDecoder');
         if ($next_hwid == null) {

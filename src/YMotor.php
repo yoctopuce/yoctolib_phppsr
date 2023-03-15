@@ -44,7 +44,7 @@ class YMotor extends YFunction
 
     //--- (end of YMotor attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YMotor constructor)
         parent::__construct($str_func);
@@ -55,7 +55,7 @@ class YMotor extends YFunction
 
     //--- (YMotor implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'motorStatus':
@@ -108,6 +108,7 @@ class YMotor extends YFunction
      * YMotor::MOTORSTATUS_HICURR, YMotor::MOTORSTATUS_HIHEAT and YMotor::MOTORSTATUS_FAILSF
      *
      * On failure, throws an exception or returns YMotor::MOTORSTATUS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_motorStatus(): int
     {
@@ -121,6 +122,9 @@ class YMotor extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_motorStatus(int $newval): int
     {
         $rest_val = strval($newval);
@@ -139,6 +143,7 @@ class YMotor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_drivingForce(float $newval): int
     {
@@ -153,6 +158,7 @@ class YMotor extends YFunction
      * percentage between -100% and +100%
      *
      * On failure, throws an exception or returns YMotor::DRIVINGFORCE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_drivingForce(): float
     {
@@ -177,6 +183,7 @@ class YMotor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_brakingForce(float $newval): int
     {
@@ -191,6 +198,7 @@ class YMotor extends YFunction
      * @return float  a floating point number corresponding to the braking force applied to the motor, as a percentage
      *
      * On failure, throws an exception or returns YMotor::BRAKINGFORCE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_brakingForce(): float
     {
@@ -220,6 +228,7 @@ class YMotor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_cutOffVoltage(float $newval): int
     {
@@ -237,6 +246,7 @@ class YMotor extends YFunction
      *         and prevents further current draw
      *
      * On failure, throws an exception or returns YMotor::CUTOFFVOLTAGE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_cutOffVoltage(): float
     {
@@ -258,6 +268,7 @@ class YMotor extends YFunction
      *         switches to error state
      *
      * On failure, throws an exception or returns YMotor::OVERCURRENTLIMIT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_overCurrentLimit(): int
     {
@@ -285,6 +296,7 @@ class YMotor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_overCurrentLimit(int $newval): int
     {
@@ -304,6 +316,7 @@ class YMotor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_frequency(float $newval): int
     {
@@ -317,6 +330,7 @@ class YMotor extends YFunction
      * @return float  a floating point number corresponding to the PWM frequency used to control the motor
      *
      * On failure, throws an exception or returns YMotor::FREQUENCY_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_frequency(): float
     {
@@ -339,6 +353,7 @@ class YMotor extends YFunction
      *         it start up
      *
      * On failure, throws an exception or returns YMotor::STARTERTIME_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_starterTime(): int
     {
@@ -364,6 +379,7 @@ class YMotor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_starterTime(int $newval): int
     {
@@ -382,6 +398,7 @@ class YMotor extends YFunction
      *         receiving any instruction from the control process
      *
      * On failure, throws an exception or returns YMotor::FAILSAFETIMEOUT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_failSafeTimeout(): int
     {
@@ -410,6 +427,7 @@ class YMotor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_failSafeTimeout(int $newval): int
     {
@@ -417,6 +435,9 @@ class YMotor extends YFunction
         return $this->_setAttr("failSafeTimeout", $rest_val);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -429,6 +450,9 @@ class YMotor extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -463,7 +487,7 @@ class YMotor extends YFunction
      *
      * @return YMotor  a YMotor object allowing you to drive the motor.
      */
-    public static function FindMotor(string $func): ?YMotor
+    public static function FindMotor(string $func): YMotor
     {
         // $obj                    is a YMotor;
         $obj = YFunction::_FindFromCache('Motor', $func);
@@ -503,6 +527,7 @@ class YMotor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function drivingForceMove(float $targetPower, int $delay): int
     {
@@ -518,98 +543,153 @@ class YMotor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function brakingForceMove(float $targetPower, int $delay): int
     {
         return $this->set_command(sprintf('B%d,%d',round($targetPower*10),$delay));
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function motorStatus(): int
 {
     return $this->get_motorStatus();
 }
 
-    public function setMotorStatus(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMotorStatus(int $newval): int
 {
     return $this->set_motorStatus($newval);
 }
 
-    public function setDrivingForce(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setDrivingForce(float $newval): int
 {
     return $this->set_drivingForce($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function drivingForce(): float
 {
     return $this->get_drivingForce();
 }
 
-    public function setBrakingForce(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setBrakingForce(float $newval): int
 {
     return $this->set_brakingForce($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function brakingForce(): float
 {
     return $this->get_brakingForce();
 }
 
-    public function setCutOffVoltage(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCutOffVoltage(float $newval): int
 {
     return $this->set_cutOffVoltage($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function cutOffVoltage(): float
 {
     return $this->get_cutOffVoltage();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function overCurrentLimit(): int
 {
     return $this->get_overCurrentLimit();
 }
 
-    public function setOverCurrentLimit(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setOverCurrentLimit(int $newval): int
 {
     return $this->set_overCurrentLimit($newval);
 }
 
-    public function setFrequency(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setFrequency(float $newval): int
 {
     return $this->set_frequency($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function frequency(): float
 {
     return $this->get_frequency();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function starterTime(): int
 {
     return $this->get_starterTime();
 }
 
-    public function setStarterTime(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setStarterTime(int $newval): int
 {
     return $this->set_starterTime($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function failSafeTimeout(): int
 {
     return $this->get_failSafeTimeout();
 }
 
-    public function setFailSafeTimeout(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setFailSafeTimeout(int $newval): int
 {
     return $this->set_failSafeTimeout($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
@@ -620,7 +700,7 @@ class YMotor extends YFunction
      * If you want to find a specific a motor, use Motor.findMotor()
      * and a hardwareID or a logical name.
      *
-     * @return YMotor  a pointer to a YMotor object, corresponding to
+     * @return ?YMotor  a pointer to a YMotor object, corresponding to
      *         a motor currently online, or a null pointer
      *         if there are no more motors to enumerate.
      */
@@ -642,11 +722,11 @@ class YMotor extends YFunction
      * Use the method YMotor::nextMotor() to iterate on
      * next motors.
      *
-     * @return YMotor  a pointer to a YMotor object, corresponding to
+     * @return ?YMotor  a pointer to a YMotor object, corresponding to
      *         the first motor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstMotor()
+    public static function FirstMotor(): ?YMotor
     {
         $next_hwid = YAPI::getFirstHardwareId('Motor');
         if ($next_hwid == null) {

@@ -22,7 +22,7 @@ class YFiles extends YFunction
 
     //--- (end of generated code: YFiles attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (generated code: YFiles constructor)
         parent::__construct($str_func);
@@ -33,7 +33,7 @@ class YFiles extends YFunction
 
     //--- (generated code: YFiles implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'filesCount':
@@ -52,6 +52,7 @@ class YFiles extends YFunction
      * @return int  an integer corresponding to the number of files currently loaded in the filesystem
      *
      * On failure, throws an exception or returns YFiles::FILESCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_filesCount(): int
     {
@@ -71,6 +72,7 @@ class YFiles extends YFunction
      * @return int  an integer corresponding to the free space for uploading new files to the filesystem, in bytes
      *
      * On failure, throws an exception or returns YFiles::FREESPACE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_freeSpace(): int
     {
@@ -112,7 +114,7 @@ class YFiles extends YFunction
      *
      * @return YFiles  a YFiles object allowing you to drive the filesystem.
      */
-    public static function FindFiles(string $func): ?YFiles
+    public static function FindFiles(string $func): YFiles
     {
         // $obj                    is a YFiles;
         $obj = YFunction::_FindFromCache('Files', $func);
@@ -123,6 +125,9 @@ class YFiles extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function sendCommand(string $command): string
     {
         // $url                    is a str;
@@ -138,6 +143,7 @@ class YFiles extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function format_fs(): int
     {
@@ -161,6 +167,7 @@ class YFiles extends YFunction
      *         and name, byte size and 32-bit CRC of the file content.
      *
      * On failure, throws an exception or returns an empty list.
+     * @throws YAPI_Exception on error
      */
     public function get_list(string $pattern): array
     {
@@ -186,6 +193,7 @@ class YFiles extends YFunction
      * @return boolean  a true if the file exist, false otherwise.
      *
      * On failure, throws an exception.
+     * @throws YAPI_Exception on error
      */
     public function fileExist(string $filename): bool
     {
@@ -210,6 +218,7 @@ class YFiles extends YFunction
      * @return string  a binary buffer with the file content
      *
      * On failure, throws an exception or returns an empty content.
+     * @throws YAPI_Exception on error
      */
     public function download(string $pathname): string
     {
@@ -226,6 +235,7 @@ class YFiles extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function upload(string $pathname, string $content): int
     {
@@ -245,6 +255,7 @@ class YFiles extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function remove(string $pathname): int
     {
@@ -256,11 +267,17 @@ class YFiles extends YFunction
         return YAPI::SUCCESS;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function filesCount(): int
 {
     return $this->get_filesCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function freeSpace(): int
 {
     return $this->get_freeSpace();
@@ -272,7 +289,7 @@ class YFiles extends YFunction
      * If you want to find a specific a filesystem, use Files.findFiles()
      * and a hardwareID or a logical name.
      *
-     * @return YFiles  a pointer to a YFiles object, corresponding to
+     * @return ?YFiles  a pointer to a YFiles object, corresponding to
      *         a filesystem currently online, or a null pointer
      *         if there are no more filesystems to enumerate.
      */
@@ -294,11 +311,11 @@ class YFiles extends YFunction
      * Use the method YFiles::nextFiles() to iterate on
      * next filesystems.
      *
-     * @return YFiles  a pointer to a YFiles object, corresponding to
+     * @return ?YFiles  a pointer to a YFiles object, corresponding to
      *         the first filesystem currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstFiles()
+    public static function FirstFiles(): ?YFiles
     {
         $next_hwid = YAPI::getFirstHardwareId('Files');
         if ($next_hwid == null) {
@@ -308,4 +325,5 @@ class YFiles extends YFunction
     }
 
     //--- (end of generated code: YFiles implementation)
-};
+}
+

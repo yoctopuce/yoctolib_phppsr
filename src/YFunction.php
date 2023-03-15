@@ -1,5 +1,6 @@
 <?php
 namespace Yoctopuce\YoctoAPI;
+use Exception;
 
 /**
  * YFunction Class: Common function interface
@@ -28,17 +29,17 @@ class YFunction
     const FRIENDLYNAME_INVALID = YAPI::INVALID_STRING;
 
     /** @var YFunction[] */
-    public static $_TimedReportCallbackList = array();
+    public static array $_TimedReportCallbackList = array();
     /** @var YFunction[] */
-    public static $_ValueCallbackList = array();
+    public static array $_ValueCallbackList = array();
 
-    protected $_className = 'Function';
-    protected $_func;
-    protected $_lastErrorType = YAPI::SUCCESS;
-    protected $_lastErrorMsg = 'no error';
-    protected $_dataStreams;
-    protected $_userData = null;
-    protected $_cache;
+    protected string $_className = 'Function';
+    protected string $_func;
+    protected int $_lastErrorType = YAPI::SUCCESS;
+    protected string $_lastErrorMsg = 'no error';
+    protected array $_dataStreams;
+    protected mixed $_userData = null;
+    protected array $_cache;
     //--- (generated code: YFunction attributes)
     protected string $_logicalName = self::LOGICALNAME_INVALID;    // Text
     protected string $_advertisedValue = self::ADVERTISEDVALUE_INVALID; // PubText
@@ -50,10 +51,10 @@ class YFunction
 
     //--- (end of generated code: YFunction attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         $this->_func = $str_func;
-        $this->_cache = array('_expiration' => 0);
+        $this->_cache = array();
         $this->_dataStreams = array();
 
         //--- (generated code: YFunction constructor)
@@ -61,13 +62,13 @@ class YFunction
     }
 
     // internal helper for YFunctionType
-    function _getHwId()
+    function _getHwId(): string
     {
         return $this->_hwId;
     }
 
 
-    private function isReadOnly_internal()
+    private function isReadOnly_internal(): bool
     {
         try {
             $serial = $this->get_serialNumber();
@@ -80,12 +81,9 @@ class YFunction
 
     //--- (generated code: YFunction implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
-            case '_expiration':
-                $this->_cacheExpiration = $val;
-                return 1;
         case 'logicalName':
             $this->_logicalName = $val;
             return 1;
@@ -102,6 +100,7 @@ class YFunction
      * @return string  a string corresponding to the logical name of the function
      *
      * On failure, throws an exception or returns YFunction.LOGICALNAME_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_logicalName(): string
     {
@@ -126,6 +125,7 @@ class YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_logicalName(string $newval): int
     {
@@ -142,6 +142,7 @@ class YFunction
      * @return string  a string corresponding to a short string representing the current state of the function
      *
      * On failure, throws an exception or returns YFunction.ADVERTISEDVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_advertisedValue(): string
     {
@@ -155,6 +156,9 @@ class YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_advertisedValue(string $newval): int
     {
         $rest_val = $newval;
@@ -189,7 +193,7 @@ class YFunction
      *
      * @return YFunction  a YFunction object allowing you to drive the function.
      */
-    public static function FindFunction(string $func): ?YFunction
+    public static function FindFunction(string $func): YFunction
     {
         // $obj                    is a YFunction;
         $obj = YFunction::_FindFromCache('Function', $func);
@@ -231,11 +235,13 @@ class YFunction
         return 0;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _invokeValueCallback(string $value): int
     {
         if (!is_null($this->_valueCallbackFunction)) {
             call_user_func($this->_valueCallbackFunction, $this, $value);
-        } else {
         }
         return 0;
     }
@@ -250,6 +256,7 @@ class YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function muteValueCallbacks(): int
     {
@@ -265,6 +272,7 @@ class YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function unmuteValueCallbacks(): int
     {
@@ -280,6 +288,7 @@ class YFunction
      * @return string  a string with the value of the the attribute
      *
      * On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
     public function loadAttribute(string $attrName): string
     {
@@ -310,6 +319,7 @@ class YFunction
      * @return string  a string corresponding to the serial number of the module, as set by the factory.
      *
      * On failure, throws an exception or returns YFunction.SERIALNUMBER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_serialNumber(): string
     {
@@ -318,27 +328,42 @@ class YFunction
         return $m->get_serialNumber();
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _parserHelper(): int
     {
         return 0;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function logicalName(): string
 {
     return $this->get_logicalName();
 }
 
-    public function setLogicalName(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setLogicalName(string $newval): int
 {
     return $this->set_logicalName($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function advertisedValue(): string
 {
     return $this->get_advertisedValue();
 }
 
-    public function setAdvertisedValue(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setAdvertisedValue(string $newval): int
 {
     return $this->set_advertisedValue($newval);
 }
@@ -362,7 +387,7 @@ class YFunction
     /**
      * comment from .yc definition
      */
-    public static function FirstFunction()
+    public static function FirstFunction(): ?YFunction
     {
         $next_hwid = YAPI::getFirstHardwareId('Function');
         if ($next_hwid == null) {
@@ -393,7 +418,7 @@ class YFunction
      * @param YFunction $obj_func
      * @param bool $bool_add
      */
-    public static function _UpdateValueCallbackList($obj_func, $bool_add)
+    public static function _UpdateValueCallbackList(YFunction $obj_func, bool $bool_add): void
     {
         $index = array_search($obj_func, self::$_ValueCallbackList);
         if ($bool_add) {
@@ -411,7 +436,7 @@ class YFunction
      * @param YFunction $obj_func
      * @param bool $bool_add
      */
-    public static function _UpdateTimedReportCallbackList($obj_func, $bool_add)
+    public static function _UpdateTimedReportCallbackList(YFunction $obj_func, bool $bool_add): void
     {
         $index = array_search($obj_func, self::$_TimedReportCallbackList);
         if ($bool_add) {
@@ -424,8 +449,11 @@ class YFunction
         }
     }
 
-    // Throw an exception, keeping track of it in the object itself
-    public function _throw($int_errType, $str_errMsg, $obj_retVal = null)
+    /**
+     *  Throw an exception, keeping track of it in the object itself
+     * @throws YAPI_Exception
+     */
+    public function _throw(int $int_errType, string $str_errMsg, mixed $obj_retVal = null): mixed
     {
         $this->_lastErrorType = $int_errType;
         $this->_lastErrorMsg = $str_errMsg;
@@ -453,7 +481,7 @@ class YFunction
      * @return string  a string that describes the function
      *         (ex: Relay(MyCustomName.relay1)=RELAYLO1-123456.relay1)
      */
-    public function describe()
+    public function describe(): string
     {
         $resolve = YAPI::resolveFunction($this->_className, $this->_func);
         if ($resolve->errorType != YAPI::SUCCESS && $resolve->result != $this->_func) {
@@ -470,8 +498,9 @@ class YFunction
      * @return string  a string that uniquely identifies the function (ex: RELAYLO1-123456.relay1)
      *
      * On failure, throws an exception or returns  YFunction.HARDWAREID_INVALID.
+     * @throws YAPI_Exception on error
      */
-    public function get_hardwareId()
+    public function get_hardwareId(): string
     {
         $resolve = YAPI::resolveFunction($this->_className, $this->_func);
         if ($resolve->errorType != YAPI::SUCCESS) {
@@ -491,8 +520,9 @@ class YFunction
      * @return string  a string that identifies the function (ex: relay1)
      *
      * On failure, throws an exception or returns  YFunction.FUNCTIONID_INVALID.
+     * @throws YAPI_Exception on error
      */
-    public function get_functionId()
+    public function get_functionId(): string
     {
         $resolve = YAPI::resolveFunction($this->_className, $this->_func);
         if ($resolve->errorType != YAPI::SUCCESS) {
@@ -515,8 +545,9 @@ class YFunction
      *         (ex: MyCustomName.relay1)
      *
      * On failure, throws an exception or returns  YFunction.FRIENDLYNAME_INVALID.
+     * @throws YAPI_Exception on error
      */
-    public function get_friendlyName()
+    public function get_friendlyName(): string
     {
         $resolve = YAPI::getFriendlyNameFunction($this->_className, $this->_func);
         if ($resolve->errorType != YAPI::SUCCESS) {
@@ -535,7 +566,7 @@ class YFunction
     protected function _parse(YAPI_YReq $yreq, float $msValidity): void
     {
         // save the whole structure for backward-compatibility
-        $yreq->result["_expiration"] = YAPI::GetTickCount() + $msValidity;
+        $this->_cacheExpiration = YAPI::GetTickCount() + $msValidity;
         $this->_serial = $yreq->deviceid;
         $this->_funId = $yreq->functionid;
         $this->_hwId = $yreq->hwid;
@@ -549,9 +580,9 @@ class YFunction
 
     // Return the value of an attribute from function cache, after reloading it from device if needed
     // Note: the function cache is a typed (parsed) cache, contrarily to the agnostic device cache
-    protected function _getAttr(string $str_attr)
+    protected function _getAttr(string $str_attr): ?string
     {
-        if ($this->_cache['_expiration'] <= YAPI::GetTickCount()) {
+        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
             // no valid cached value, reload from device
             if ($this->load(YAPI::$defaultCacheValidity) != YAPI::SUCCESS) {
                 return null;
@@ -564,9 +595,9 @@ class YFunction
     }
 
     // Return the value of an attribute from function cache, after loading it from device if never done
-    protected function _getFixedAttr($str_attr)
+    protected function _getFixedAttr(string $str_attr): ?string
     {
-        if ($this->_cache['_expiration'] == 0) {
+        if ($this->_cacheExpiration == 0) {
             // no cached value, load from device
             if ($this->load(YAPI::$defaultCacheValidity) != YAPI::SUCCESS) {
                 return null;
@@ -578,7 +609,7 @@ class YFunction
         return $this->_cache[$str_attr];
     }
 
-    protected function _escapeAttr($str_newval)
+    protected function _escapeAttr(string $str_newval): string
     {
         // urlencode according to RFC 3986 instead of php default RFC 1738
         $safecodes = array('%21', '%23', '%24', '%27', '%28', '%29', '%2A', '%2C', '%2F', '%3A', '%3B', '%40', '%3F', '%5B', '%5D');
@@ -586,9 +617,11 @@ class YFunction
         return str_replace($safecodes, $safechars, urlencode($str_newval));
     }
 
-
-    // Change the value of an attribute on a device, and update cache on the fly
-    // Note: the function cache is a typed (parsed) cache, contrarily to the agnostic device cache
+    /**
+     * Change the value of an attribute on a device, and update cache on the fly
+     * Note: the function cache is a typed (parsed) cache, contrarily to the agnostic device cache
+     * @throws YAPI_Exception
+     */
     protected function _setAttr(string $str_attr, string $str_newval): int
     {
         if (!isset($str_newval)) {
@@ -600,8 +633,8 @@ class YFunction
         $attrname = str_replace($safecodes, $safechars, urlencode($str_attr));
         $extra = "/$attrname?$attrname=" . $this->_escapeAttr($str_newval) . "&.";
         $yreq = YAPI::funcRequest($this->_className, $this->_func, $extra);
-        if ($this->_cache['_expiration'] != 0) {
-            $this->_cache['_expiration'] = YAPI::GetTickCount();
+        if ($this->_cacheExpiration != 0) {
+            $this->_cacheExpiration = YAPI::GetTickCount();
         }
         if ($yreq->errorType != YAPI::SUCCESS) {
             return $this->_throw($yreq->errorType, $yreq->errorMsg, $yreq->errorType);
@@ -609,9 +642,11 @@ class YFunction
         return YAPI::SUCCESS;
     }
 
-    // Execute an arbitrary HTTP GET request on the device and return the binary content
-    //
-    public function _download($str_path)
+    /**
+     * Execute an arbitrary HTTP GET request on the device and return the binary content
+     * @throws YAPI_Exception
+     */
+    public function _download(string $str_path): mixed
     {
         // get the device serial number
         $devid = $this->module()->get_serialNumber();
@@ -625,10 +660,15 @@ class YFunction
         return $yreq->result;
     }
 
-    // Upload a file to the filesystem, to the specified full path name.
-    // If a file already exists with the same path name, its content is overwritten.
-    //
-    public function _upload($str_path, $bin_content)
+    /**
+     * Upload a file to the filesystem, to the specified full path name.
+     * If a file already exists with the same path name, its content is overwritten.
+     * @param string $str_path
+     * @param mixed $bin_content
+     * @return int
+     * @throws YAPI_Exception
+     */
+    public function _upload(string $str_path, mixed $bin_content): int
     {
         // get the device serial number
         $devid = $this->module()->get_serialNumber();
@@ -652,7 +692,7 @@ class YFunction
     // Upload a file to the filesystem, to the specified full path name.
     // If a file already exists with the same path name, its content is overwritten.
     //
-    public function _uploadEx($str_path, $bin_content)
+    public function _uploadEx(string $str_path, mixed $bin_content)
     {
         // get the device serial number
         $devid = $this->module()->get_serialNumber();
@@ -676,7 +716,7 @@ class YFunction
 
     // Get a value from a JSON buffer
     //
-    public function _json_get_key($bin_jsonbuff, $str_key)
+    public function _json_get_key(string $bin_jsonbuff, string $str_key): mixed
     {
         $loadval = json_decode($bin_jsonbuff, true);
         if (isset($loadval[$str_key])) {
@@ -687,14 +727,14 @@ class YFunction
 
     // Get a string from a JSON buffer
     //
-    public function _json_get_string($bin_jsonbuff)
+    public function _json_get_string(string $bin_jsonbuff): string
     {
         return json_decode($bin_jsonbuff, true);
     }
 
     // Get an array of strings from a JSON buffer
     //
-    public function _json_get_array($bin_jsonbuff)
+    public function _json_get_array(string $bin_jsonbuff): array
     {
         $loadval = json_decode($bin_jsonbuff, true);
         $res = array();
@@ -704,7 +744,7 @@ class YFunction
         return $res;
     }
 
-    public function _get_json_path($str_json, $path)
+    public function _get_json_path(string $str_json, string $path): string
     {
         $json = json_decode($str_json, true);
         $paths = explode('|', $path);
@@ -718,9 +758,12 @@ class YFunction
         return json_encode($json);
     }
 
-    public function _decode_json_string($json)
+    public function _decode_json_string(string $json): string
     {
         $decoded = json_decode($json);
+        if (is_null($decoded)) {
+            return '';
+        }
         return $decoded;
     }
 
@@ -728,9 +771,9 @@ class YFunction
      * Method used to cache DataStream objects (new DataLogger)
      * @param YDataSet $obj_dataset
      * @param string $str_def
-     * @return YDataStream
+     * @return ?YDataStream
      */
-    public function _findDataStream($obj_dataset, $str_def)
+    public function _findDataStream(YDataSet $obj_dataset, string $str_def): ?YDataStream
     {
         $key = $obj_dataset->get_functionId() . ":" . $str_def;
         if (isset($this->_dataStreams[$key])) {
@@ -748,13 +791,13 @@ class YFunction
     }
 
     // Method used to clear cache of DataStream object (undocumented)
-    public function _clearDataStreamCache()
+    public function _clearDataStreamCache(): void
     {
         $this->_dataStreams = array();
     }
 
 
-    public function _getValueCallback()
+    public function _getValueCallback(): callable
     {
         return $this->_valueCallbackFunction;
     }
@@ -768,10 +811,10 @@ class YFunction
      *
      * @return boolean  true if the function can be reached, and false otherwise
      */
-    public function isOnline()
+    public function isOnline(): bool
     {
         // A valid value in cache means that the device is online
-        if ($this->_cache['_expiration'] > YAPI::GetTickCount()) {
+        if ($this->_cacheExpiration > YAPI::GetTickCount()) {
             return true;
         }
 
@@ -794,17 +837,17 @@ class YFunction
      * @return int  a number corresponding to the code of the latest error that occurred while
      *         using the function object
      */
-    public function get_errorType()
+    public function get_errorType(): int
     {
         return $this->_lastErrorType;
     }
 
-    public function errorType()
+    public function errorType(): int
     {
         return $this->_lastErrorType;
     }
 
-    public function errType()
+    public function errType(): int
     {
         return $this->_lastErrorType;
     }
@@ -817,17 +860,17 @@ class YFunction
      * @return string  a string corresponding to the latest error message that occured while
      *         using the function object
      */
-    public function get_errorMessage()
+    public function get_errorMessage(): string
     {
         return $this->_lastErrorMsg;
     }
 
-    public function errorMessage()
+    public function errorMessage(): string
     {
         return $this->_lastErrorMsg;
     }
 
-    public function errMessage()
+    public function errMessage(): string
     {
         return $this->_lastErrorMsg;
     }
@@ -845,6 +888,7 @@ class YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function load(float $msValidity): int
     {
@@ -863,7 +907,7 @@ class YFunction
      *
      * @noreturn
      */
-    public function clearCache()
+    public function clearCache(): void
     {
         $resolve = YAPI::resolveFunction($this->_className, $this->_func);
         if ($resolve->errorType != YAPI::SUCCESS) {
@@ -888,9 +932,9 @@ class YFunction
      * If the function cannot be located on any module, the returned instance of
      * YModule is not shown as on-line.
      *
-     * @return YModule  an instance of YModule
+     * @return ?YModule  an instance of YModule
      */
-    public function get_module()
+    public function get_module(): YModule
     {
         // try to resolve the function name to a device id without query
         if ($this->_serial != '') {
@@ -925,7 +969,7 @@ class YFunction
         return YModule::FindModule('module_of_' . $this->_className . '_' . $this->_func);
     }
 
-    public function module()
+    public function module(): YModule
     {
         return $this->get_module();
     }
@@ -939,7 +983,7 @@ class YFunction
      *
      * If the function has never been contacted, the returned value is Y$CLASSNAME$.FUNCTIONDESCRIPTOR_INVALID.
      */
-    public function get_functionDescriptor()
+    public function get_functionDescriptor(): string
     {
         // try to resolve the function name to a device id without query
         $hwid = $this->_func;
@@ -957,7 +1001,7 @@ class YFunction
         return YFunction::FUNCTIONDESCRIPTOR_INVALID;
     }
 
-    public function getFunctionDescriptor()
+    public function getFunctionDescriptor(): string
     {
         return $this->get_functionDescriptor();
     }
@@ -970,12 +1014,12 @@ class YFunction
      *
      * @return Object  the object stored previously by the caller.
      */
-    public function get_userData()
+    public function get_userData(): mixed
     {
         return $this->_userData;
     }
 
-    public function userData()
+    public function userData(): mixed
     {
         return $this->_userData;
     }
@@ -987,12 +1031,12 @@ class YFunction
      * @param Object $data : any kind of object to be stored
      * @noreturn
      */
-    public function set_userData($data)
+    public function set_userData(mixed $data): void
     {
         $this->_userData = $data;
     }
 
-    public function setUserData($data)
+    public function setUserData(mixed $data): void
     {
         $this->_userData = $data;
     }

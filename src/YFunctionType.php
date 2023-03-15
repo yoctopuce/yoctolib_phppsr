@@ -1,16 +1,16 @@
 <?php
 namespace Yoctopuce\YoctoAPI;
-//
-// YFunctionType Class (used internally)
-//
-// Instances of this class stores everything we know about a given type of function:
-// Mapping between function logical names and Hardware ID as discovered on hubs,
-// and existing instances of YFunction (either already connected or simply requested).
-// To keep it simple, this implementation separates completely the name resolution
-// mechanism, implemented using the yellow pages, and the storage and retrieval of
-// existing YFunction instances.
-//
 
+/**
+ * YFunctionType Class (used internally)
+ *
+ * Instances of this class stores everything we know about a given type of function:
+ * Mapping between function logical names and Hardware ID as discovered on hubs,
+ * and existing instances of YFunction (either already connected or simply requested).
+ * To keep it simple, this implementation separates completely the name resolution
+ * mechanism, implemented using the yellow pages, and the storage and retrieval of
+ * existing YFunction instances.
+ */
 class YFunctionType
 {
     // private attributes, to be used within yocto_api only
@@ -25,13 +25,9 @@ class YFunctionType
     /**
      * YFunctionType constructor.
      * @param string $str_classname
-     * @throws YAPI_Exception
      */
     function __construct(string $str_classname)
     {
-        if (ord($str_classname[strlen($str_classname) - 1]) <= 57) {
-            throw new YAPI_Exception("Invalid function type", -1);
-        }
         $this->_className = $str_classname;
         $this->_connectedFns = array();
         $this->_requestedFns = array();

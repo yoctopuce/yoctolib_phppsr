@@ -21,7 +21,7 @@ class YCarbonDioxide extends YSensor
 
     //--- (end of YCarbonDioxide attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YCarbonDioxide constructor)
         parent::__construct($str_func);
@@ -32,7 +32,7 @@ class YCarbonDioxide extends YSensor
 
     //--- (YCarbonDioxide implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'abcPeriod':
@@ -52,6 +52,7 @@ class YCarbonDioxide extends YSensor
      * @return int  an integer corresponding to the Automatic Baseline Calibration period, in hours
      *
      * On failure, throws an exception or returns YCarbonDioxide::ABCPERIOD_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_abcPeriod(): int
     {
@@ -78,6 +79,7 @@ class YCarbonDioxide extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_abcPeriod(int $newval): int
     {
@@ -85,6 +87,9 @@ class YCarbonDioxide extends YSensor
         return $this->_setAttr("abcPeriod", $rest_val);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -97,6 +102,9 @@ class YCarbonDioxide extends YSensor
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -131,7 +139,7 @@ class YCarbonDioxide extends YSensor
      *
      * @return YCarbonDioxide  a YCarbonDioxide object allowing you to drive the CO2 sensor.
      */
-    public static function FindCarbonDioxide(string $func): ?YCarbonDioxide
+    public static function FindCarbonDioxide(string $func): YCarbonDioxide
     {
         // $obj                    is a YCarbonDioxide;
         $obj = YFunction::_FindFromCache('CarbonDioxide', $func);
@@ -153,6 +161,7 @@ class YCarbonDioxide extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function triggerForcedCalibration(float $refVal): int
     {
@@ -173,12 +182,16 @@ class YCarbonDioxide extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function triggerBaselineCalibration(): int
     {
         return $this->set_command('BC');
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function triggetBaselineCalibration(): int
     {
         return $this->triggerBaselineCalibration();
@@ -200,33 +213,49 @@ class YCarbonDioxide extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function triggerZeroCalibration(): int
     {
         return $this->set_command('ZC');
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function triggetZeroCalibration(): int
     {
         return $this->triggerZeroCalibration();
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function abcPeriod(): int
 {
     return $this->get_abcPeriod();
 }
 
-    public function setAbcPeriod(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setAbcPeriod(int $newval): int
 {
     return $this->set_abcPeriod($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
@@ -237,7 +266,7 @@ class YCarbonDioxide extends YSensor
      * If you want to find a specific a CO2 sensor, use CarbonDioxide.findCarbonDioxide()
      * and a hardwareID or a logical name.
      *
-     * @return YCarbonDioxide  a pointer to a YCarbonDioxide object, corresponding to
+     * @return ?YCarbonDioxide  a pointer to a YCarbonDioxide object, corresponding to
      *         a CO2 sensor currently online, or a null pointer
      *         if there are no more CO2 sensors to enumerate.
      */
@@ -259,11 +288,11 @@ class YCarbonDioxide extends YSensor
      * Use the method YCarbonDioxide::nextCarbonDioxide() to iterate on
      * next CO2 sensors.
      *
-     * @return YCarbonDioxide  a pointer to a YCarbonDioxide object, corresponding to
+     * @return ?YCarbonDioxide  a pointer to a YCarbonDioxide object, corresponding to
      *         the first CO2 sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstCarbonDioxide()
+    public static function FirstCarbonDioxide(): ?YCarbonDioxide
     {
         $next_hwid = YAPI::getFirstHardwareId('CarbonDioxide');
         if ($next_hwid == null) {

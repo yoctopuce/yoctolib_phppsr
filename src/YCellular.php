@@ -66,7 +66,7 @@ class YCellular extends YFunction
 
     //--- (end of generated code: YCellular attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (generated code: YCellular constructor)
         parent::__construct($str_func);
@@ -77,7 +77,7 @@ class YCellular extends YFunction
 
     //--- (generated code: YCellular implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'linkQuality':
@@ -141,6 +141,7 @@ class YCellular extends YFunction
      * @return int  an integer corresponding to the link quality, expressed in percent
      *
      * On failure, throws an exception or returns YCellular::LINKQUALITY_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_linkQuality(): int
     {
@@ -160,6 +161,7 @@ class YCellular extends YFunction
      * @return string  a string corresponding to the name of the cell operator currently in use
      *
      * On failure, throws an exception or returns YCellular::CELLOPERATOR_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_cellOperator(): string
     {
@@ -180,6 +182,7 @@ class YCellular extends YFunction
      * MCC, MNC, LAC and Cell ID
      *
      * On failure, throws an exception or returns YCellular::CELLIDENTIFIER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_cellIdentifier(): string
     {
@@ -201,6 +204,7 @@ class YCellular extends YFunction
      * YCellular::CELLTYPE_CDMA, YCellular::CELLTYPE_LTE_M, YCellular::CELLTYPE_NB_IOT and YCellular::CELLTYPE_EC_GSM_IOT
      *
      * On failure, throws an exception or returns YCellular::CELLTYPE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_cellType(): int
     {
@@ -225,6 +229,7 @@ class YCellular extends YFunction
      *         the SIM card
      *
      * On failure, throws an exception or returns YCellular::IMSI_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_imsi(): string
     {
@@ -244,6 +249,7 @@ class YCellular extends YFunction
      * @return string  a string corresponding to the latest status message from the wireless interface
      *
      * On failure, throws an exception or returns YCellular::MESSAGE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_message(): string
     {
@@ -268,6 +274,7 @@ class YCellular extends YFunction
      *         was rejected by the SIM card
      *
      * On failure, throws an exception or returns YCellular::PIN_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pin(): string
     {
@@ -299,6 +306,7 @@ class YCellular extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_pin(string $newval): int
     {
@@ -316,6 +324,7 @@ class YCellular extends YFunction
      * @return string  a string corresponding to the type of protocol used over the serial line, as a string
      *
      * On failure, throws an exception or returns YCellular::RADIOCONFIG_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_radioConfig(): string
     {
@@ -345,6 +354,7 @@ class YCellular extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_radioConfig(string $newval): int
     {
@@ -363,6 +373,7 @@ class YCellular extends YFunction
      *         cell operators
      *
      * On failure, throws an exception or returns YCellular::LOCKEDOPERATOR_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_lockedOperator(): string
     {
@@ -388,6 +399,7 @@ class YCellular extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_lockedOperator(string $newval): int
     {
@@ -402,6 +414,7 @@ class YCellular extends YFunction
      * the airplane mode is active (radio turned off)
      *
      * On failure, throws an exception or returns YCellular::AIRPLANEMODE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_airplaneMode(): int
     {
@@ -424,6 +437,7 @@ class YCellular extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_airplaneMode(int $newval): int
     {
@@ -440,6 +454,7 @@ class YCellular extends YFunction
      * enabling IP data services (GPRS)
      *
      * On failure, throws an exception or returns YCellular::ENABLEDATA_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_enableData(): int
     {
@@ -470,6 +485,7 @@ class YCellular extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_enableData(int $newval): int
     {
@@ -484,6 +500,7 @@ class YCellular extends YFunction
      * @return string  a string corresponding to the Access Point Name (APN) to be used, if needed
      *
      * On failure, throws an exception or returns YCellular::APN_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_apn(): string
     {
@@ -508,6 +525,7 @@ class YCellular extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_apn(string $newval): int
     {
@@ -524,6 +542,7 @@ class YCellular extends YFunction
      *         in the device, or an empty string otherwise
      *
      * On failure, throws an exception or returns YCellular::APNSECRET_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_apnSecret(): string
     {
@@ -537,6 +556,9 @@ class YCellular extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_apnSecret(string $newval): int
     {
         $rest_val = $newval;
@@ -549,6 +571,7 @@ class YCellular extends YFunction
      * @return int  an integer corresponding to the automated connectivity check interval, in seconds
      *
      * On failure, throws an exception or returns YCellular::PINGINTERVAL_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pingInterval(): int
     {
@@ -572,6 +595,7 @@ class YCellular extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_pingInterval(int $newval): int
     {
@@ -585,6 +609,7 @@ class YCellular extends YFunction
      * @return int  an integer corresponding to the number of bytes sent so far
      *
      * On failure, throws an exception or returns YCellular::DATASENT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_dataSent(): int
     {
@@ -606,6 +631,7 @@ class YCellular extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_dataSent(int $newval): int
     {
@@ -619,6 +645,7 @@ class YCellular extends YFunction
      * @return int  an integer corresponding to the number of bytes received so far
      *
      * On failure, throws an exception or returns YCellular::DATARECEIVED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_dataReceived(): int
     {
@@ -640,6 +667,7 @@ class YCellular extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_dataReceived(int $newval): int
     {
@@ -647,6 +675,9 @@ class YCellular extends YFunction
         return $this->_setAttr("dataReceived", $rest_val);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -659,6 +690,9 @@ class YCellular extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -693,7 +727,7 @@ class YCellular extends YFunction
      *
      * @return YCellular  a YCellular object allowing you to drive the cellular interface.
      */
-    public static function FindCellular(string $func): ?YCellular
+    public static function FindCellular(string $func): YCellular
     {
         // $obj                    is a YCellular;
         $obj = YFunction::_FindFromCache('Cellular', $func);
@@ -717,6 +751,7 @@ class YCellular extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function sendPUK(string $puk, string $newPin): int
     {
@@ -739,6 +774,7 @@ class YCellular extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_apnAuth(string $username, string $password): int
     {
@@ -751,6 +787,7 @@ class YCellular extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function clearDataCounters(): int
     {
@@ -956,6 +993,9 @@ class YCellular extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function imm_decodePLMN(string $mccmnc): string
     {
         // $inputlen               is a int;
@@ -5450,142 +5490,226 @@ class YCellular extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function linkQuality(): int
 {
     return $this->get_linkQuality();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function cellOperator(): string
 {
     return $this->get_cellOperator();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function cellIdentifier(): string
 {
     return $this->get_cellIdentifier();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function cellType(): int
 {
     return $this->get_cellType();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function imsi(): string
 {
     return $this->get_imsi();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function message(): string
 {
     return $this->get_message();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pin(): string
 {
     return $this->get_pin();
 }
 
-    public function setPin(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPin(string $newval): int
 {
     return $this->set_pin($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function radioConfig(): string
 {
     return $this->get_radioConfig();
 }
 
-    public function setRadioConfig(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setRadioConfig(string $newval): int
 {
     return $this->set_radioConfig($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function lockedOperator(): string
 {
     return $this->get_lockedOperator();
 }
 
-    public function setLockedOperator(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setLockedOperator(string $newval): int
 {
     return $this->set_lockedOperator($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function airplaneMode(): int
 {
     return $this->get_airplaneMode();
 }
 
-    public function setAirplaneMode(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setAirplaneMode(int $newval): int
 {
     return $this->set_airplaneMode($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function enableData(): int
 {
     return $this->get_enableData();
 }
 
-    public function setEnableData(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setEnableData(int $newval): int
 {
     return $this->set_enableData($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function apn(): string
 {
     return $this->get_apn();
 }
 
-    public function setApn(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setApn(string $newval): int
 {
     return $this->set_apn($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function apnSecret(): string
 {
     return $this->get_apnSecret();
 }
 
-    public function setApnSecret(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setApnSecret(string $newval): int
 {
     return $this->set_apnSecret($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pingInterval(): int
 {
     return $this->get_pingInterval();
 }
 
-    public function setPingInterval(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPingInterval(int $newval): int
 {
     return $this->set_pingInterval($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function dataSent(): int
 {
     return $this->get_dataSent();
 }
 
-    public function setDataSent(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setDataSent(int $newval): int
 {
     return $this->set_dataSent($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function dataReceived(): int
 {
     return $this->get_dataReceived();
 }
 
-    public function setDataReceived(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setDataReceived(int $newval): int
 {
     return $this->set_dataReceived($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
@@ -5596,7 +5720,7 @@ class YCellular extends YFunction
      * If you want to find a specific a cellular interface, use Cellular.findCellular()
      * and a hardwareID or a logical name.
      *
-     * @return YCellular  a pointer to a YCellular object, corresponding to
+     * @return ?YCellular  a pointer to a YCellular object, corresponding to
      *         a cellular interface currently online, or a null pointer
      *         if there are no more cellular interfaces to enumerate.
      */
@@ -5618,11 +5742,11 @@ class YCellular extends YFunction
      * Use the method YCellular::nextCellular() to iterate on
      * next cellular interfaces.
      *
-     * @return YCellular  a pointer to a YCellular object, corresponding to
+     * @return ?YCellular  a pointer to a YCellular object, corresponding to
      *         the first cellular interface currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstCellular()
+    public static function FirstCellular(): ?YCellular
     {
         $next_hwid = YAPI::getFirstHardwareId('Cellular');
         if ($next_hwid == null) {
@@ -5633,4 +5757,4 @@ class YCellular extends YFunction
 
     //--- (end of generated code: YCellular implementation)
 
-};
+}

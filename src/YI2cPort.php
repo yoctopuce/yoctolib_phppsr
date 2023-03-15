@@ -52,7 +52,7 @@ class YI2cPort extends YFunction
 
     //--- (end of generated code: YI2cPort attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (generated code: YI2cPort constructor)
         parent::__construct($str_func);
@@ -63,7 +63,7 @@ class YI2cPort extends YFunction
 
     //--- (generated code: YI2cPort implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'rxCount':
@@ -118,6 +118,7 @@ class YI2cPort extends YFunction
      * @return int  an integer corresponding to the total number of bytes received since last reset
      *
      * On failure, throws an exception or returns YI2cPort::RXCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_rxCount(): int
     {
@@ -137,6 +138,7 @@ class YI2cPort extends YFunction
      * @return int  an integer corresponding to the total number of bytes transmitted since last reset
      *
      * On failure, throws an exception or returns YI2cPort::TXCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_txCount(): int
     {
@@ -156,6 +158,7 @@ class YI2cPort extends YFunction
      * @return int  an integer corresponding to the total number of communication errors detected since last reset
      *
      * On failure, throws an exception or returns YI2cPort::ERRCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_errCount(): int
     {
@@ -175,6 +178,7 @@ class YI2cPort extends YFunction
      * @return int  an integer corresponding to the total number of messages received since last reset
      *
      * On failure, throws an exception or returns YI2cPort::RXMSGCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_rxMsgCount(): int
     {
@@ -194,6 +198,7 @@ class YI2cPort extends YFunction
      * @return int  an integer corresponding to the total number of messages send since last reset
      *
      * On failure, throws an exception or returns YI2cPort::TXMSGCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_txMsgCount(): int
     {
@@ -213,6 +218,7 @@ class YI2cPort extends YFunction
      * @return string  a string corresponding to the latest message fully received (for Line and Frame protocols)
      *
      * On failure, throws an exception or returns YI2cPort::LASTMSG_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_lastMsg(): string
     {
@@ -232,6 +238,7 @@ class YI2cPort extends YFunction
      * @return string  a string corresponding to the name of the job file currently in use
      *
      * On failure, throws an exception or returns YI2cPort::CURRENTJOB_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_currentJob(): string
     {
@@ -254,6 +261,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_currentJob(string $newval): int
     {
@@ -267,6 +275,7 @@ class YI2cPort extends YFunction
      * @return string  a string corresponding to the job file to use when the device is powered on
      *
      * On failure, throws an exception or returns YI2cPort::STARTUPJOB_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_startupJob(): string
     {
@@ -290,6 +299,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_startupJob(string $newval): int
     {
@@ -303,6 +313,7 @@ class YI2cPort extends YFunction
      * @return int  an integer corresponding to the maximum number of tasks in a job that the device can handle
      *
      * On failure, throws an exception or returns YI2cPort::JOBMAXTASK_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_jobMaxTask(): int
     {
@@ -322,6 +333,7 @@ class YI2cPort extends YFunction
      * @return int  an integer corresponding to maximum size allowed for job files
      *
      * On failure, throws an exception or returns YI2cPort::JOBMAXSIZE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_jobMaxSize(): int
     {
@@ -335,6 +347,9 @@ class YI2cPort extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -347,6 +362,9 @@ class YI2cPort extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -362,6 +380,7 @@ class YI2cPort extends YFunction
      * @return string  a string corresponding to the type of protocol used to send I2C messages, as a string
      *
      * On failure, throws an exception or returns YI2cPort::PROTOCOL_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_protocol(): string
     {
@@ -390,6 +409,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_protocol(string $newval): int
     {
@@ -404,6 +424,7 @@ class YI2cPort extends YFunction
      * YI2cPort::I2CVOLTAGELEVEL_1V8 corresponding to the voltage level used on the I2C bus
      *
      * On failure, throws an exception or returns YI2cPort::I2CVOLTAGELEVEL_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_i2cVoltageLevel(): int
     {
@@ -428,6 +449,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_i2cVoltageLevel(int $newval): int
     {
@@ -446,6 +468,7 @@ class YI2cPort extends YFunction
      *         "400kbps,2000ms,NoRestart"
      *
      * On failure, throws an exception or returns YI2cPort::I2CMODE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_i2cMode(): string
     {
@@ -474,6 +497,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_i2cMode(string $newval): int
     {
@@ -509,7 +533,7 @@ class YI2cPort extends YFunction
      *
      * @return YI2cPort  a YI2cPort object allowing you to drive the I2C port.
      */
-    public static function FindI2cPort(string $func): ?YI2cPort
+    public static function FindI2cPort(string $func): YI2cPort
     {
         // $obj                    is a YI2cPort;
         $obj = YFunction::_FindFromCache('I2cPort', $func);
@@ -520,6 +544,9 @@ class YI2cPort extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function sendCommand(string $text): int
     {
         return $this->set_command($text);
@@ -537,6 +564,7 @@ class YI2cPort extends YFunction
      * @return string  a string with a single line of text
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function readLine(): string
     {
@@ -583,6 +611,7 @@ class YI2cPort extends YFunction
      *         Binary messages are converted to hexadecimal representation.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function readMessages(string $pattern, int $maxWait): array
     {
@@ -656,6 +685,9 @@ class YI2cPort extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function end_tell(): int
     {
         // $availPosStr            is a str;
@@ -681,6 +713,7 @@ class YI2cPort extends YFunction
      *         Additional lines can be obtained by calling readLine or readMessages.
      *
      * On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
     public function queryLine(string $query, int $maxWait): string
     {
@@ -728,6 +761,7 @@ class YI2cPort extends YFunction
      *         Additional frames can be obtained by calling readHex or readMessages.
      *
      * On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
     public function queryHex(string $hexString, int $maxWait): string
     {
@@ -773,6 +807,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function uploadJob(string $jobfile, string $jsonDef): int
     {
@@ -790,6 +825,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function selectJob(string $jobfile): int
     {
@@ -802,6 +838,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function reset(): int
     {
@@ -822,6 +859,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function i2cSendBin(int $slaveAddr, string $buff): int
     {
@@ -858,6 +896,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function i2cSendArray(int $slaveAddr, array $values): int
     {
@@ -896,6 +935,7 @@ class YI2cPort extends YFunction
      * @return string  a list of bytes with the data received from slave device.
      *
      * On failure, throws an exception or returns an empty binary buffer.
+     * @throws YAPI_Exception on error
      */
     public function i2cSendAndReceiveBin(int $slaveAddr, string $buff, int $rcvCount): string
     {
@@ -954,6 +994,7 @@ class YI2cPort extends YFunction
      * @return Integer[]  a list of bytes with the data received from slave device.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function i2cSendAndReceiveArray(int $slaveAddr, array $values, int $rcvCount): array
     {
@@ -1031,6 +1072,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeStr(string $codes): int
     {
@@ -1079,6 +1121,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeLine(string $codes): int
     {
@@ -1102,6 +1145,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeByte(int $code): int
     {
@@ -1118,6 +1162,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeHex(string $hexString): int
     {
@@ -1142,6 +1187,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeBin(string $buff): int
     {
@@ -1171,6 +1217,7 @@ class YI2cPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeArray(array $byteList): int
     {
@@ -1202,6 +1249,7 @@ class YI2cPort extends YFunction
      * @return YI2cSnoopingRecord[]  an array of YI2cSnoopingRecord objects containing the messages found, if any.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function snoopMessages(int $maxWait): array
     {
@@ -1230,102 +1278,162 @@ class YI2cPort extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function rxCount(): int
 {
     return $this->get_rxCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function txCount(): int
 {
     return $this->get_txCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function errCount(): int
 {
     return $this->get_errCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function rxMsgCount(): int
 {
     return $this->get_rxMsgCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function txMsgCount(): int
 {
     return $this->get_txMsgCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function lastMsg(): string
 {
     return $this->get_lastMsg();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function currentJob(): string
 {
     return $this->get_currentJob();
 }
 
-    public function setCurrentJob(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCurrentJob(string $newval): int
 {
     return $this->set_currentJob($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function startupJob(): string
 {
     return $this->get_startupJob();
 }
 
-    public function setStartupJob(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setStartupJob(string $newval): int
 {
     return $this->set_startupJob($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function jobMaxTask(): int
 {
     return $this->get_jobMaxTask();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function jobMaxSize(): int
 {
     return $this->get_jobMaxSize();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function protocol(): string
 {
     return $this->get_protocol();
 }
 
-    public function setProtocol(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setProtocol(string $newval): int
 {
     return $this->set_protocol($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function i2cVoltageLevel(): int
 {
     return $this->get_i2cVoltageLevel();
 }
 
-    public function setI2cVoltageLevel(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setI2cVoltageLevel(int $newval): int
 {
     return $this->set_i2cVoltageLevel($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function i2cMode(): string
 {
     return $this->get_i2cMode();
 }
 
-    public function setI2cMode(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setI2cMode(string $newval): int
 {
     return $this->set_i2cMode($newval);
 }
@@ -1336,7 +1444,7 @@ class YI2cPort extends YFunction
      * If you want to find a specific an I2C port, use I2cPort.findI2cPort()
      * and a hardwareID or a logical name.
      *
-     * @return YI2cPort  a pointer to a YI2cPort object, corresponding to
+     * @return ?YI2cPort  a pointer to a YI2cPort object, corresponding to
      *         an I2C port currently online, or a null pointer
      *         if there are no more I2C ports to enumerate.
      */
@@ -1358,11 +1466,11 @@ class YI2cPort extends YFunction
      * Use the method YI2cPort::nextI2cPort() to iterate on
      * next I2C ports.
      *
-     * @return YI2cPort  a pointer to a YI2cPort object, corresponding to
+     * @return ?YI2cPort  a pointer to a YI2cPort object, corresponding to
      *         the first I2C port currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstI2cPort()
+    public static function FirstI2cPort(): ?YI2cPort
     {
         $next_hwid = YAPI::getFirstHardwareId('I2cPort');
         if ($next_hwid == null) {
@@ -1373,4 +1481,6 @@ class YI2cPort extends YFunction
 
     //--- (end of generated code: YI2cPort implementation)
 
-};
+}
+
+;

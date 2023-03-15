@@ -17,7 +17,7 @@ class YPressure extends YSensor
 
     //--- (end of YPressure attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YPressure constructor)
         parent::__construct($str_func);
@@ -56,7 +56,7 @@ class YPressure extends YSensor
      *
      * @return YPressure  a YPressure object allowing you to drive the pressure sensor.
      */
-    public static function FindPressure(string $func): ?YPressure
+    public static function FindPressure(string $func): YPressure
     {
         // $obj                    is a YPressure;
         $obj = YFunction::_FindFromCache('Pressure', $func);
@@ -73,7 +73,7 @@ class YPressure extends YSensor
      * If you want to find a specific a pressure sensor, use Pressure.findPressure()
      * and a hardwareID or a logical name.
      *
-     * @return YPressure  a pointer to a YPressure object, corresponding to
+     * @return ?YPressure  a pointer to a YPressure object, corresponding to
      *         a pressure sensor currently online, or a null pointer
      *         if there are no more pressure sensors to enumerate.
      */
@@ -95,11 +95,11 @@ class YPressure extends YSensor
      * Use the method YPressure::nextPressure() to iterate on
      * next pressure sensors.
      *
-     * @return YPressure  a pointer to a YPressure object, corresponding to
+     * @return ?YPressure  a pointer to a YPressure object, corresponding to
      *         the first pressure sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstPressure()
+    public static function FirstPressure(): ?YPressure
     {
         $next_hwid = YAPI::getFirstHardwareId('Pressure');
         if ($next_hwid == null) {

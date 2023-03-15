@@ -44,7 +44,7 @@ class YMultiCellWeighScale extends YSensor
 
     //--- (end of YMultiCellWeighScale attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YMultiCellWeighScale constructor)
         parent::__construct($str_func);
@@ -55,7 +55,7 @@ class YMultiCellWeighScale extends YSensor
 
     //--- (YMultiCellWeighScale implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'cellCount':
@@ -102,6 +102,7 @@ class YMultiCellWeighScale extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_unit(string $newval): int
     {
@@ -115,6 +116,7 @@ class YMultiCellWeighScale extends YSensor
      * @return int  an integer corresponding to the number of load cells in use
      *
      * On failure, throws an exception or returns YMultiCellWeighScale::CELLCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_cellCount(): int
     {
@@ -137,6 +139,7 @@ class YMultiCellWeighScale extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_cellCount(int $newval): int
     {
@@ -152,6 +155,7 @@ class YMultiCellWeighScale extends YSensor
      * 6-wires load cells
      *
      * On failure, throws an exception or returns YMultiCellWeighScale::EXTERNALSENSE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_externalSense(): int
     {
@@ -178,6 +182,7 @@ class YMultiCellWeighScale extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_externalSense(int $newval): int
     {
@@ -192,6 +197,7 @@ class YMultiCellWeighScale extends YSensor
      * and YMultiCellWeighScale::EXCITATION_AC corresponding to the current load cell bridge excitation method
      *
      * On failure, throws an exception or returns YMultiCellWeighScale::EXCITATION_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_excitation(): int
     {
@@ -217,6 +223,7 @@ class YMultiCellWeighScale extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_excitation(int $newval): int
     {
@@ -239,6 +246,7 @@ class YMultiCellWeighScale extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_tempAvgAdaptRatio(float $newval): int
     {
@@ -256,6 +264,7 @@ class YMultiCellWeighScale extends YSensor
      * @return float  a floating point number corresponding to the averaged temperature update rate, in per mille
      *
      * On failure, throws an exception or returns YMultiCellWeighScale::TEMPAVGADAPTRATIO_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_tempAvgAdaptRatio(): float
     {
@@ -282,6 +291,7 @@ class YMultiCellWeighScale extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_tempChgAdaptRatio(float $newval): int
     {
@@ -298,6 +308,7 @@ class YMultiCellWeighScale extends YSensor
      * @return float  a floating point number corresponding to the temperature change update rate, in per mille
      *
      * On failure, throws an exception or returns YMultiCellWeighScale::TEMPCHGADAPTRATIO_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_tempChgAdaptRatio(): float
     {
@@ -318,6 +329,7 @@ class YMultiCellWeighScale extends YSensor
      * thermal compensation
      *
      * On failure, throws an exception or returns YMultiCellWeighScale::COMPTEMPAVG_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_compTempAvg(): float
     {
@@ -338,6 +350,7 @@ class YMultiCellWeighScale extends YSensor
      * thermal compensation
      *
      * On failure, throws an exception or returns YMultiCellWeighScale::COMPTEMPCHG_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_compTempChg(): float
     {
@@ -357,6 +370,7 @@ class YMultiCellWeighScale extends YSensor
      * @return float  a floating point number corresponding to the current current thermal compensation value
      *
      * On failure, throws an exception or returns YMultiCellWeighScale::COMPENSATION_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_compensation(): float
     {
@@ -382,6 +396,7 @@ class YMultiCellWeighScale extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_zeroTracking(float $newval): int
     {
@@ -397,6 +412,7 @@ class YMultiCellWeighScale extends YSensor
      * @return float  a floating point number corresponding to the zero tracking threshold value
      *
      * On failure, throws an exception or returns YMultiCellWeighScale::ZEROTRACKING_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_zeroTracking(): float
     {
@@ -410,6 +426,9 @@ class YMultiCellWeighScale extends YSensor
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -422,6 +441,9 @@ class YMultiCellWeighScale extends YSensor
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -457,7 +479,7 @@ class YMultiCellWeighScale extends YSensor
      * @return YMultiCellWeighScale  a YMultiCellWeighScale object allowing you to drive the multi-cell
      * weighing scale sensor.
      */
-    public static function FindMultiCellWeighScale(string $func): ?YMultiCellWeighScale
+    public static function FindMultiCellWeighScale(string $func): YMultiCellWeighScale
     {
         // $obj                    is a YMultiCellWeighScale;
         $obj = YFunction::_FindFromCache('MultiCellWeighScale', $func);
@@ -476,6 +498,7 @@ class YMultiCellWeighScale extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function tare(): int
     {
@@ -492,98 +515,153 @@ class YMultiCellWeighScale extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function setupSpan(float $currWeight, float $maxWeight): int
     {
         return $this->set_command(sprintf('S%d:%d', round(1000*$currWeight), round(1000*$maxWeight)));
     }
 
-    public function setUnit(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setUnit(string $newval): int
 {
     return $this->set_unit($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function cellCount(): int
 {
     return $this->get_cellCount();
 }
 
-    public function setCellCount(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCellCount(int $newval): int
 {
     return $this->set_cellCount($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function externalSense(): int
 {
     return $this->get_externalSense();
 }
 
-    public function setExternalSense(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setExternalSense(int $newval): int
 {
     return $this->set_externalSense($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function excitation(): int
 {
     return $this->get_excitation();
 }
 
-    public function setExcitation(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setExcitation(int $newval): int
 {
     return $this->set_excitation($newval);
 }
 
-    public function setTempAvgAdaptRatio(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setTempAvgAdaptRatio(float $newval): int
 {
     return $this->set_tempAvgAdaptRatio($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function tempAvgAdaptRatio(): float
 {
     return $this->get_tempAvgAdaptRatio();
 }
 
-    public function setTempChgAdaptRatio(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setTempChgAdaptRatio(float $newval): int
 {
     return $this->set_tempChgAdaptRatio($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function tempChgAdaptRatio(): float
 {
     return $this->get_tempChgAdaptRatio();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function compTempAvg(): float
 {
     return $this->get_compTempAvg();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function compTempChg(): float
 {
     return $this->get_compTempChg();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function compensation(): float
 {
     return $this->get_compensation();
 }
 
-    public function setZeroTracking(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setZeroTracking(float $newval): int
 {
     return $this->set_zeroTracking($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function zeroTracking(): float
 {
     return $this->get_zeroTracking();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
@@ -595,7 +673,7 @@ class YMultiCellWeighScale extends YSensor
      * MultiCellWeighScale.findMultiCellWeighScale()
      * and a hardwareID or a logical name.
      *
-     * @return YMultiCellWeighScale  a pointer to a YMultiCellWeighScale object, corresponding to
+     * @return ?YMultiCellWeighScale  a pointer to a YMultiCellWeighScale object, corresponding to
      *         a multi-cell weighing scale sensor currently online, or a null pointer
      *         if there are no more multi-cell weighing scale sensors to enumerate.
      */
@@ -617,11 +695,11 @@ class YMultiCellWeighScale extends YSensor
      * Use the method YMultiCellWeighScale::nextMultiCellWeighScale() to iterate on
      * next multi-cell weighing scale sensors.
      *
-     * @return YMultiCellWeighScale  a pointer to a YMultiCellWeighScale object, corresponding to
+     * @return ?YMultiCellWeighScale  a pointer to a YMultiCellWeighScale object, corresponding to
      *         the first multi-cell weighing scale sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstMultiCellWeighScale()
+    public static function FirstMultiCellWeighScale(): ?YMultiCellWeighScale
     {
         $next_hwid = YAPI::getFirstHardwareId('MultiCellWeighScale');
         if ($next_hwid == null) {

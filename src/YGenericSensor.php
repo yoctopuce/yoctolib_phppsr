@@ -41,7 +41,7 @@ class YGenericSensor extends YSensor
 
     //--- (end of YGenericSensor attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YGenericSensor constructor)
         parent::__construct($str_func);
@@ -52,7 +52,7 @@ class YGenericSensor extends YSensor
 
     //--- (YGenericSensor implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'signalValue':
@@ -90,6 +90,7 @@ class YGenericSensor extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_unit(string $newval): int
     {
@@ -104,6 +105,7 @@ class YGenericSensor extends YSensor
      * measured by the sensor
      *
      * On failure, throws an exception or returns YGenericSensor::SIGNALVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_signalValue(): float
     {
@@ -123,6 +125,7 @@ class YGenericSensor extends YSensor
      * @return string  a string corresponding to the measuring unit of the electrical signal used by the sensor
      *
      * On failure, throws an exception or returns YGenericSensor::SIGNALUNIT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_signalUnit(): string
     {
@@ -142,6 +145,7 @@ class YGenericSensor extends YSensor
      * @return string  a string corresponding to the input signal range used by the sensor
      *
      * On failure, throws an exception or returns YGenericSensor::SIGNALRANGE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_signalRange(): string
     {
@@ -174,6 +178,7 @@ class YGenericSensor extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_signalRange(string $newval): int
     {
@@ -187,6 +192,7 @@ class YGenericSensor extends YSensor
      * @return string  a string corresponding to the physical value range measured by the sensor
      *
      * On failure, throws an exception or returns YGenericSensor::VALUERANGE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_valueRange(): string
     {
@@ -217,6 +223,7 @@ class YGenericSensor extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_valueRange(string $newval): int
     {
@@ -237,6 +244,7 @@ class YGenericSensor extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_signalBias(float $newval): int
     {
@@ -252,6 +260,7 @@ class YGenericSensor extends YSensor
      * @return float  a floating point number corresponding to the electric signal bias for zero shift adjustment
      *
      * On failure, throws an exception or returns YGenericSensor::SIGNALBIAS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_signalBias(): float
     {
@@ -279,6 +288,7 @@ class YGenericSensor extends YSensor
      * YGenericSensor::SIGNALSAMPLING_AC corresponding to the electric signal sampling method to use
      *
      * On failure, throws an exception or returns YGenericSensor::SIGNALSAMPLING_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_signalSampling(): int
     {
@@ -310,6 +320,7 @@ class YGenericSensor extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_signalSampling(int $newval): int
     {
@@ -324,6 +335,7 @@ class YGenericSensor extends YSensor
      * activation state of this input
      *
      * On failure, throws an exception or returns YGenericSensor::ENABLED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_enabled(): int
     {
@@ -350,6 +362,7 @@ class YGenericSensor extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_enabled(int $newval): int
     {
@@ -385,7 +398,7 @@ class YGenericSensor extends YSensor
      *
      * @return YGenericSensor  a YGenericSensor object allowing you to drive the generic sensor.
      */
-    public static function FindGenericSensor(string $func): ?YGenericSensor
+    public static function FindGenericSensor(string $func): YGenericSensor
     {
         // $obj                    is a YGenericSensor;
         $obj = YFunction::_FindFromCache('GenericSensor', $func);
@@ -404,6 +417,7 @@ class YGenericSensor extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function zeroAdjust(): int
     {
@@ -414,67 +428,106 @@ class YGenericSensor extends YSensor
         return $this->set_signalBias($currSignal + $currBias);
     }
 
-    public function setUnit(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setUnit(string $newval): int
 {
     return $this->set_unit($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function signalValue(): float
 {
     return $this->get_signalValue();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function signalUnit(): string
 {
     return $this->get_signalUnit();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function signalRange(): string
 {
     return $this->get_signalRange();
 }
 
-    public function setSignalRange(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setSignalRange(string $newval): int
 {
     return $this->set_signalRange($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function valueRange(): string
 {
     return $this->get_valueRange();
 }
 
-    public function setValueRange(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setValueRange(string $newval): int
 {
     return $this->set_valueRange($newval);
 }
 
-    public function setSignalBias(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setSignalBias(float $newval): int
 {
     return $this->set_signalBias($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function signalBias(): float
 {
     return $this->get_signalBias();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function signalSampling(): int
 {
     return $this->get_signalSampling();
 }
 
-    public function setSignalSampling(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setSignalSampling(int $newval): int
 {
     return $this->set_signalSampling($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function enabled(): int
 {
     return $this->get_enabled();
 }
 
-    public function setEnabled(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setEnabled(int $newval): int
 {
     return $this->set_enabled($newval);
 }
@@ -485,7 +538,7 @@ class YGenericSensor extends YSensor
      * If you want to find a specific a generic sensor, use GenericSensor.findGenericSensor()
      * and a hardwareID or a logical name.
      *
-     * @return YGenericSensor  a pointer to a YGenericSensor object, corresponding to
+     * @return ?YGenericSensor  a pointer to a YGenericSensor object, corresponding to
      *         a generic sensor currently online, or a null pointer
      *         if there are no more generic sensors to enumerate.
      */
@@ -507,11 +560,11 @@ class YGenericSensor extends YSensor
      * Use the method YGenericSensor::nextGenericSensor() to iterate on
      * next generic sensors.
      *
-     * @return YGenericSensor  a pointer to a YGenericSensor object, corresponding to
+     * @return ?YGenericSensor  a pointer to a YGenericSensor object, corresponding to
      *         the first generic sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstGenericSensor()
+    public static function FirstGenericSensor(): ?YGenericSensor
     {
         $next_hwid = YAPI::getFirstHardwareId('GenericSensor');
         if ($next_hwid == null) {

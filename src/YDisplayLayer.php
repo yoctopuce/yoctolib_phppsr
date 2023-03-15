@@ -32,26 +32,26 @@ class YDisplayLayer
     //--- (generated code: YDisplayLayer attributes)
 
     //--- (end of generated code: YDisplayLayer attributes)
-    protected $_display;
-    protected $_id;
-    protected $_cmdbuff;
-    protected $_hidden;
+    protected YDisplay $_display;
+    protected int $_id;
+    protected string $_cmdbuff;
+    protected bool $_hidden;
 
-    function __construct($parent, $id)
+    function __construct(YDisplay $parent, int $id)
     {
         //--- (generated code: YDisplayLayer constructor)
         //--- (end of generated code: YDisplayLayer constructor)
-        $this->_display    = $parent;
-        $this->_id         = $id;
-        $this->_cmdbuff    = '';
-        $this->_hidden     = FALSE;
+        $this->_display = $parent;
+        $this->_id = $id;
+        $this->_cmdbuff = '';
+        $this->_hidden = false;
     }
 
     // internal function to flush any pending command for this layer
-    public function flush_now()
+    public function flush_now(): int
     {
         $res = YAPI::SUCCESS;
-        if($this->_cmdbuff != '') {
+        if ($this->_cmdbuff != '') {
             $res = $this->_display->sendCommand($this->_cmdbuff);
             $this->_cmdbuff = '';
         }
@@ -59,15 +59,15 @@ class YDisplayLayer
     }
 
     // internal function to send a state command for this layer
-    private function command_push($str_cmd)
+    private function command_push(string $str_cmd): int
     {
         $res = YAPI::SUCCESS;
 
-        if(strlen($this->_cmdbuff)+strlen($str_cmd) >= 100) {
+        if (strlen($this->_cmdbuff) + strlen($str_cmd) >= 100) {
             // force flush before, to prevent overflow
             $res = $this->flush_now();
         }
-        if($this->_cmdbuff=='') {
+        if ($this->_cmdbuff == '') {
             // always prepend layer ID first
             $this->_cmdbuff = $this->_id;
         }
@@ -76,10 +76,10 @@ class YDisplayLayer
     }
 
     // internal function to send a command for this layer
-    private function command_flush($str_cmd)
+    private function command_flush(string $str_cmd): int
     {
         $res = $this->command_push($str_cmd);
-        if($this->_hidden) {
+        if ($this->_hidden) {
             return $res;
         }
         return $this->flush_now();
@@ -96,6 +96,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function reset(): int
     {
@@ -112,6 +113,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function clear(): int
     {
@@ -129,6 +131,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function selectColorPen(int $color): int
     {
@@ -148,6 +151,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function selectGrayPen(int $graylevel): int
     {
@@ -163,6 +167,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function selectEraser(): int
     {
@@ -184,6 +189,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function setAntialiasingMode(bool $mode): int
     {
@@ -199,6 +205,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function drawPixel(int $x, int $y): int
     {
@@ -216,6 +223,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function drawRect(int $x1, int $y1, int $x2, int $y2): int
     {
@@ -233,6 +241,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function drawBar(int $x1, int $y1, int $x2, int $y2): int
     {
@@ -249,6 +258,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function drawCircle(int $x, int $y, int $r): int
     {
@@ -265,6 +275,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function drawDisc(int $x, int $y, int $r): int
     {
@@ -284,6 +295,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function selectFont(string $fontname): int
     {
@@ -311,6 +323,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function drawText(int $x, int $y, int $anchor, string $text): int
     {
@@ -330,6 +343,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function drawImage(int $x, int $y, string $imagename): int
     {
@@ -355,6 +369,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function drawBitmap(int $x, int $y, int $w, string $bitmap, int $bgcol): int
     {
@@ -372,6 +387,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function moveTo(int $x, int $y): int
     {
@@ -389,6 +405,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function lineTo(int $x, int $y): int
     {
@@ -407,6 +424,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function consoleOut(string $text): int
     {
@@ -424,6 +442,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function setConsoleMargins(int $x1, int $y1, int $x2, int $y2): int
     {
@@ -440,6 +459,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function setConsoleBackground(int $bgcol): int
     {
@@ -455,6 +475,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function setConsoleWordWrap(bool $wordwrap): int
     {
@@ -468,6 +489,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function clearConsole(): int
     {
@@ -487,6 +509,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function setLayerPosition(int $x, int $y, int $scrollTime): int
     {
@@ -502,6 +525,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function hide(): int
     {
@@ -516,6 +540,7 @@ class YDisplayLayer
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function unhide(): int
     {
@@ -526,7 +551,7 @@ class YDisplayLayer
     /**
      * Gets parent YDisplay. Returns the parent YDisplay object of the current YDisplayLayer::
      *
-     * @return YDisplay  an YDisplay object
+     * @return ?YDisplay  an YDisplay object
      */
     public function get_display(): ?YDisplay
     {
@@ -539,6 +564,7 @@ class YDisplayLayer
      * @return int  an integer corresponding to the display width, in pixels
      *
      * On failure, throws an exception or returns YDisplayLayer::DISPLAYWIDTH_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_displayWidth(): int
     {
@@ -551,6 +577,7 @@ class YDisplayLayer
      * @return int  an integer corresponding to the display height, in pixels
      *
      * On failure, throws an exception or returns YDisplayLayer::DISPLAYHEIGHT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_displayHeight(): int
     {
@@ -563,6 +590,7 @@ class YDisplayLayer
      * @return int  an integer corresponding to the width of the layers to draw on, in pixels
      *
      * On failure, throws an exception or returns YDisplayLayer::LAYERWIDTH_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_layerWidth(): int
     {
@@ -575,12 +603,16 @@ class YDisplayLayer
      * @return int  an integer corresponding to the height of the layers to draw on, in pixels
      *
      * On failure, throws an exception or returns YDisplayLayer::LAYERHEIGHT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_layerHeight(): int
     {
         return $this->_display->get_layerHeight();
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function resetHiddenFlag(): int
     {
         $this->_hidden = false;
@@ -588,4 +620,5 @@ class YDisplayLayer
     }
 
     //--- (end of generated code: YDisplayLayer implementation)
-};
+}
+

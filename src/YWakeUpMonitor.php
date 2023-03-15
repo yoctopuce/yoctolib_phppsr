@@ -37,7 +37,7 @@ class YWakeUpMonitor extends YFunction
 
     //--- (end of YWakeUpMonitor attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YWakeUpMonitor constructor)
         parent::__construct($str_func);
@@ -48,7 +48,7 @@ class YWakeUpMonitor extends YFunction
 
     //--- (YWakeUpMonitor implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'powerDuration':
@@ -80,6 +80,7 @@ class YWakeUpMonitor extends YFunction
      * going to sleep
      *
      * On failure, throws an exception or returns YWakeUpMonitor::POWERDURATION_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_powerDuration(): int
     {
@@ -104,6 +105,7 @@ class YWakeUpMonitor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_powerDuration(int $newval): int
     {
@@ -117,6 +119,7 @@ class YWakeUpMonitor extends YFunction
      * @return int  an integer corresponding to the delay before the  next sleep period
      *
      * On failure, throws an exception or returns YWakeUpMonitor::SLEEPCOUNTDOWN_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_sleepCountdown(): int
     {
@@ -138,6 +141,7 @@ class YWakeUpMonitor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_sleepCountdown(int $newval): int
     {
@@ -151,6 +155,7 @@ class YWakeUpMonitor extends YFunction
      * @return float  an integer corresponding to the next scheduled wake up date/time (UNIX format)
      *
      * On failure, throws an exception or returns YWakeUpMonitor::NEXTWAKEUP_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_nextWakeUp(): float
     {
@@ -172,6 +177,7 @@ class YWakeUpMonitor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_nextWakeUp(float $newval): int
     {
@@ -188,6 +194,7 @@ class YWakeUpMonitor extends YFunction
      * YWakeUpMonitor::WAKEUPREASON_SCHEDULE2 corresponding to the latest wake up reason
      *
      * On failure, throws an exception or returns YWakeUpMonitor::WAKEUPREASON_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_wakeUpReason(): int
     {
@@ -208,6 +215,7 @@ class YWakeUpMonitor extends YFunction
      * according to  the current state of the monitor
      *
      * On failure, throws an exception or returns YWakeUpMonitor::WAKEUPSTATE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_wakeUpState(): int
     {
@@ -221,12 +229,18 @@ class YWakeUpMonitor extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_wakeUpState(int $newval): int
     {
         $rest_val = strval($newval);
         return $this->_setAttr("wakeUpState", $rest_val);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_rtcTime(): float
     {
         // $res                    is a long;
@@ -267,7 +281,7 @@ class YWakeUpMonitor extends YFunction
      *
      * @return YWakeUpMonitor  a YWakeUpMonitor object allowing you to drive the wake-up monitor.
      */
-    public static function FindWakeUpMonitor(string $func): ?YWakeUpMonitor
+    public static function FindWakeUpMonitor(string $func): YWakeUpMonitor
     {
         // $obj                    is a YWakeUpMonitor;
         $obj = YFunction::_FindFromCache('WakeUpMonitor', $func);
@@ -295,6 +309,7 @@ class YWakeUpMonitor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function sleep(int $secBeforeSleep): int
     {
@@ -317,6 +332,7 @@ class YWakeUpMonitor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function sleepFor(int $secUntilWakeUp, int $secBeforeSleep): int
     {
@@ -339,6 +355,7 @@ class YWakeUpMonitor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function sleepUntil(int $wakeUpTime, int $secBeforeSleep): int
     {
@@ -355,6 +372,7 @@ class YWakeUpMonitor extends YFunction
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function resetSleepCountDown(): int
     {
@@ -363,51 +381,81 @@ class YWakeUpMonitor extends YFunction
         return YAPI::SUCCESS;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function powerDuration(): int
 {
     return $this->get_powerDuration();
 }
 
-    public function setPowerDuration(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPowerDuration(int $newval): int
 {
     return $this->set_powerDuration($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function sleepCountdown(): int
 {
     return $this->get_sleepCountdown();
 }
 
-    public function setSleepCountdown(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setSleepCountdown(int $newval): int
 {
     return $this->set_sleepCountdown($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function nextWakeUp(): float
 {
     return $this->get_nextWakeUp();
 }
 
-    public function setNextWakeUp(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setNextWakeUp(float $newval): int
 {
     return $this->set_nextWakeUp($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function wakeUpReason(): int
 {
     return $this->get_wakeUpReason();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function wakeUpState(): int
 {
     return $this->get_wakeUpState();
 }
 
-    public function setWakeUpState(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setWakeUpState(int $newval): int
 {
     return $this->set_wakeUpState($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function rtcTime(): float
 {
     return $this->get_rtcTime();
@@ -419,7 +467,7 @@ class YWakeUpMonitor extends YFunction
      * If you want to find a specific a wake-up monitor, use WakeUpMonitor.findWakeUpMonitor()
      * and a hardwareID or a logical name.
      *
-     * @return YWakeUpMonitor  a pointer to a YWakeUpMonitor object, corresponding to
+     * @return ?YWakeUpMonitor  a pointer to a YWakeUpMonitor object, corresponding to
      *         a wake-up monitor currently online, or a null pointer
      *         if there are no more wake-up monitors to enumerate.
      */
@@ -441,11 +489,11 @@ class YWakeUpMonitor extends YFunction
      * Use the method YWakeUpMonitor::nextWakeUpMonitor() to iterate on
      * next wake-up monitors.
      *
-     * @return YWakeUpMonitor  a pointer to a YWakeUpMonitor object, corresponding to
+     * @return ?YWakeUpMonitor  a pointer to a YWakeUpMonitor object, corresponding to
      *         the first wake-up monitor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstWakeUpMonitor()
+    public static function FirstWakeUpMonitor(): ?YWakeUpMonitor
     {
         $next_hwid = YAPI::getFirstHardwareId('WakeUpMonitor');
         if ($next_hwid == null) {

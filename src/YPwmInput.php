@@ -49,7 +49,7 @@ class YPwmInput extends YSensor
 
     //--- (end of YPwmInput attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YPwmInput constructor)
         parent::__construct($str_func);
@@ -60,7 +60,7 @@ class YPwmInput extends YSensor
 
     //--- (YPwmInput implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'dutyCycle':
@@ -109,6 +109,7 @@ class YPwmInput extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_unit(string $newval): int
     {
@@ -122,6 +123,7 @@ class YPwmInput extends YSensor
      * @return float  a floating point number corresponding to the PWM duty cycle, in per cents
      *
      * On failure, throws an exception or returns YPwmInput::DUTYCYCLE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_dutyCycle(): float
     {
@@ -142,6 +144,7 @@ class YPwmInput extends YSensor
      * floating point number
      *
      * On failure, throws an exception or returns YPwmInput::PULSEDURATION_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pulseDuration(): float
     {
@@ -161,6 +164,7 @@ class YPwmInput extends YSensor
      * @return float  a floating point number corresponding to the PWM frequency in Hz
      *
      * On failure, throws an exception or returns YPwmInput::FREQUENCY_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_frequency(): float
     {
@@ -180,6 +184,7 @@ class YPwmInput extends YSensor
      * @return float  a floating point number corresponding to the PWM period in milliseconds
      *
      * On failure, throws an exception or returns YPwmInput::PERIOD_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_period(): float
     {
@@ -201,6 +206,7 @@ class YPwmInput extends YSensor
      * @return float  an integer corresponding to the pulse counter value
      *
      * On failure, throws an exception or returns YPwmInput::PULSECOUNTER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pulseCounter(): float
     {
@@ -214,6 +220,9 @@ class YPwmInput extends YSensor
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_pulseCounter(float $newval): int
     {
         $rest_val = strval($newval);
@@ -226,6 +235,7 @@ class YPwmInput extends YSensor
      * @return float  an integer corresponding to the timer of the pulses counter (ms)
      *
      * On failure, throws an exception or returns YPwmInput::PULSETIMER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pulseTimer(): float
     {
@@ -253,6 +263,7 @@ class YPwmInput extends YSensor
      * function and callbacks
      *
      * On failure, throws an exception or returns YPwmInput::PWMREPORTMODE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pwmReportMode(): int
     {
@@ -285,6 +296,7 @@ class YPwmInput extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_pwmReportMode(int $newval): int
     {
@@ -298,6 +310,7 @@ class YPwmInput extends YSensor
      * @return int  an integer corresponding to the shortest expected pulse duration, in ms
      *
      * On failure, throws an exception or returns YPwmInput::DEBOUNCEPERIOD_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_debouncePeriod(): int
     {
@@ -320,6 +333,7 @@ class YPwmInput extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_debouncePeriod(int $newval): int
     {
@@ -333,6 +347,7 @@ class YPwmInput extends YSensor
      * @return int  an integer corresponding to the input signal sampling rate, in kHz
      *
      * On failure, throws an exception or returns YPwmInput::BANDWIDTH_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_bandwidth(): int
     {
@@ -358,6 +373,7 @@ class YPwmInput extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_bandwidth(int $newval): int
     {
@@ -372,6 +388,7 @@ class YPwmInput extends YSensor
      * @return int  an integer corresponding to the number of edges detected per preiod
      *
      * On failure, throws an exception or returns YPwmInput::EDGESPERPERIOD_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_edgesPerPeriod(): int
     {
@@ -413,7 +430,7 @@ class YPwmInput extends YSensor
      *
      * @return YPwmInput  a YPwmInput object allowing you to drive the PWM input.
      */
-    public static function FindPwmInput(string $func): ?YPwmInput
+    public static function FindPwmInput(string $func): YPwmInput
     {
         // $obj                    is a YPwmInput;
         $obj = YFunction::_FindFromCache('PwmInput', $func);
@@ -430,82 +447,128 @@ class YPwmInput extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function resetCounter(): int
     {
         return $this->set_pulseCounter(0);
     }
 
-    public function setUnit(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setUnit(string $newval): int
 {
     return $this->set_unit($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function dutyCycle(): float
 {
     return $this->get_dutyCycle();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pulseDuration(): float
 {
     return $this->get_pulseDuration();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function frequency(): float
 {
     return $this->get_frequency();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function period(): float
 {
     return $this->get_period();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pulseCounter(): float
 {
     return $this->get_pulseCounter();
 }
 
-    public function setPulseCounter(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPulseCounter(float $newval): int
 {
     return $this->set_pulseCounter($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pulseTimer(): float
 {
     return $this->get_pulseTimer();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pwmReportMode(): int
 {
     return $this->get_pwmReportMode();
 }
 
-    public function setPwmReportMode(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPwmReportMode(int $newval): int
 {
     return $this->set_pwmReportMode($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function debouncePeriod(): int
 {
     return $this->get_debouncePeriod();
 }
 
-    public function setDebouncePeriod(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setDebouncePeriod(int $newval): int
 {
     return $this->set_debouncePeriod($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function bandwidth(): int
 {
     return $this->get_bandwidth();
 }
 
-    public function setBandwidth(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setBandwidth(int $newval): int
 {
     return $this->set_bandwidth($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function edgesPerPeriod(): int
 {
     return $this->get_edgesPerPeriod();
@@ -517,7 +580,7 @@ class YPwmInput extends YSensor
      * If you want to find a specific a PWM input, use PwmInput.findPwmInput()
      * and a hardwareID or a logical name.
      *
-     * @return YPwmInput  a pointer to a YPwmInput object, corresponding to
+     * @return ?YPwmInput  a pointer to a YPwmInput object, corresponding to
      *         a PWM input currently online, or a null pointer
      *         if there are no more PWM inputs to enumerate.
      */
@@ -539,11 +602,11 @@ class YPwmInput extends YSensor
      * Use the method YPwmInput::nextPwmInput() to iterate on
      * next PWM inputs.
      *
-     * @return YPwmInput  a pointer to a YPwmInput object, corresponding to
+     * @return ?YPwmInput  a pointer to a YPwmInput object, corresponding to
      *         the first PWM input currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstPwmInput()
+    public static function FirstPwmInput(): ?YPwmInput
     {
         $next_hwid = YAPI::getFirstHardwareId('PwmInput');
         if ($next_hwid == null) {

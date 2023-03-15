@@ -18,15 +18,15 @@ class YFileRecord
 
     //--- (end of generated code: YFileRecord attributes)
 
-    function __construct($str_json)
+    function __construct(string $str_json)
     {
         //--- (generated code: YFileRecord constructor)
         //--- (end of generated code: YFileRecord constructor)
 
-        $loadval = json_decode($str_json, TRUE);
+        $loadval = json_decode($str_json, true);
         $this->_name = $loadval['name'];
         $this->_size = $loadval['size'];
-        $this->_crc  = $loadval['crc'];
+        $this->_crc = $loadval['crc'];
     }
 
     //--- (generated code: YFileRecord implementation)
@@ -63,9 +63,10 @@ class YFileRecord
 
     //--- (end of generated code: YFileRecord implementation)
 
-    function contentEquals($bin_content)
+    function contentEquals(string $bin_content): bool
     {
         return ($this->_size == strlen($bin_content) &&
-                $this->_crc == crc32($bin_content));
+            $this->_crc == crc32($bin_content));
     }
 }
+

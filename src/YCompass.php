@@ -25,7 +25,7 @@ class YCompass extends YSensor
 
     //--- (end of YCompass attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YCompass constructor)
         parent::__construct($str_func);
@@ -36,7 +36,7 @@ class YCompass extends YSensor
 
     //--- (YCompass implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'bandwidth':
@@ -58,6 +58,7 @@ class YCompass extends YSensor
      * @return int  an integer corresponding to the measure update frequency, measured in Hz
      *
      * On failure, throws an exception or returns YCompass::BANDWIDTH_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_bandwidth(): int
     {
@@ -82,6 +83,7 @@ class YCompass extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_bandwidth(int $newval): int
     {
@@ -89,6 +91,9 @@ class YCompass extends YSensor
         return $this->_setAttr("bandwidth", $rest_val);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_axis(): int
     {
         // $res                    is a enumAXIS;
@@ -108,6 +113,7 @@ class YCompass extends YSensor
      * configured bearing
      *
      * On failure, throws an exception or returns YCompass::MAGNETICHEADING_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_magneticHeading(): float
     {
@@ -149,7 +155,7 @@ class YCompass extends YSensor
      *
      * @return YCompass  a YCompass object allowing you to drive the compass function.
      */
-    public static function FindCompass(string $func): ?YCompass
+    public static function FindCompass(string $func): YCompass
     {
         // $obj                    is a YCompass;
         $obj = YFunction::_FindFromCache('Compass', $func);
@@ -160,21 +166,33 @@ class YCompass extends YSensor
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function bandwidth(): int
 {
     return $this->get_bandwidth();
 }
 
-    public function setBandwidth(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setBandwidth(int $newval): int
 {
     return $this->set_bandwidth($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function axis(): int
 {
     return $this->get_axis();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function magneticHeading(): float
 {
     return $this->get_magneticHeading();
@@ -186,7 +204,7 @@ class YCompass extends YSensor
      * If you want to find a specific a compass function, use Compass.findCompass()
      * and a hardwareID or a logical name.
      *
-     * @return YCompass  a pointer to a YCompass object, corresponding to
+     * @return ?YCompass  a pointer to a YCompass object, corresponding to
      *         a compass function currently online, or a null pointer
      *         if there are no more compass functions to enumerate.
      */
@@ -208,11 +226,11 @@ class YCompass extends YSensor
      * Use the method YCompass::nextCompass() to iterate on
      * next compass functions.
      *
-     * @return YCompass  a pointer to a YCompass object, corresponding to
+     * @return ?YCompass  a pointer to a YCompass object, corresponding to
      *         the first compass function currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstCompass()
+    public static function FirstCompass(): ?YCompass
     {
         $next_hwid = YAPI::getFirstHardwareId('Compass');
         if ($next_hwid == null) {

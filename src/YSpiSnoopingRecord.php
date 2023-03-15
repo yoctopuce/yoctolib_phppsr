@@ -17,12 +17,12 @@ class YSpiSnoopingRecord
 
     //--- (end of generated code: YSpiSnoopingRecord attributes)
 
-    function __construct($str_json)
+    function __construct(string $str_json)
     {
         //--- (generated code: YSpiSnoopingRecord constructor)
         //--- (end of generated code: YSpiSnoopingRecord constructor)
 
-        $loadval = json_decode($str_json, TRUE);
+        $loadval = json_decode($str_json, true);
         $this->_tim = $loadval['t'];
         $this->_dir = $loadval['m'][0] == '<' ? 1 : 0;
         $this->_msg = substr($loadval['m'], 1);

@@ -31,7 +31,7 @@ class YAccelerometer extends YSensor
 
     //--- (end of YAccelerometer attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YAccelerometer constructor)
         parent::__construct($str_func);
@@ -42,7 +42,7 @@ class YAccelerometer extends YSensor
 
     //--- (YAccelerometer implementation)
 
-    function _parseAttr(string $name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'bandwidth':
@@ -70,6 +70,7 @@ class YAccelerometer extends YSensor
      * @return int  an integer corresponding to the measure update frequency, measured in Hz
      *
      * On failure, throws an exception or returns YAccelerometer::BANDWIDTH_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_bandwidth(): int
     {
@@ -94,6 +95,7 @@ class YAccelerometer extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_bandwidth(int $newval): int
     {
@@ -108,6 +110,7 @@ class YAccelerometer extends YSensor
      * floating point number
      *
      * On failure, throws an exception or returns YAccelerometer::XVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_xValue(): float
     {
@@ -128,6 +131,7 @@ class YAccelerometer extends YSensor
      * floating point number
      *
      * On failure, throws an exception or returns YAccelerometer::YVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_yValue(): float
     {
@@ -148,6 +152,7 @@ class YAccelerometer extends YSensor
      * floating point number
      *
      * On failure, throws an exception or returns YAccelerometer::ZVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_zValue(): float
     {
@@ -161,6 +166,9 @@ class YAccelerometer extends YSensor
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_gravityCancellation(): int
     {
         // $res                    is a enumONOFF;
@@ -173,6 +181,9 @@ class YAccelerometer extends YSensor
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_gravityCancellation(int $newval): int
     {
         $rest_val = strval($newval);
@@ -207,7 +218,7 @@ class YAccelerometer extends YSensor
      *
      * @return YAccelerometer  a YAccelerometer object allowing you to drive the accelerometer.
      */
-    public static function FindAccelerometer(string $func): ?YAccelerometer
+    public static function FindAccelerometer(string $func): YAccelerometer
     {
         // $obj                    is a YAccelerometer;
         $obj = YFunction::_FindFromCache('Accelerometer', $func);
@@ -218,37 +229,58 @@ class YAccelerometer extends YSensor
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function bandwidth(): int
 {
     return $this->get_bandwidth();
 }
 
-    public function setBandwidth(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setBandwidth(int $newval): int
 {
     return $this->set_bandwidth($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function xValue(): float
 {
     return $this->get_xValue();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function yValue(): float
 {
     return $this->get_yValue();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function zValue(): float
 {
     return $this->get_zValue();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function gravityCancellation(): int
 {
     return $this->get_gravityCancellation();
 }
 
-    public function setGravityCancellation(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setGravityCancellation(int $newval): int
 {
     return $this->set_gravityCancellation($newval);
 }
@@ -259,7 +291,7 @@ class YAccelerometer extends YSensor
      * If you want to find a specific an accelerometer, use Accelerometer.findAccelerometer()
      * and a hardwareID or a logical name.
      *
-     * @return YAccelerometer  a pointer to a YAccelerometer object, corresponding to
+     * @return ?YAccelerometer  a pointer to a YAccelerometer object, corresponding to
      *         an accelerometer currently online, or a null pointer
      *         if there are no more accelerometers to enumerate.
      */
@@ -281,11 +313,11 @@ class YAccelerometer extends YSensor
      * Use the method YAccelerometer::nextAccelerometer() to iterate on
      * next accelerometers.
      *
-     * @return YAccelerometer  a pointer to a YAccelerometer object, corresponding to
+     * @return ?YAccelerometer  a pointer to a YAccelerometer object, corresponding to
      *         the first accelerometer currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstAccelerometer()
+    public static function FirstAccelerometer(): ?YAccelerometer
     {
         $next_hwid = YAPI::getFirstHardwareId('Accelerometer');
         if ($next_hwid == null) {

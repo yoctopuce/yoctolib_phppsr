@@ -34,7 +34,7 @@ class YRangeFinder extends YSensor
 
     //--- (end of YRangeFinder attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YRangeFinder constructor)
         parent::__construct($str_func);
@@ -45,7 +45,7 @@ class YRangeFinder extends YSensor
 
     //--- (YRangeFinder implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'rangeFinderMode':
@@ -82,6 +82,7 @@ class YRangeFinder extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_unit(string $newval): int
     {
@@ -98,6 +99,7 @@ class YRangeFinder extends YSensor
      * YRangeFinder::RANGEFINDERMODE_HIGH_SPEED corresponding to the range finder running mode
      *
      * On failure, throws an exception or returns YRangeFinder::RANGEFINDERMODE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_rangeFinderMode(): int
     {
@@ -125,6 +127,7 @@ class YRangeFinder extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_rangeFinderMode(int $newval): int
     {
@@ -140,6 +143,7 @@ class YRangeFinder extends YSensor
      *         reliability
      *
      * On failure, throws an exception or returns YRangeFinder::TIMEFRAME_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_timeFrame(): float
     {
@@ -167,6 +171,7 @@ class YRangeFinder extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_timeFrame(float $newval): int
     {
@@ -180,6 +185,7 @@ class YRangeFinder extends YSensor
      * @return int  an integer corresponding to a measure quality estimate, based on measured dispersion
      *
      * On failure, throws an exception or returns YRangeFinder::QUALITY_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_quality(): int
     {
@@ -193,6 +199,9 @@ class YRangeFinder extends YSensor
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_hardwareCalibration(): string
     {
         // $res                    is a string;
@@ -205,6 +214,9 @@ class YRangeFinder extends YSensor
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_hardwareCalibration(string $newval): int
     {
         $rest_val = $newval;
@@ -218,6 +230,7 @@ class YRangeFinder extends YSensor
      * floating point number
      *
      * On failure, throws an exception or returns YRangeFinder::CURRENTTEMPERATURE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_currentTemperature(): float
     {
@@ -231,6 +244,9 @@ class YRangeFinder extends YSensor
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -243,6 +259,9 @@ class YRangeFinder extends YSensor
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -277,7 +296,7 @@ class YRangeFinder extends YSensor
      *
      * @return YRangeFinder  a YRangeFinder object allowing you to drive the range finder.
      */
-    public static function FindRangeFinder(string $func): ?YRangeFinder
+    public static function FindRangeFinder(string $func): YRangeFinder
     {
         // $obj                    is a YRangeFinder;
         $obj = YFunction::_FindFromCache('RangeFinder', $func);
@@ -295,6 +314,7 @@ class YRangeFinder extends YSensor
      *
      * @return float  a temperature, as a floating point number.
      *         On failure, throws an exception or return YAPI::INVALID_DOUBLE.
+     * @throws YAPI_Exception on error
      */
     public function get_hardwareCalibrationTemperature(): float
     {
@@ -314,6 +334,7 @@ class YRangeFinder extends YSensor
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function triggerTemperatureCalibration(): int
     {
@@ -328,6 +349,7 @@ class YRangeFinder extends YSensor
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function triggerSpadCalibration(): int
     {
@@ -345,6 +367,7 @@ class YRangeFinder extends YSensor
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function triggerOffsetCalibration(float $targetDist): int
     {
@@ -368,6 +391,7 @@ class YRangeFinder extends YSensor
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function triggerXTalkCalibration(float $targetDist): int
     {
@@ -387,63 +411,97 @@ class YRangeFinder extends YSensor
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function cancelCoverGlassCalibrations(): int
     {
         return $this->set_hardwareCalibration('');
     }
 
-    public function setUnit(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setUnit(string $newval): int
 {
     return $this->set_unit($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function rangeFinderMode(): int
 {
     return $this->get_rangeFinderMode();
 }
 
-    public function setRangeFinderMode(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setRangeFinderMode(int $newval): int
 {
     return $this->set_rangeFinderMode($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function timeFrame(): float
 {
     return $this->get_timeFrame();
 }
 
-    public function setTimeFrame(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setTimeFrame(float $newval): int
 {
     return $this->set_timeFrame($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function quality(): int
 {
     return $this->get_quality();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function hardwareCalibration(): string
 {
     return $this->get_hardwareCalibration();
 }
 
-    public function setHardwareCalibration(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setHardwareCalibration(string $newval): int
 {
     return $this->set_hardwareCalibration($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function currentTemperature(): float
 {
     return $this->get_currentTemperature();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
@@ -454,7 +512,7 @@ class YRangeFinder extends YSensor
      * If you want to find a specific a range finder, use RangeFinder.findRangeFinder()
      * and a hardwareID or a logical name.
      *
-     * @return YRangeFinder  a pointer to a YRangeFinder object, corresponding to
+     * @return ?YRangeFinder  a pointer to a YRangeFinder object, corresponding to
      *         a range finder currently online, or a null pointer
      *         if there are no more range finders to enumerate.
      */
@@ -476,11 +534,11 @@ class YRangeFinder extends YSensor
      * Use the method YRangeFinder::nextRangeFinder() to iterate on
      * next range finders.
      *
-     * @return YRangeFinder  a pointer to a YRangeFinder object, corresponding to
+     * @return ?YRangeFinder  a pointer to a YRangeFinder object, corresponding to
      *         the first range finder currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstRangeFinder()
+    public static function FirstRangeFinder(): ?YRangeFinder
     {
         $next_hwid = YAPI::getFirstHardwareId('RangeFinder');
         if ($next_hwid == null) {

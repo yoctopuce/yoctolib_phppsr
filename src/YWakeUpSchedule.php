@@ -31,7 +31,7 @@ class YWakeUpSchedule extends YFunction
 
     //--- (end of YWakeUpSchedule attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YWakeUpSchedule constructor)
         parent::__construct($str_func);
@@ -42,7 +42,7 @@ class YWakeUpSchedule extends YFunction
 
     //--- (YWakeUpSchedule implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'minutesA':
@@ -76,6 +76,7 @@ class YWakeUpSchedule extends YFunction
      * @return int  an integer corresponding to the minutes in the 00-29 interval of each hour scheduled for wake up
      *
      * On failure, throws an exception or returns YWakeUpSchedule::MINUTESA_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_minutesA(): int
     {
@@ -100,6 +101,7 @@ class YWakeUpSchedule extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_minutesA(int $newval): int
     {
@@ -113,6 +115,7 @@ class YWakeUpSchedule extends YFunction
      * @return int  an integer corresponding to the minutes in the 30-59 interval of each hour scheduled for wake up
      *
      * On failure, throws an exception or returns YWakeUpSchedule::MINUTESB_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_minutesB(): int
     {
@@ -137,6 +140,7 @@ class YWakeUpSchedule extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_minutesB(int $newval): int
     {
@@ -150,6 +154,7 @@ class YWakeUpSchedule extends YFunction
      * @return int  an integer corresponding to the hours scheduled for wake up
      *
      * On failure, throws an exception or returns YWakeUpSchedule::HOURS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_hours(): int
     {
@@ -173,6 +178,7 @@ class YWakeUpSchedule extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_hours(int $newval): int
     {
@@ -186,6 +192,7 @@ class YWakeUpSchedule extends YFunction
      * @return int  an integer corresponding to the days of the week scheduled for wake up
      *
      * On failure, throws an exception or returns YWakeUpSchedule::WEEKDAYS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_weekDays(): int
     {
@@ -209,6 +216,7 @@ class YWakeUpSchedule extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_weekDays(int $newval): int
     {
@@ -222,6 +230,7 @@ class YWakeUpSchedule extends YFunction
      * @return int  an integer corresponding to the days of the month scheduled for wake up
      *
      * On failure, throws an exception or returns YWakeUpSchedule::MONTHDAYS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_monthDays(): int
     {
@@ -245,6 +254,7 @@ class YWakeUpSchedule extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_monthDays(int $newval): int
     {
@@ -258,6 +268,7 @@ class YWakeUpSchedule extends YFunction
      * @return int  an integer corresponding to the months scheduled for wake up
      *
      * On failure, throws an exception or returns YWakeUpSchedule::MONTHS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_months(): int
     {
@@ -281,6 +292,7 @@ class YWakeUpSchedule extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_months(int $newval): int
     {
@@ -294,6 +306,7 @@ class YWakeUpSchedule extends YFunction
      * @return float  an integer corresponding to the date/time (seconds) of the next wake up occurrence
      *
      * On failure, throws an exception or returns YWakeUpSchedule::NEXTOCCURENCE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_nextOccurence(): float
     {
@@ -335,7 +348,7 @@ class YWakeUpSchedule extends YFunction
      *
      * @return YWakeUpSchedule  a YWakeUpSchedule object allowing you to drive the wake up schedule.
      */
-    public static function FindWakeUpSchedule(string $func): ?YWakeUpSchedule
+    public static function FindWakeUpSchedule(string $func): YWakeUpSchedule
     {
         // $obj                    is a YWakeUpSchedule;
         $obj = YFunction::_FindFromCache('WakeUpSchedule', $func);
@@ -367,6 +380,7 @@ class YWakeUpSchedule extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_minutes(float $bitmap): int
     {
@@ -375,66 +389,105 @@ class YWakeUpSchedule extends YFunction
         return $this->set_minutesB((($bitmap) & (0x3fffffff)));
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function minutesA(): int
 {
     return $this->get_minutesA();
 }
 
-    public function setMinutesA(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMinutesA(int $newval): int
 {
     return $this->set_minutesA($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function minutesB(): int
 {
     return $this->get_minutesB();
 }
 
-    public function setMinutesB(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMinutesB(int $newval): int
 {
     return $this->set_minutesB($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function hours(): int
 {
     return $this->get_hours();
 }
 
-    public function setHours(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setHours(int $newval): int
 {
     return $this->set_hours($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function weekDays(): int
 {
     return $this->get_weekDays();
 }
 
-    public function setWeekDays(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setWeekDays(int $newval): int
 {
     return $this->set_weekDays($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function monthDays(): int
 {
     return $this->get_monthDays();
 }
 
-    public function setMonthDays(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMonthDays(int $newval): int
 {
     return $this->set_monthDays($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function months(): int
 {
     return $this->get_months();
 }
 
-    public function setMonths(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMonths(int $newval): int
 {
     return $this->set_months($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function nextOccurence(): float
 {
     return $this->get_nextOccurence();
@@ -446,7 +499,7 @@ class YWakeUpSchedule extends YFunction
      * If you want to find a specific a wake up schedule, use WakeUpSchedule.findWakeUpSchedule()
      * and a hardwareID or a logical name.
      *
-     * @return YWakeUpSchedule  a pointer to a YWakeUpSchedule object, corresponding to
+     * @return ?YWakeUpSchedule  a pointer to a YWakeUpSchedule object, corresponding to
      *         a wake up schedule currently online, or a null pointer
      *         if there are no more wake up schedules to enumerate.
      */
@@ -468,11 +521,11 @@ class YWakeUpSchedule extends YFunction
      * Use the method YWakeUpSchedule::nextWakeUpSchedule() to iterate on
      * next wake up schedules.
      *
-     * @return YWakeUpSchedule  a pointer to a YWakeUpSchedule object, corresponding to
+     * @return ?YWakeUpSchedule  a pointer to a YWakeUpSchedule object, corresponding to
      *         the first wake up schedule currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstWakeUpSchedule()
+    public static function FirstWakeUpSchedule(): ?YWakeUpSchedule
     {
         $next_hwid = YAPI::getFirstHardwareId('WakeUpSchedule');
         if ($next_hwid == null) {

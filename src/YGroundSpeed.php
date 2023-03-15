@@ -16,7 +16,7 @@ class YGroundSpeed extends YSensor
 
     //--- (end of YGroundSpeed attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YGroundSpeed constructor)
         parent::__construct($str_func);
@@ -55,7 +55,7 @@ class YGroundSpeed extends YSensor
      *
      * @return YGroundSpeed  a YGroundSpeed object allowing you to drive the ground speed sensor.
      */
-    public static function FindGroundSpeed(string $func): ?YGroundSpeed
+    public static function FindGroundSpeed(string $func): YGroundSpeed
     {
         // $obj                    is a YGroundSpeed;
         $obj = YFunction::_FindFromCache('GroundSpeed', $func);
@@ -72,7 +72,7 @@ class YGroundSpeed extends YSensor
      * If you want to find a specific a ground speed sensor, use GroundSpeed.findGroundSpeed()
      * and a hardwareID or a logical name.
      *
-     * @return YGroundSpeed  a pointer to a YGroundSpeed object, corresponding to
+     * @return ?YGroundSpeed  a pointer to a YGroundSpeed object, corresponding to
      *         a ground speed sensor currently online, or a null pointer
      *         if there are no more ground speed sensors to enumerate.
      */
@@ -94,11 +94,11 @@ class YGroundSpeed extends YSensor
      * Use the method YGroundSpeed::nextGroundSpeed() to iterate on
      * next ground speed sensors.
      *
-     * @return YGroundSpeed  a pointer to a YGroundSpeed object, corresponding to
+     * @return ?YGroundSpeed  a pointer to a YGroundSpeed object, corresponding to
      *         the first ground speed sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstGroundSpeed()
+    public static function FirstGroundSpeed(): ?YGroundSpeed
     {
         $next_hwid = YAPI::getFirstHardwareId('GroundSpeed');
         if ($next_hwid == null) {

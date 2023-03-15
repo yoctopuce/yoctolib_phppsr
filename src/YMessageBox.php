@@ -35,7 +35,7 @@ class YMessageBox extends YFunction
 
     //--- (end of generated code: YMessageBox attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (generated code: YMessageBox constructor)
         parent::__construct($str_func);
@@ -46,7 +46,7 @@ class YMessageBox extends YFunction
 
     //--- (generated code: YMessageBox implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'slotsInUse':
@@ -77,6 +77,7 @@ class YMessageBox extends YFunction
      * @return int  an integer corresponding to the number of message storage slots currently in use
      *
      * On failure, throws an exception or returns YMessageBox::SLOTSINUSE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_slotsInUse(): int
     {
@@ -96,6 +97,7 @@ class YMessageBox extends YFunction
      * @return int  an integer corresponding to the total number of message storage slots on the SIM card
      *
      * On failure, throws an exception or returns YMessageBox::SLOTSCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_slotsCount(): int
     {
@@ -109,6 +111,9 @@ class YMessageBox extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_slotsBitmap(): string
     {
         // $res                    is a string;
@@ -127,6 +132,7 @@ class YMessageBox extends YFunction
      * @return int  an integer corresponding to the number of SMS units sent so far
      *
      * On failure, throws an exception or returns YMessageBox::PDUSENT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pduSent(): int
     {
@@ -148,6 +154,7 @@ class YMessageBox extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_pduSent(int $newval): int
     {
@@ -161,6 +168,7 @@ class YMessageBox extends YFunction
      * @return int  an integer corresponding to the number of SMS units received so far
      *
      * On failure, throws an exception or returns YMessageBox::PDURECEIVED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pduReceived(): int
     {
@@ -182,6 +190,7 @@ class YMessageBox extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_pduReceived(int $newval): int
     {
@@ -189,6 +198,9 @@ class YMessageBox extends YFunction
         return $this->_setAttr("pduReceived", $rest_val);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -201,6 +213,9 @@ class YMessageBox extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -235,7 +250,7 @@ class YMessageBox extends YFunction
      *
      * @return YMessageBox  a YMessageBox object allowing you to drive the SMS message box interface.
      */
-    public static function FindMessageBox(string $func): ?YMessageBox
+    public static function FindMessageBox(string $func): YMessageBox
     {
         // $obj                    is a YMessageBox;
         $obj = YFunction::_FindFromCache('MessageBox', $func);
@@ -246,12 +261,18 @@ class YMessageBox extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function nextMsgRef(): int
     {
         $this->_nextMsgRef = $this->_nextMsgRef + 1;
         return $this->_nextMsgRef;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function clearSIMSlot(int $slot): int
     {
         // $retry                  is a int;
@@ -288,6 +309,9 @@ class YMessageBox extends YFunction
         return YAPI::IO_ERROR;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _AT(string $cmd): string
     {
         // $chrPos                 is a int;
@@ -352,6 +376,9 @@ class YMessageBox extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function fetchPdu(int $slot): ?YSms
     {
         // $binPdu                 is a bin;
@@ -368,6 +395,9 @@ class YMessageBox extends YFunction
         return $sms;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function initGsm2Unicode(): int
     {
         // $i                      is a int;
@@ -454,6 +484,9 @@ class YMessageBox extends YFunction
         return YAPI::SUCCESS;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function gsm2unicode(string $gsm): array
     {
         // $i                      is a int;
@@ -540,6 +573,9 @@ class YMessageBox extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function gsm2str(string $gsm): string
     {
         // $i                      is a int;
@@ -631,6 +667,9 @@ class YMessageBox extends YFunction
         return $resstr;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function str2gsm(string $msg): string
     {
         // $asc                    is a bin;
@@ -707,6 +746,9 @@ class YMessageBox extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function checkNewMessages(): int
     {
         // $bitmapStr              is a str;
@@ -842,6 +884,9 @@ class YMessageBox extends YFunction
         return YAPI::SUCCESS;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_pdus(): array
     {
         $this->checkNewMessages();
@@ -854,6 +899,7 @@ class YMessageBox extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function clearPduCounters(): int
     {
@@ -881,6 +927,7 @@ class YMessageBox extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function sendTextMessage(string $recipient, string $message): int
     {
@@ -907,6 +954,7 @@ class YMessageBox extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function sendFlashMessage(string $recipient, string $message): int
     {
@@ -925,9 +973,10 @@ class YMessageBox extends YFunction
      * @param string $recipient : a text string with the recipient phone number, either as a
      *         national number, or in international format starting with a plus sign
      *
-     * @return YSms  YAPI::SUCCESS when the call succeeds.
+     * @return ?YSms  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function newMessage(string $recipient): ?YSms
     {
@@ -944,6 +993,7 @@ class YMessageBox extends YFunction
      * @return YSms[]  an YSms object list.
      *
      * On failure, throws an exception or returns an empty list.
+     * @throws YAPI_Exception on error
      */
     public function get_messages(): array
     {
@@ -951,47 +1001,74 @@ class YMessageBox extends YFunction
         return $this->_messages;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function slotsInUse(): int
 {
     return $this->get_slotsInUse();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function slotsCount(): int
 {
     return $this->get_slotsCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function slotsBitmap(): string
 {
     return $this->get_slotsBitmap();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pduSent(): int
 {
     return $this->get_pduSent();
 }
 
-    public function setPduSent(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPduSent(int $newval): int
 {
     return $this->set_pduSent($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pduReceived(): int
 {
     return $this->get_pduReceived();
 }
 
-    public function setPduReceived(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPduReceived(int $newval): int
 {
     return $this->set_pduReceived($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
@@ -1002,7 +1079,7 @@ class YMessageBox extends YFunction
      * If you want to find a specific a SMS message box interface, use MessageBox.findMessageBox()
      * and a hardwareID or a logical name.
      *
-     * @return YMessageBox  a pointer to a YMessageBox object, corresponding to
+     * @return ?YMessageBox  a pointer to a YMessageBox object, corresponding to
      *         a SMS message box interface currently online, or a null pointer
      *         if there are no more SMS message box interfaces to enumerate.
      */
@@ -1024,11 +1101,11 @@ class YMessageBox extends YFunction
      * Use the method YMessageBox::nextMessageBox() to iterate on
      * next SMS message box interfaces.
      *
-     * @return YMessageBox  a pointer to a YMessageBox object, corresponding to
+     * @return ?YMessageBox  a pointer to a YMessageBox object, corresponding to
      *         the first SMS message box interface currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstMessageBox()
+    public static function FirstMessageBox(): ?YMessageBox
     {
         $next_hwid = YAPI::getFirstHardwareId('MessageBox');
         if ($next_hwid == null) {
@@ -1039,4 +1116,5 @@ class YMessageBox extends YFunction
 
     //--- (end of generated code: YMessageBox implementation)
 
-};
+}
+

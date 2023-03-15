@@ -36,7 +36,7 @@ class YServo extends YFunction
 
     //--- (end of YServo attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YServo constructor)
         parent::__construct($str_func);
@@ -47,7 +47,7 @@ class YServo extends YFunction
 
     //--- (YServo implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'position':
@@ -81,6 +81,7 @@ class YServo extends YFunction
      * @return int  an integer corresponding to the current servo position
      *
      * On failure, throws an exception or returns YServo::POSITION_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_position(): int
     {
@@ -102,6 +103,7 @@ class YServo extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_position(int $newval): int
     {
@@ -115,6 +117,7 @@ class YServo extends YFunction
      * @return int  either YServo::ENABLED_FALSE or YServo::ENABLED_TRUE, according to the state of the RC servo motors
      *
      * On failure, throws an exception or returns YServo::ENABLED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_enabled(): int
     {
@@ -136,6 +139,7 @@ class YServo extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_enabled(int $newval): int
     {
@@ -149,6 +153,7 @@ class YServo extends YFunction
      * @return int  an integer corresponding to the current range of use of the servo
      *
      * On failure, throws an exception or returns YServo::RANGE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_range(): int
     {
@@ -176,6 +181,7 @@ class YServo extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_range(int $newval): int
     {
@@ -189,6 +195,7 @@ class YServo extends YFunction
      * @return int  an integer corresponding to the duration in microseconds of a neutral pulse for the servo
      *
      * On failure, throws an exception or returns YServo::NEUTRAL_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_neutral(): int
     {
@@ -216,6 +223,7 @@ class YServo extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_neutral(int $newval): int
     {
@@ -223,6 +231,9 @@ class YServo extends YFunction
         return $this->_setAttr("neutral", $rest_val);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_move(): mixed
     {
         // $res                    is a YMove;
@@ -235,6 +246,9 @@ class YServo extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_move(mixed $newval): int
     {
         $rest_val = $newval["target"].':'.$newval["ms"];
@@ -250,6 +264,7 @@ class YServo extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function move(int $target,int $ms_duration): int
     {
@@ -263,6 +278,7 @@ class YServo extends YFunction
      * @return int  an integer corresponding to the servo position at device power up
      *
      * On failure, throws an exception or returns YServo::POSITIONATPOWERON_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_positionAtPowerOn(): int
     {
@@ -285,6 +301,7 @@ class YServo extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_positionAtPowerOn(int $newval): int
     {
@@ -299,6 +316,7 @@ class YServo extends YFunction
      * servo signal generator state at power up
      *
      * On failure, throws an exception or returns YServo::ENABLEDATPOWERON_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_enabledAtPowerOn(): int
     {
@@ -321,6 +339,7 @@ class YServo extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_enabledAtPowerOn(int $newval): int
     {
@@ -356,7 +375,7 @@ class YServo extends YFunction
      *
      * @return YServo  a YServo object allowing you to drive the RC servo motor.
      */
-    public static function FindServo(string $func): ?YServo
+    public static function FindServo(string $func): YServo
     {
         // $obj                    is a YServo;
         $obj = YFunction::_FindFromCache('Servo', $func);
@@ -367,67 +386,106 @@ class YServo extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function position(): int
 {
     return $this->get_position();
 }
 
-    public function setPosition(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPosition(int $newval): int
 {
     return $this->set_position($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function enabled(): int
 {
     return $this->get_enabled();
 }
 
-    public function setEnabled(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setEnabled(int $newval): int
 {
     return $this->set_enabled($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function range(): int
 {
     return $this->get_range();
 }
 
-    public function setRange(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setRange(int $newval): int
 {
     return $this->set_range($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function neutral(): int
 {
     return $this->get_neutral();
 }
 
-    public function setNeutral(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setNeutral(int $newval): int
 {
     return $this->set_neutral($newval);
 }
 
-    public function setMove(mixed $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMove(mixed $newval): int
 {
     return $this->set_move($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function positionAtPowerOn(): int
 {
     return $this->get_positionAtPowerOn();
 }
 
-    public function setPositionAtPowerOn(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPositionAtPowerOn(int $newval): int
 {
     return $this->set_positionAtPowerOn($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function enabledAtPowerOn(): int
 {
     return $this->get_enabledAtPowerOn();
 }
 
-    public function setEnabledAtPowerOn(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setEnabledAtPowerOn(int $newval): int
 {
     return $this->set_enabledAtPowerOn($newval);
 }
@@ -438,7 +496,7 @@ class YServo extends YFunction
      * If you want to find a specific a RC servo motor, use Servo.findServo()
      * and a hardwareID or a logical name.
      *
-     * @return YServo  a pointer to a YServo object, corresponding to
+     * @return ?YServo  a pointer to a YServo object, corresponding to
      *         a RC servo motor currently online, or a null pointer
      *         if there are no more RC servo motors to enumerate.
      */
@@ -460,11 +518,11 @@ class YServo extends YFunction
      * Use the method YServo::nextServo() to iterate on
      * next RC servo motors.
      *
-     * @return YServo  a pointer to a YServo object, corresponding to
+     * @return ?YServo  a pointer to a YServo object, corresponding to
      *         the first RC servo motor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstServo()
+    public static function FirstServo(): ?YServo
     {
         $next_hwid = YAPI::getFirstHardwareId('Servo');
         if ($next_hwid == null) {

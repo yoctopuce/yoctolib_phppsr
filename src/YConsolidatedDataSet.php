@@ -25,7 +25,7 @@ class YConsolidatedDataSet
 
     //--- (end of generated code: YConsolidatedDataSet attributes)
 
-    public function __construct($float_startTime, $float_endTime, $obj_sensorList)
+    public function __construct(float $float_startTime, float $float_endTime, array $obj_sensorList)
     {
         //--- (generated code: YConsolidatedDataSet constructor)
         //--- (end of generated code: YConsolidatedDataSet constructor)
@@ -34,6 +34,9 @@ class YConsolidatedDataSet
 
     //--- (generated code: YConsolidatedDataSet implementation)
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function imm_init(float $startt, float $endt, array $sensorList): int
     {
         $this->_start = $startt;
@@ -62,7 +65,7 @@ class YConsolidatedDataSet
      *         January 1, 1970 UTC. The special value 0 can be used
      *         to include any measure, without ending limit.
      *
-     * @return YConsolidatedDataSet  an instance of YConsolidatedDataSet, providing access to
+     * @return ?YConsolidatedDataSet  an instance of YConsolidatedDataSet, providing access to
      *         consolidated historical data. Records can be loaded progressively
      *         using the YConsolidatedDataSet::nextRecord() method.
      */
@@ -101,6 +104,7 @@ class YConsolidatedDataSet
      *         or a negative error code in case of failure.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function nextRecord(array &$datarec): int
     {

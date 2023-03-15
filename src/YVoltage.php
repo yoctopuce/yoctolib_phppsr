@@ -21,7 +21,7 @@ class YVoltage extends YSensor
 
     //--- (end of YVoltage attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YVoltage constructor)
         parent::__construct($str_func);
@@ -32,7 +32,7 @@ class YVoltage extends YSensor
 
     //--- (YVoltage implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'enabled':
@@ -49,6 +49,7 @@ class YVoltage extends YSensor
      * state of this input
      *
      * On failure, throws an exception or returns YVoltage::ENABLED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_enabled(): int
     {
@@ -76,6 +77,7 @@ class YVoltage extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_enabled(int $newval): int
     {
@@ -111,7 +113,7 @@ class YVoltage extends YSensor
      *
      * @return YVoltage  a YVoltage object allowing you to drive the voltage sensor.
      */
-    public static function FindVoltage(string $func): ?YVoltage
+    public static function FindVoltage(string $func): YVoltage
     {
         // $obj                    is a YVoltage;
         $obj = YFunction::_FindFromCache('Voltage', $func);
@@ -122,12 +124,18 @@ class YVoltage extends YSensor
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function enabled(): int
 {
     return $this->get_enabled();
 }
 
-    public function setEnabled(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setEnabled(int $newval): int
 {
     return $this->set_enabled($newval);
 }
@@ -138,7 +146,7 @@ class YVoltage extends YSensor
      * If you want to find a specific a voltage sensor, use Voltage.findVoltage()
      * and a hardwareID or a logical name.
      *
-     * @return YVoltage  a pointer to a YVoltage object, corresponding to
+     * @return ?YVoltage  a pointer to a YVoltage object, corresponding to
      *         a voltage sensor currently online, or a null pointer
      *         if there are no more voltage sensors to enumerate.
      */
@@ -160,11 +168,11 @@ class YVoltage extends YSensor
      * Use the method YVoltage::nextVoltage() to iterate on
      * next voltage sensors.
      *
-     * @return YVoltage  a pointer to a YVoltage object, corresponding to
+     * @return ?YVoltage  a pointer to a YVoltage object, corresponding to
      *         the first voltage sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstVoltage()
+    public static function FirstVoltage(): ?YVoltage
     {
         $next_hwid = YAPI::getFirstHardwareId('Voltage');
         if ($next_hwid == null) {

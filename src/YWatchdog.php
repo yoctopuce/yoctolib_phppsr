@@ -59,7 +59,7 @@ class YWatchdog extends YFunction
 
     //--- (end of YWatchdog attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YWatchdog constructor)
         parent::__construct($str_func);
@@ -70,7 +70,7 @@ class YWatchdog extends YFunction
 
     //--- (YWatchdog implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'state':
@@ -123,6 +123,7 @@ class YWatchdog extends YFunction
      * (A for the idle position, B for the active position)
      *
      * On failure, throws an exception or returns YWatchdog::STATE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_state(): int
     {
@@ -145,6 +146,7 @@ class YWatchdog extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_state(int $newval): int
     {
@@ -162,6 +164,7 @@ class YWatchdog extends YFunction
      *         B for the active position, UNCHANGED to leave the relay state as is)
      *
      * On failure, throws an exception or returns YWatchdog::STATEATPOWERON_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_stateAtPowerOn(): int
     {
@@ -189,6 +192,7 @@ class YWatchdog extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_stateAtPowerOn(int $newval): int
     {
@@ -204,6 +208,7 @@ class YWatchdog extends YFunction
      *         A before automatically switching back in to B state
      *
      * On failure, throws an exception or returns YWatchdog::MAXTIMEONSTATEA_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_maxTimeOnStateA(): float
     {
@@ -230,6 +235,7 @@ class YWatchdog extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_maxTimeOnStateA(float $newval): int
     {
@@ -244,6 +250,7 @@ class YWatchdog extends YFunction
      * @return float  an integer
      *
      * On failure, throws an exception or returns YWatchdog::MAXTIMEONSTATEB_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_maxTimeOnStateB(): float
     {
@@ -270,6 +277,7 @@ class YWatchdog extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_maxTimeOnStateB(float $newval): int
     {
@@ -284,6 +292,7 @@ class YWatchdog extends YFunction
      * the watchdog, when used as a simple switch (single throw)
      *
      * On failure, throws an exception or returns YWatchdog::OUTPUT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_output(): int
     {
@@ -306,6 +315,7 @@ class YWatchdog extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_output(int $newval): int
     {
@@ -322,6 +332,7 @@ class YWatchdog extends YFunction
      *         (state A), during a measured pulse generation
      *
      * On failure, throws an exception or returns YWatchdog::PULSETIMER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pulseTimer(): float
     {
@@ -335,6 +346,9 @@ class YWatchdog extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_pulseTimer(float $newval): int
     {
         $rest_val = strval($newval);
@@ -350,6 +364,7 @@ class YWatchdog extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function pulse(int $ms_duration): int
     {
@@ -357,6 +372,9 @@ class YWatchdog extends YFunction
         return $this->_setAttr("pulseTimer",$rest_val);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_delayedPulseTimer(): mixed
     {
         // $res                    is a YDelayedPulse;
@@ -369,6 +387,9 @@ class YWatchdog extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_delayedPulseTimer(mixed $newval): int
     {
         $rest_val = $newval["target"].':'.$newval["ms"];
@@ -384,6 +405,7 @@ class YWatchdog extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function delayedPulse(int $ms_delay,int $ms_duration): int
     {
@@ -400,6 +422,7 @@ class YWatchdog extends YFunction
      *         When there is no scheduled pulse, returns zero
      *
      * On failure, throws an exception or returns YWatchdog::COUNTDOWN_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_countdown(): float
     {
@@ -420,6 +443,7 @@ class YWatchdog extends YFunction
      * running state at module power on
      *
      * On failure, throws an exception or returns YWatchdog::AUTOSTART_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_autoStart(): int
     {
@@ -443,6 +467,7 @@ class YWatchdog extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_autoStart(int $newval): int
     {
@@ -456,6 +481,7 @@ class YWatchdog extends YFunction
      * @return int  either YWatchdog::RUNNING_OFF or YWatchdog::RUNNING_ON, according to the watchdog running state
      *
      * On failure, throws an exception or returns YWatchdog::RUNNING_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_running(): int
     {
@@ -478,6 +504,7 @@ class YWatchdog extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_running(int $newval): int
     {
@@ -493,6 +520,7 @@ class YWatchdog extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function resetWatchdog(): int
     {
@@ -507,6 +535,7 @@ class YWatchdog extends YFunction
      * triggered by the watchdog, in milliseconds
      *
      * On failure, throws an exception or returns YWatchdog::TRIGGERDELAY_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_triggerDelay(): float
     {
@@ -532,6 +561,7 @@ class YWatchdog extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_triggerDelay(float $newval): int
     {
@@ -545,6 +575,7 @@ class YWatchdog extends YFunction
      * @return float  an integer corresponding to the duration of resets caused by the watchdog, in milliseconds
      *
      * On failure, throws an exception or returns YWatchdog::TRIGGERDURATION_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_triggerDuration(): float
     {
@@ -569,6 +600,7 @@ class YWatchdog extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_triggerDuration(float $newval): int
     {
@@ -582,6 +614,7 @@ class YWatchdog extends YFunction
      * @return int  an integer corresponding to the number of seconds spent since the last output power-up event
      *
      * On failure, throws an exception or returns YWatchdog::LASTTRIGGER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_lastTrigger(): int
     {
@@ -623,7 +656,7 @@ class YWatchdog extends YFunction
      *
      * @return YWatchdog  a YWatchdog object allowing you to drive the watchdog.
      */
-    public static function FindWatchdog(string $func): ?YWatchdog
+    public static function FindWatchdog(string $func): YWatchdog
     {
         // $obj                    is a YWatchdog;
         $obj = YFunction::_FindFromCache('Watchdog', $func);
@@ -640,6 +673,7 @@ class YWatchdog extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function toggle(): int
     {
@@ -670,121 +704,193 @@ class YWatchdog extends YFunction
         }
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function state(): int
 {
     return $this->get_state();
 }
 
-    public function setState(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setState(int $newval): int
 {
     return $this->set_state($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function stateAtPowerOn(): int
 {
     return $this->get_stateAtPowerOn();
 }
 
-    public function setStateAtPowerOn(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setStateAtPowerOn(int $newval): int
 {
     return $this->set_stateAtPowerOn($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function maxTimeOnStateA(): float
 {
     return $this->get_maxTimeOnStateA();
 }
 
-    public function setMaxTimeOnStateA(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMaxTimeOnStateA(float $newval): int
 {
     return $this->set_maxTimeOnStateA($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function maxTimeOnStateB(): float
 {
     return $this->get_maxTimeOnStateB();
 }
 
-    public function setMaxTimeOnStateB(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMaxTimeOnStateB(float $newval): int
 {
     return $this->set_maxTimeOnStateB($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function output(): int
 {
     return $this->get_output();
 }
 
-    public function setOutput(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setOutput(int $newval): int
 {
     return $this->set_output($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pulseTimer(): float
 {
     return $this->get_pulseTimer();
 }
 
-    public function setPulseTimer(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPulseTimer(float $newval): int
 {
     return $this->set_pulseTimer($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function delayedPulseTimer(): mixed
 {
     return $this->get_delayedPulseTimer();
 }
 
-    public function setDelayedPulseTimer(mixed $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setDelayedPulseTimer(mixed $newval): int
 {
     return $this->set_delayedPulseTimer($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function countdown(): float
 {
     return $this->get_countdown();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function autoStart(): int
 {
     return $this->get_autoStart();
 }
 
-    public function setAutoStart(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setAutoStart(int $newval): int
 {
     return $this->set_autoStart($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function running(): int
 {
     return $this->get_running();
 }
 
-    public function setRunning(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setRunning(int $newval): int
 {
     return $this->set_running($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function triggerDelay(): float
 {
     return $this->get_triggerDelay();
 }
 
-    public function setTriggerDelay(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setTriggerDelay(float $newval): int
 {
     return $this->set_triggerDelay($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function triggerDuration(): float
 {
     return $this->get_triggerDuration();
 }
 
-    public function setTriggerDuration(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setTriggerDuration(float $newval): int
 {
     return $this->set_triggerDuration($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function lastTrigger(): int
 {
     return $this->get_lastTrigger();
@@ -796,7 +902,7 @@ class YWatchdog extends YFunction
      * If you want to find a specific a watchdog, use Watchdog.findWatchdog()
      * and a hardwareID or a logical name.
      *
-     * @return YWatchdog  a pointer to a YWatchdog object, corresponding to
+     * @return ?YWatchdog  a pointer to a YWatchdog object, corresponding to
      *         a watchdog currently online, or a null pointer
      *         if there are no more watchdog to enumerate.
      */
@@ -818,11 +924,11 @@ class YWatchdog extends YFunction
      * Use the method YWatchdog::nextWatchdog() to iterate on
      * next watchdog.
      *
-     * @return YWatchdog  a pointer to a YWatchdog object, corresponding to
+     * @return ?YWatchdog  a pointer to a YWatchdog object, corresponding to
      *         the first watchdog currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstWatchdog()
+    public static function FirstWatchdog(): ?YWatchdog
     {
         $next_hwid = YAPI::getFirstHardwareId('Watchdog');
         if ($next_hwid == null) {

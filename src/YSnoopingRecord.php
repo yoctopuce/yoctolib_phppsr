@@ -17,12 +17,12 @@ class YSnoopingRecord
 
     //--- (end of generated code: YSnoopingRecord attributes)
 
-    function __construct($str_json)
+    function __construct(string $str_json)
     {
         //--- (generated code: YSnoopingRecord constructor)
         //--- (end of generated code: YSnoopingRecord constructor)
 
-        $loadval = json_decode($str_json, TRUE);
+        $loadval = json_decode($str_json, true);
         $this->_tim = $loadval['t'];
         $this->_dir = $loadval['m'][0] == '<' ? 1 : 0;
         $this->_msg = substr($loadval['m'], 1);
@@ -62,3 +62,4 @@ class YSnoopingRecord
 
     //--- (end of generated code: YSnoopingRecord implementation)
 }
+

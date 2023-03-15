@@ -16,7 +16,7 @@ class YVoc extends YSensor
 
     //--- (end of YVoc attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YVoc constructor)
         parent::__construct($str_func);
@@ -55,7 +55,7 @@ class YVoc extends YSensor
      *
      * @return YVoc  a YVoc object allowing you to drive the Volatile Organic Compound sensor.
      */
-    public static function FindVoc(string $func): ?YVoc
+    public static function FindVoc(string $func): YVoc
     {
         // $obj                    is a YVoc;
         $obj = YFunction::_FindFromCache('Voc', $func);
@@ -72,7 +72,7 @@ class YVoc extends YSensor
      * If you want to find a specific a Volatile Organic Compound sensor, use Voc.findVoc()
      * and a hardwareID or a logical name.
      *
-     * @return YVoc  a pointer to a YVoc object, corresponding to
+     * @return ?YVoc  a pointer to a YVoc object, corresponding to
      *         a Volatile Organic Compound sensor currently online, or a null pointer
      *         if there are no more Volatile Organic Compound sensors to enumerate.
      */
@@ -94,11 +94,11 @@ class YVoc extends YSensor
      * Use the method YVoc::nextVoc() to iterate on
      * next Volatile Organic Compound sensors.
      *
-     * @return YVoc  a pointer to a YVoc object, corresponding to
+     * @return ?YVoc  a pointer to a YVoc object, corresponding to
      *         the first Volatile Organic Compound sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstVoc()
+    public static function FirstVoc(): ?YVoc
     {
         $next_hwid = YAPI::getFirstHardwareId('Voc');
         if ($next_hwid == null) {

@@ -47,9 +47,9 @@ class YModule extends YFunction
     protected mixed $_beaconCallback = null;                         // YModuleBeaconCallback
 
     //--- (end of generated code: YModule attributes)
-    protected static $_moduleCallbackList = array();
+    protected static array $_moduleCallbackList = array();
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (generated code: YModule constructor)
         parent::__construct($str_func);
@@ -58,12 +58,15 @@ class YModule extends YFunction
         //--- (end of generated code: YModule constructor)
     }
 
-    private static function _updateModuleCallbackList($module, $add)
+    private static function _updateModuleCallbackList(YModule $module, bool $add): void
     {
     }
 
-    // Return the internal device object hosting the function
-    protected function _getDev()
+    /**
+     * Return the internal device object hosting the function
+     * @throws YAPI_Exception
+     */
+    protected function _getDev(): ?YDevice
     {
         $devid = $this->_func;
         $dotidx = strpos($devid, '.');
@@ -83,8 +86,9 @@ class YModule extends YFunction
      * @return int  the number of functions on the module
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
-    public function functionCount()
+    public function functionCount(): int
     {
         $dev = $this->_getDev();
         return $dev->functionCount();
@@ -99,8 +103,9 @@ class YModule extends YFunction
      * @return string  a string corresponding to the unambiguous hardware identifier of the requested module function
      *
      * On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
-    public function functionId($functionIndex)
+    public function functionId(int $functionIndex): string
     {
         $dev = $this->_getDev();
         return $dev->functionId($functionIndex);
@@ -115,8 +120,9 @@ class YModule extends YFunction
      * @return string  a string corresponding to the type of the function
      *
      * On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
-    public function functionType($functionIndex)
+    public function functionType(int $functionIndex): string
     {
         $dev = $this->_getDev();
         return $dev->functionType($functionIndex);
@@ -132,8 +138,9 @@ class YModule extends YFunction
      * @return string  a string corresponding to the base type of the function
      *
      * On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
-    public function functionBaseType($functionIndex)
+    public function functionBaseType(int $functionIndex): string
     {
         $dev = $this->_getDev();
         return $dev->functionBaseType($functionIndex);
@@ -149,8 +156,9 @@ class YModule extends YFunction
      * @return string  a string corresponding to the logical name of the requested module function
      *
      * On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
-    public function functionName($functionIndex)
+    public function functionName(int $functionIndex): string
     {
         $devid = $this->_func;
         $dotidx = strpos($devid, '.');
@@ -171,14 +179,15 @@ class YModule extends YFunction
      * requested module function
      *
      * On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
-    public function functionValue($functionIndex)
+    public function functionValue(int $functionIndex): string
     {
         $dev = $this->_getDev();
         return $dev->functionValue($functionIndex);
     }
 
-    protected function _flattenJsonStruct_internal($jsoncomplex)
+    protected function _flattenJsonStruct_internal(string $jsoncomplex): string
     {
         $decoded = json_decode($jsoncomplex);
         if ($decoded == null) {
@@ -202,13 +211,13 @@ class YModule extends YFunction
         return json_encode($attrs);
     }
 
-    private function get_subDevices_internal()
+    private function get_subDevices_internal(): array
     {
         $serial = $this->get_serialNumber();
         return YAPI::getSubDevicesFrom($serial);
     }
 
-    private function get_parentHub_internal()
+    private function get_parentHub_internal(): string
     {
         $serial = $this->get_serialNumber();
         $hubserial = YAPI::getHubSerialFrom($serial);
@@ -218,16 +227,13 @@ class YModule extends YFunction
         return $hubserial;
     }
 
-    private function get_url_internal()
+    private function get_url_internal(): string
     {
-        $dev = $this->_getDev();
-        if (!($dev == null)) {
-            return $dev->getRootUrl();
-        }
-        return "";
+        $serial = $this->get_serialNumber();
+        return YAPI::getHubURLFrom($serial);
     }
 
-    private function _startStopDevLog_internal($str_serial, $bool_start)
+    private function _startStopDevLog_internal(string $str_serial, bool $bool_start): void
     {
         $dev = $this->_getDev();
         if (!($dev == null)) {
@@ -237,7 +243,7 @@ class YModule extends YFunction
 
     //--- (generated code: YModule implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'productName':
@@ -286,6 +292,7 @@ class YModule extends YFunction
      * @return string  a string corresponding to the commercial name of the module, as set by the factory
      *
      * On failure, throws an exception or returns YModule::PRODUCTNAME_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_productName(): string
     {
@@ -310,6 +317,7 @@ class YModule extends YFunction
      * @return string  a string corresponding to the serial number of the module, as set by the factory
      *
      * On failure, throws an exception or returns YModule::SERIALNUMBER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_serialNumber(): string
     {
@@ -334,6 +342,7 @@ class YModule extends YFunction
      * @return int  an integer corresponding to the USB device identifier of the module
      *
      * On failure, throws an exception or returns YModule::PRODUCTID_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_productId(): int
     {
@@ -359,6 +368,7 @@ class YModule extends YFunction
      * @return int  an integer corresponding to the release number of the module hardware, preprogrammed at the factory
      *
      * On failure, throws an exception or returns YModule::PRODUCTRELEASE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_productRelease(): int
     {
@@ -378,6 +388,7 @@ class YModule extends YFunction
      * @return string  a string corresponding to the version of the firmware embedded in the module
      *
      * On failure, throws an exception or returns YModule::FIRMWARERELEASE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_firmwareRelease(): string
     {
@@ -398,6 +409,7 @@ class YModule extends YFunction
      * YModule::PERSISTENTSETTINGS_MODIFIED corresponding to the current state of persistent module settings
      *
      * On failure, throws an exception or returns YModule::PERSISTENTSETTINGS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_persistentSettings(): int
     {
@@ -411,6 +423,9 @@ class YModule extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_persistentSettings(int $newval): int
     {
         $rest_val = strval($newval);
@@ -423,6 +438,7 @@ class YModule extends YFunction
      * @return int  an integer corresponding to the luminosity of the  module informative LEDs (from 0 to 100)
      *
      * On failure, throws an exception or returns YModule::LUMINOSITY_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_luminosity(): int
     {
@@ -447,6 +463,7 @@ class YModule extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_luminosity(int $newval): int
     {
@@ -460,6 +477,7 @@ class YModule extends YFunction
      * @return int  either YModule::BEACON_OFF or YModule::BEACON_ON, according to the state of the localization beacon
      *
      * On failure, throws an exception or returns YModule::BEACON_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_beacon(): int
     {
@@ -486,6 +504,7 @@ class YModule extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_beacon(int $newval): int
     {
@@ -499,6 +518,7 @@ class YModule extends YFunction
      * @return float  an integer corresponding to the number of milliseconds spent since the module was powered on
      *
      * On failure, throws an exception or returns YModule::UPTIME_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_upTime(): float
     {
@@ -518,6 +538,7 @@ class YModule extends YFunction
      * @return int  an integer corresponding to the current consumed by the module on the USB bus, in milli-amps
      *
      * On failure, throws an exception or returns YModule::USBCURRENT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_usbCurrent(): int
     {
@@ -540,6 +561,7 @@ class YModule extends YFunction
      *         reboot has been scheduled
      *
      * On failure, throws an exception or returns YModule::REBOOTCOUNTDOWN_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_rebootCountdown(): int
     {
@@ -553,6 +575,9 @@ class YModule extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_rebootCountdown(int $newval): int
     {
         $rest_val = strval($newval);
@@ -566,6 +591,7 @@ class YModule extends YFunction
      * @return int  an integer corresponding to the value previously stored in this attribute
      *
      * On failure, throws an exception or returns YModule::USERVAR_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_userVar(): int
     {
@@ -589,6 +615,7 @@ class YModule extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_userVar(int $newval): int
     {
@@ -618,7 +645,7 @@ class YModule extends YFunction
      * @return YModule  a YModule object allowing you to drive the module
      *         or get additional information on the module.
      */
-    public static function FindModule(string $func): ?YModule
+    public static function FindModule(string $func): YModule
     {
         // $obj                    is a YModule;
         // $cleanHwId              is a str;
@@ -636,6 +663,9 @@ class YModule extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_productNameAndRevision(): string
     {
         // $prodname               is a str;
@@ -660,6 +690,7 @@ class YModule extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function saveToFlash(): int
     {
@@ -673,6 +704,7 @@ class YModule extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function revertFromFlash(): int
     {
@@ -687,6 +719,7 @@ class YModule extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function reboot(int $secBeforeReboot): int
     {
@@ -701,12 +734,16 @@ class YModule extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function triggerFirmwareUpdate(int $secBeforeReboot): int
     {
         return $this->set_rebootCountdown(-$secBeforeReboot);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _startStopDevLog(string $serial, bool $start): void
     {
         $this->_startStopDevLog_internal($serial, $start);
@@ -723,6 +760,7 @@ class YModule extends YFunction
      * should take two
      *         arguments: the module object that emitted the log message, and the character string containing the log.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function registerLogCallback(mixed $callback): int
     {
@@ -737,6 +775,9 @@ class YModule extends YFunction
         return 0;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_logCallback(): mixed
     {
         return $this->_logCallback;
@@ -760,6 +801,9 @@ class YModule extends YFunction
         return 0;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _invokeConfigChangeCallback(): int
     {
         if (!is_null($this->_confChangeCallback)) {
@@ -787,6 +831,9 @@ class YModule extends YFunction
         return 0;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _invokeBeaconCallback(int $beaconState): int
     {
         if (!is_null($this->_beaconCallback)) {
@@ -818,6 +865,7 @@ class YModule extends YFunction
      * @return string  the path of the byn file to use or a empty string if no byn files matches the requirement
      *
      * On failure, throws an exception or returns a string that start with "error:".
+     * @throws YAPI_Exception on error
      */
     public function checkFirmware(string $path, bool $onlynew): string
     {
@@ -845,7 +893,7 @@ class YModule extends YFunction
      * @param string $path : the path of the .byn file to use.
      * @param boolean $force : true to force the firmware update even if some prerequisites appear not to be met
      *
-     * @return YFirmwareUpdate  a YFirmwareUpdate object or NULL on error.
+     * @return ?YFirmwareUpdate  a YFirmwareUpdate object or NULL on error.
      */
     public function updateFirmwareEx(string $path, bool $force): ?YFirmwareUpdate
     {
@@ -867,7 +915,7 @@ class YModule extends YFunction
      *
      * @param string $path : the path of the .byn file to use.
      *
-     * @return YFirmwareUpdate  a YFirmwareUpdate object or NULL on error.
+     * @return ?YFirmwareUpdate  a YFirmwareUpdate object or NULL on error.
      */
     public function updateFirmware(string $path): ?YFirmwareUpdate
     {
@@ -881,6 +929,7 @@ class YModule extends YFunction
      * @return string  a binary buffer with all the settings.
      *
      * On failure, throws an exception or returns an binary object of size 0.
+     * @throws YAPI_Exception on error
      */
     public function get_allSettings(): string
     {
@@ -948,6 +997,9 @@ class YModule extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function loadThermistorExtra(string $funcId, string $jsonExtra): int
     {
         $values = [];           // strArr;
@@ -973,6 +1025,9 @@ class YModule extends YFunction
         return YAPI::SUCCESS;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function set_extraSettings(string $jsonExtra): int
     {
         $extras = [];           // strArr;
@@ -1002,6 +1057,7 @@ class YModule extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_allSettingsAndFiles(string $settings): int
     {
@@ -1109,6 +1165,9 @@ class YModule extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _flattenJsonStruct(string $jsoncomplex): string
     {
         return $this->_flattenJsonStruct_internal($jsoncomplex);
@@ -1117,6 +1176,9 @@ class YModule extends YFunction
     //cannot be generated for PHP:
     //private function _flattenJsonStruct_internal(string $jsoncomplex)
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function calibVersion(string $cparams): int
     {
         if ($cparams == '0,') {
@@ -1139,6 +1201,9 @@ class YModule extends YFunction
         }
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function calibScale(string $unit_name, string $sensorType): int
     {
         if ($unit_name == 'g' || $unit_name == 'gauss' || $unit_name == 'W') {
@@ -1160,6 +1225,9 @@ class YModule extends YFunction
         return 1;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function calibOffset(string $unit_name): int
     {
         if ($unit_name == '% RH' || $unit_name == 'mbar' || $unit_name == 'lx') {
@@ -1168,6 +1236,9 @@ class YModule extends YFunction
         return 32767;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function calibConvert(string $param, string $currentFuncValue, string $unit_name, string $sensorType): string
     {
         // $paramVer               is a int;
@@ -1339,6 +1410,9 @@ class YModule extends YFunction
         return $param;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _tryExec(string $url): int
     {
         // $res                    is a int;
@@ -1373,6 +1447,7 @@ class YModule extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_allSettings(string $settings): int
     {
@@ -1719,6 +1794,7 @@ class YModule extends YFunction
      * @return string  a binary buffer with the file content
      *
      * On failure, throws an exception or returns  YAPI::INVALID_STRING.
+     * @throws YAPI_Exception on error
      */
     public function download(string $pathname): string
     {
@@ -1731,6 +1807,7 @@ class YModule extends YFunction
      *
      * @return string  a binary buffer with module icon, in png format.
      *         On failure, throws an exception or returns  YAPI::INVALID_STRING.
+     * @throws YAPI_Exception on error
      */
     public function get_icon2d(): string
     {
@@ -1743,6 +1820,7 @@ class YModule extends YFunction
      *
      * @return string  a string with last logs of the module.
      *         On failure, throws an exception or returns  YAPI::INVALID_STRING.
+     * @throws YAPI_Exception on error
      */
     public function get_lastLogs(): string
     {
@@ -1762,6 +1840,7 @@ class YModule extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function log(string $text): int
     {
@@ -1812,87 +1891,138 @@ class YModule extends YFunction
     //cannot be generated for PHP:
     //private function get_url_internal()
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function productName(): string
 {
     return $this->get_productName();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function serialNumber(): string
 {
     return $this->get_serialNumber();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function productId(): int
 {
     return $this->get_productId();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function productRelease(): int
 {
     return $this->get_productRelease();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function firmwareRelease(): string
 {
     return $this->get_firmwareRelease();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function persistentSettings(): int
 {
     return $this->get_persistentSettings();
 }
 
-    public function setPersistentSettings(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPersistentSettings(int $newval): int
 {
     return $this->set_persistentSettings($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function luminosity(): int
 {
     return $this->get_luminosity();
 }
 
-    public function setLuminosity(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setLuminosity(int $newval): int
 {
     return $this->set_luminosity($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function beacon(): int
 {
     return $this->get_beacon();
 }
 
-    public function setBeacon(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setBeacon(int $newval): int
 {
     return $this->set_beacon($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function upTime(): float
 {
     return $this->get_upTime();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function usbCurrent(): int
 {
     return $this->get_usbCurrent();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function rebootCountdown(): int
 {
     return $this->get_rebootCountdown();
 }
 
-    public function setRebootCountdown(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setRebootCountdown(int $newval): int
 {
     return $this->set_rebootCountdown($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function userVar(): int
 {
     return $this->get_userVar();
 }
 
-    public function setUserVar(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setUserVar(int $newval): int
 {
     return $this->set_userVar($newval);
 }
@@ -1903,7 +2033,7 @@ class YModule extends YFunction
      * If you want to find a specific module, use Module.findModule()
      * and a hardwareID or a logical name.
      *
-     * @return YModule  a pointer to a YModule object, corresponding to
+     * @return ?YModule  a pointer to a YModule object, corresponding to
      *         the next module found, or a null pointer
      *         if there are no more modules to enumerate.
      */
@@ -1925,11 +2055,11 @@ class YModule extends YFunction
      * Use the method YModule::nextModule() to iterate on the
      * next modules.
      *
-     * @return YModule  a pointer to a YModule object, corresponding to
+     * @return ?YModule  a pointer to a YModule object, corresponding to
      *         the first module currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstModule()
+    public static function FirstModule(): ?YModule
     {
         $next_hwid = YAPI::getFirstHardwareId('Module');
         if ($next_hwid == null) {

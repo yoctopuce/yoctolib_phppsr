@@ -25,7 +25,7 @@ class YFirmwareUpdate
 
     //--- (end of generated code: YFirmwareUpdate attributes)
 
-    public function __construct($serial, $path, $settings, $force)
+    public function __construct(string $serial, string $path, string $settings, bool $force)
     {
         //--- (generated code: YFirmwareUpdate constructor)
         //--- (end of generated code: YFirmwareUpdate constructor)
@@ -35,7 +35,7 @@ class YFirmwareUpdate
         $this->_force = $force;
     }
 
-    private function _processMore_internal($i)
+    private function _processMore_internal(int $i): int
     {
         //not yet implemented
         $this->_progress = -1;
@@ -43,10 +43,10 @@ class YFirmwareUpdate
         return $this->_progress;
     }
 
-    private static function CheckFirmware_internal($serial, $path, $minrelease)
+    private static function CheckFirmware_internal(string $serial, string $path, string $minrelease): string
     {
-        if ($path == "http://www.yoctopuce.com" || $path == "www.yoctopuce.com") {
-            $yoctopuce_infos = file_get_contents('http://www.yoctopuce.com/FR/common/getLastFirmwareLink.php?serial=' . $serial);
+        if ($path == "http://www.yoctopuce.com" || $path == "http://www.yoctopuce.com" || $path == "www.yoctopuce.com") {
+            $yoctopuce_infos = file_get_contents('https://www.yoctopuce.com/FR/common/getLastFirmwareLink.php?serial=' . $serial);
             if ($yoctopuce_infos === false) {
                 return 'error: Unable to get last firmware info from www.yoctopuce.com';
             }
@@ -69,7 +69,7 @@ class YFirmwareUpdate
         }
     }
 
-    private static function GetAllBootLoaders_internal()
+    private static function GetAllBootLoaders_internal(): array
     {
         return array();
     }
@@ -77,6 +77,9 @@ class YFirmwareUpdate
 
     //--- (generated code: YFirmwareUpdate implementation)
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _processMore(int $newupdate): int
     {
         return $this->_processMore_internal($newupdate);

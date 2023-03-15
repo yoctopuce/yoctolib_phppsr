@@ -52,7 +52,7 @@ class YAnButton extends YFunction
 
     //--- (end of YAnButton attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YAnButton constructor)
         parent::__construct($str_func);
@@ -63,7 +63,7 @@ class YAnButton extends YFunction
 
     //--- (YAnButton implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'calibratedValue':
@@ -112,6 +112,7 @@ class YAnButton extends YFunction
      * @return int  an integer corresponding to the current calibrated input value (between 0 and 1000, included)
      *
      * On failure, throws an exception or returns YAnButton::CALIBRATEDVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_calibratedValue(): int
     {
@@ -131,6 +132,7 @@ class YAnButton extends YFunction
      * @return int  an integer corresponding to the current measured input value as-is (between 0 and 4095, included)
      *
      * On failure, throws an exception or returns YAnButton::RAWVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_rawValue(): int
     {
@@ -150,6 +152,7 @@ class YAnButton extends YFunction
      * @return int  either YAnButton::ANALOGCALIBRATION_OFF or YAnButton::ANALOGCALIBRATION_ON
      *
      * On failure, throws an exception or returns YAnButton::ANALOGCALIBRATION_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_analogCalibration(): int
     {
@@ -172,6 +175,7 @@ class YAnButton extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_analogCalibration(int $newval): int
     {
@@ -186,6 +190,7 @@ class YAnButton extends YFunction
      * 0 and 4095, included)
      *
      * On failure, throws an exception or returns YAnButton::CALIBRATIONMAX_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_calibrationMax(): int
     {
@@ -211,6 +216,7 @@ class YAnButton extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_calibrationMax(int $newval): int
     {
@@ -225,6 +231,7 @@ class YAnButton extends YFunction
      * 0 and 4095, included)
      *
      * On failure, throws an exception or returns YAnButton::CALIBRATIONMIN_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_calibrationMin(): int
     {
@@ -250,6 +257,7 @@ class YAnButton extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_calibrationMin(int $newval): int
     {
@@ -264,6 +272,7 @@ class YAnButton extends YFunction
      * triggering user callbacks
      *
      * On failure, throws an exception or returns YAnButton::SENSITIVITY_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_sensitivity(): int
     {
@@ -291,6 +300,7 @@ class YAnButton extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_sensitivity(int $newval): int
     {
@@ -305,6 +315,7 @@ class YAnButton extends YFunction
      * input (considered as binary) is active (closed contact), and false otherwise
      *
      * On failure, throws an exception or returns YAnButton::ISPRESSED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_isPressed(): int
     {
@@ -327,6 +338,7 @@ class YAnButton extends YFunction
      *         the input button was pressed (the input contact transitioned from open to closed)
      *
      * On failure, throws an exception or returns YAnButton::LASTTIMEPRESSED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_lastTimePressed(): float
     {
@@ -349,6 +361,7 @@ class YAnButton extends YFunction
      *         the input button was released (the input contact transitioned from closed to open)
      *
      * On failure, throws an exception or returns YAnButton::LASTTIMERELEASED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_lastTimeReleased(): float
     {
@@ -370,6 +383,7 @@ class YAnButton extends YFunction
      * @return float  an integer corresponding to the pulse counter value
      *
      * On failure, throws an exception or returns YAnButton::PULSECOUNTER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pulseCounter(): float
     {
@@ -383,6 +397,9 @@ class YAnButton extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_pulseCounter(float $newval): int
     {
         $rest_val = strval($newval);
@@ -395,6 +412,7 @@ class YAnButton extends YFunction
      * @return float  an integer corresponding to the timer of the pulses counter (ms)
      *
      * On failure, throws an exception or returns YAnButton::PULSETIMER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pulseTimer(): float
     {
@@ -416,6 +434,7 @@ class YAnButton extends YFunction
      * or multiplexed binary switches)
      *
      * On failure, throws an exception or returns YAnButton::INPUTTYPE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_inputType(): int
     {
@@ -440,6 +459,7 @@ class YAnButton extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_inputType(int $newval): int
     {
@@ -475,7 +495,7 @@ class YAnButton extends YFunction
      *
      * @return YAnButton  a YAnButton object allowing you to drive the analog input.
      */
-    public static function FindAnButton(string $func): ?YAnButton
+    public static function FindAnButton(string $func): YAnButton
     {
         // $obj                    is a YAnButton;
         $obj = YFunction::_FindFromCache('AnButton', $func);
@@ -492,98 +512,153 @@ class YAnButton extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function resetCounter(): int
     {
         return $this->set_pulseCounter(0);
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function calibratedValue(): int
 {
     return $this->get_calibratedValue();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function rawValue(): int
 {
     return $this->get_rawValue();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function analogCalibration(): int
 {
     return $this->get_analogCalibration();
 }
 
-    public function setAnalogCalibration(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setAnalogCalibration(int $newval): int
 {
     return $this->set_analogCalibration($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function calibrationMax(): int
 {
     return $this->get_calibrationMax();
 }
 
-    public function setCalibrationMax(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCalibrationMax(int $newval): int
 {
     return $this->set_calibrationMax($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function calibrationMin(): int
 {
     return $this->get_calibrationMin();
 }
 
-    public function setCalibrationMin(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCalibrationMin(int $newval): int
 {
     return $this->set_calibrationMin($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function sensitivity(): int
 {
     return $this->get_sensitivity();
 }
 
-    public function setSensitivity(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setSensitivity(int $newval): int
 {
     return $this->set_sensitivity($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function isPressed(): int
 {
     return $this->get_isPressed();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function lastTimePressed(): float
 {
     return $this->get_lastTimePressed();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function lastTimeReleased(): float
 {
     return $this->get_lastTimeReleased();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pulseCounter(): float
 {
     return $this->get_pulseCounter();
 }
 
-    public function setPulseCounter(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPulseCounter(float $newval): int
 {
     return $this->set_pulseCounter($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pulseTimer(): float
 {
     return $this->get_pulseTimer();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function inputType(): int
 {
     return $this->get_inputType();
 }
 
-    public function setInputType(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setInputType(int $newval): int
 {
     return $this->set_inputType($newval);
 }
@@ -594,7 +669,7 @@ class YAnButton extends YFunction
      * If you want to find a specific an analog input, use AnButton.findAnButton()
      * and a hardwareID or a logical name.
      *
-     * @return YAnButton  a pointer to a YAnButton object, corresponding to
+     * @return ?YAnButton  a pointer to a YAnButton object, corresponding to
      *         an analog input currently online, or a null pointer
      *         if there are no more analog inputs to enumerate.
      */
@@ -616,11 +691,11 @@ class YAnButton extends YFunction
      * Use the method YAnButton::nextAnButton() to iterate on
      * next analog inputs.
      *
-     * @return YAnButton  a pointer to a YAnButton object, corresponding to
+     * @return ?YAnButton  a pointer to a YAnButton object, corresponding to
      *         the first analog input currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstAnButton()
+    public static function FirstAnButton(): ?YAnButton
     {
         $next_hwid = YAPI::getFirstHardwareId('AnButton');
         if ($next_hwid == null) {

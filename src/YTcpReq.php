@@ -1,12 +1,12 @@
 <?php
 namespace Yoctopuce\YoctoAPI;
 
-//
-// YTcpReq Class (used internally)
-//
-// Instances of this class represent an open TCP connection to an HTTP socket.
-// The class handles digest authorization transparently.
-//
+/**
+ * YTcpReq Class (used internally)
+ *
+ * Instances of this class represent an open TCP connection to an HTTP socket.
+ * The class handles digest authorization transparently.
+ */
 class YTcpReq
 {
     // attributes
@@ -115,7 +115,7 @@ class YTcpReq
         return $dechunk;
     }
 
-    function newsocket(&$errno, &$errstr, int $mstimeout)
+    function newsocket(int &$errno, string &$errstr, int $mstimeout): mixed
     {
         // for now, use client socket only since server sockets
         // for callbacks are not reliably available on a public server

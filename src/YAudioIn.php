@@ -26,7 +26,7 @@ class YAudioIn extends YFunction
 
     //--- (end of YAudioIn attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YAudioIn constructor)
         parent::__construct($str_func);
@@ -37,7 +37,7 @@ class YAudioIn extends YFunction
 
     //--- (YAudioIn implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'volume':
@@ -65,6 +65,7 @@ class YAudioIn extends YFunction
      * @return int  an integer corresponding to audio input gain, in per cents
      *
      * On failure, throws an exception or returns YAudioIn::VOLUME_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_volume(): int
     {
@@ -88,6 +89,7 @@ class YAudioIn extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_volume(int $newval): int
     {
@@ -101,6 +103,7 @@ class YAudioIn extends YFunction
      * @return int  either YAudioIn::MUTE_FALSE or YAudioIn::MUTE_TRUE, according to the state of the mute function
      *
      * On failure, throws an exception or returns YAudioIn::MUTE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_mute(): int
     {
@@ -124,6 +127,7 @@ class YAudioIn extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_mute(int $newval): int
     {
@@ -140,6 +144,7 @@ class YAudioIn extends YFunction
      * @return string  a string corresponding to the supported volume range
      *
      * On failure, throws an exception or returns YAudioIn::VOLUMERANGE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_volumeRange(): string
     {
@@ -159,6 +164,7 @@ class YAudioIn extends YFunction
      * @return int  an integer corresponding to the detected input signal level
      *
      * On failure, throws an exception or returns YAudioIn::SIGNAL_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_signal(): int
     {
@@ -178,6 +184,7 @@ class YAudioIn extends YFunction
      * @return int  an integer corresponding to the number of seconds elapsed without detecting a signal
      *
      * On failure, throws an exception or returns YAudioIn::NOSIGNALFOR_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_noSignalFor(): int
     {
@@ -219,7 +226,7 @@ class YAudioIn extends YFunction
      *
      * @return YAudioIn  a YAudioIn object allowing you to drive the audio input.
      */
-    public static function FindAudioIn(string $func): ?YAudioIn
+    public static function FindAudioIn(string $func): YAudioIn
     {
         // $obj                    is a YAudioIn;
         $obj = YFunction::_FindFromCache('AudioIn', $func);
@@ -230,36 +237,57 @@ class YAudioIn extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function volume(): int
 {
     return $this->get_volume();
 }
 
-    public function setVolume(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setVolume(int $newval): int
 {
     return $this->set_volume($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function mute(): int
 {
     return $this->get_mute();
 }
 
-    public function setMute(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMute(int $newval): int
 {
     return $this->set_mute($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function volumeRange(): string
 {
     return $this->get_volumeRange();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function signal(): int
 {
     return $this->get_signal();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function noSignalFor(): int
 {
     return $this->get_noSignalFor();
@@ -271,7 +299,7 @@ class YAudioIn extends YFunction
      * If you want to find a specific an audio input, use AudioIn.findAudioIn()
      * and a hardwareID or a logical name.
      *
-     * @return YAudioIn  a pointer to a YAudioIn object, corresponding to
+     * @return ?YAudioIn  a pointer to a YAudioIn object, corresponding to
      *         an audio input currently online, or a null pointer
      *         if there are no more audio inputs to enumerate.
      */
@@ -293,11 +321,11 @@ class YAudioIn extends YFunction
      * Use the method YAudioIn::nextAudioIn() to iterate on
      * next audio inputs.
      *
-     * @return YAudioIn  a pointer to a YAudioIn object, corresponding to
+     * @return ?YAudioIn  a pointer to a YAudioIn object, corresponding to
      *         the first audio input currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstAudioIn()
+    public static function FirstAudioIn(): ?YAudioIn
     {
         $next_hwid = YAPI::getFirstHardwareId('AudioIn');
         if ($next_hwid == null) {

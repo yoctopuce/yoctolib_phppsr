@@ -27,7 +27,7 @@ class YCurrentLoopOutput extends YFunction
 
     //--- (end of YCurrentLoopOutput attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YCurrentLoopOutput constructor)
         parent::__construct($str_func);
@@ -38,7 +38,7 @@ class YCurrentLoopOutput extends YFunction
 
     //--- (YCurrentLoopOutput implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'current':
@@ -68,6 +68,7 @@ class YCurrentLoopOutput extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_current(float $newval): int
     {
@@ -81,6 +82,7 @@ class YCurrentLoopOutput extends YFunction
      * @return float  a floating point number corresponding to the loop current set point in mA
      *
      * On failure, throws an exception or returns YCurrentLoopOutput::CURRENT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_current(): float
     {
@@ -94,6 +96,9 @@ class YCurrentLoopOutput extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_currentTransition(): string
     {
         // $res                    is a string;
@@ -106,6 +111,9 @@ class YCurrentLoopOutput extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_currentTransition(string $newval): int
     {
         $rest_val = $newval;
@@ -121,6 +129,7 @@ class YCurrentLoopOutput extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_currentAtStartUp(float $newval): int
     {
@@ -134,6 +143,7 @@ class YCurrentLoopOutput extends YFunction
      * @return float  a floating point number corresponding to the current in the loop at device startup, in mA
      *
      * On failure, throws an exception or returns YCurrentLoopOutput::CURRENTATSTARTUP_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_currentAtStartUp(): float
     {
@@ -156,6 +166,7 @@ class YCurrentLoopOutput extends YFunction
      * and YCurrentLoopOutput::LOOPPOWER_POWEROK corresponding to the loop powerstate
      *
      * On failure, throws an exception or returns YCurrentLoopOutput::LOOPPOWER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_loopPower(): int
     {
@@ -197,7 +208,7 @@ class YCurrentLoopOutput extends YFunction
      *
      * @return YCurrentLoopOutput  a YCurrentLoopOutput object allowing you to drive the 4-20mA output.
      */
-    public static function FindCurrentLoopOutput(string $func): ?YCurrentLoopOutput
+    public static function FindCurrentLoopOutput(string $func): YCurrentLoopOutput
     {
         // $obj                    is a YCurrentLoopOutput;
         $obj = YFunction::_FindFromCache('CurrentLoopOutput', $func);
@@ -232,36 +243,57 @@ class YCurrentLoopOutput extends YFunction
         return $this->set_currentTransition($newval);
     }
 
-    public function setCurrent(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCurrent(float $newval): int
 {
     return $this->set_current($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function current(): float
 {
     return $this->get_current();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function currentTransition(): string
 {
     return $this->get_currentTransition();
 }
 
-    public function setCurrentTransition(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCurrentTransition(string $newval): int
 {
     return $this->set_currentTransition($newval);
 }
 
-    public function setCurrentAtStartUp(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCurrentAtStartUp(float $newval): int
 {
     return $this->set_currentAtStartUp($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function currentAtStartUp(): float
 {
     return $this->get_currentAtStartUp();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function loopPower(): int
 {
     return $this->get_loopPower();
@@ -273,7 +305,7 @@ class YCurrentLoopOutput extends YFunction
      * If you want to find a specific a 4-20mA output, use CurrentLoopOutput.findCurrentLoopOutput()
      * and a hardwareID or a logical name.
      *
-     * @return YCurrentLoopOutput  a pointer to a YCurrentLoopOutput object, corresponding to
+     * @return ?YCurrentLoopOutput  a pointer to a YCurrentLoopOutput object, corresponding to
      *         a 4-20mA output currently online, or a null pointer
      *         if there are no more 4-20mA outputs to enumerate.
      */
@@ -295,11 +327,11 @@ class YCurrentLoopOutput extends YFunction
      * Use the method YCurrentLoopOutput::nextCurrentLoopOutput() to iterate on
      * next 4-20mA outputs.
      *
-     * @return YCurrentLoopOutput  a pointer to a YCurrentLoopOutput object, corresponding to
+     * @return ?YCurrentLoopOutput  a pointer to a YCurrentLoopOutput object, corresponding to
      *         the first 4-20mA output currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstCurrentLoopOutput()
+    public static function FirstCurrentLoopOutput(): ?YCurrentLoopOutput
     {
         $next_hwid = YAPI::getFirstHardwareId('CurrentLoopOutput');
         if ($next_hwid == null) {

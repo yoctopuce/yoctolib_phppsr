@@ -1,5 +1,6 @@
 <?php
 namespace Yoctopuce\YoctoAPI;
+use Exception;
 
 /**
  * YDataSet Class: Recorded data sequence, as returned by sensor.get_recordedData()
@@ -46,19 +47,18 @@ class YDataSet
 
     //--- (end of generated code: YDataSet attributes)
 
-    public function __construct($obj_parent, $str_functionId = null, $str_unit = null, $float_startTime = null, $float_endTime = null)
+    public function __construct(YFunction $obj_parent, ?string $str_functionId = null, ?string $str_unit = null, ?float $float_startTime = null, ?float $float_endTime = null)
     {
         //--- (generated code: YDataSet constructor)
         //--- (end of generated code: YDataSet constructor)
         $this->_summary = new YMeasure(0, 0, 0, 0, 0);
+        $this->_parent = $obj_parent;
         if (is_null($str_unit)) {
             // 1st version of constructor, called from YDataLogger
-            $this->_parent = $obj_parent;
-            $this->_startTime = 0;
-            $this->_endTime = 0;
+            $this->_startTimeMs = 0;
+            $this->_endTimeMs = 0;
         } else {
             // 2nd version of constructor, called from YFunction
-            $this->_parent = $obj_parent;
             $this->_functionId = $str_functionId;
             $this->_unit = $str_unit;
             $this->_startTimeMs = $float_startTime * 1000;
@@ -69,11 +69,17 @@ class YDataSet
 
     //--- (generated code: YDataSet implementation)
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _get_calibration(): array
     {
         return $this->_calib;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function loadSummary(string $data): int
     {
         $dataRows = [];         // floatArrArr;
@@ -247,6 +253,9 @@ class YDataSet
         return $this->get_progress();
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function processMore(int $progress, string $data): int
     {
         // $stream                 is a YDataStream;
@@ -359,6 +368,9 @@ class YDataSet
         return $this->get_progress();
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_privateDataStreams(): array
     {
         return $this->_streams;
@@ -373,6 +385,7 @@ class YDataSet
      * @return string  a string that uniquely identifies the function (ex: THRMCPL1-123456.temperature1)
      *
      * On failure, throws an exception or returns  YDataSet::HARDWAREID_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_hardwareId(): string
     {
@@ -402,6 +415,7 @@ class YDataSet
      * @return string  a string that represents a physical unit.
      *
      * On failure, throws an exception or returns  YDataSet::UNIT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_unit(): string
     {
@@ -428,6 +442,9 @@ class YDataSet
         return $this->imm_get_startTimeUTC();
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function imm_get_startTimeUTC(): float
     {
         return ($this->_startTimeMs / 1000.0);
@@ -453,6 +470,9 @@ class YDataSet
         return $this->imm_get_endTimeUTC();
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function imm_get_endTimeUTC(): float
     {
         return round($this->_endTimeMs / 1000.0);
@@ -486,6 +506,7 @@ class YDataSet
      *         or a negative error code in case of failure.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function loadMore(): int
     {
@@ -530,7 +551,7 @@ class YDataSet
      * This summary is available as soon as loadMore() has
      * been called for the first time.
      *
-     * @return YMeasure  an YMeasure object
+     * @return ?YMeasure  an YMeasure object
      */
     public function get_summary(): ?YMeasure
     {
@@ -554,6 +575,7 @@ class YDataSet
      *         measured values during a time interval
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function get_preview(): array
     {
@@ -572,6 +594,7 @@ class YDataSet
      *         measured values during a time interval
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function get_measuresAt(YMeasure $measure): array
     {
@@ -653,6 +676,7 @@ class YDataSet
      *         measured value for a given time interval
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function get_measures(): array
     {
@@ -662,7 +686,7 @@ class YDataSet
     //--- (end of generated code: YDataSet implementation)
 
     // YDataSet parser for stream list
-    public function _parse($str_json)
+    public function _parse(string $str_json)
     {
         $loadval = json_decode(iconv("ISO-8859-1", "UTF-8", $str_json), true);
 
@@ -680,7 +704,7 @@ class YDataSet
         $this->_preview = array();
         $this->_measures = array();
         for ($i = 0; $i < sizeof($loadval['streams']); $i++) {
-            /** @var $stream YDataStream */
+            /** @var YDataStream $stream */
             $stream = $this->_parent->_findDataStream($this, $loadval['streams'][$i]);
             $streamStartTime = $stream->get_realstartTimeUTC() * 1000;
             $streamEndTime = $streamStartTime + $stream->get_realDuration() * 1000;

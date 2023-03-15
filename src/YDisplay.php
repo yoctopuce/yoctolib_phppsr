@@ -56,23 +56,23 @@ class YDisplay extends YFunction
     protected array $_allDisplayLayers = [];                           // YDisplayLayerArr
 
     //--- (end of generated code: YDisplay attributes)
-    protected $_recording;
-    protected $_sequence;
+    protected bool $_recording;
+    protected string $_sequence;
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (generated code: YDisplay constructor)
         parent::__construct($str_func);
         $this->_className = 'Display';
 
         //--- (end of generated code: YDisplay constructor)
-        $this->_recording  = FALSE;
-        $this->_sequence   = '';
+        $this->_recording = false;
+        $this->_sequence = '';
     }
 
     //--- (generated code: YDisplay implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'enabled':
@@ -119,6 +119,7 @@ class YDisplay extends YFunction
      * screen is powered, false otherwise
      *
      * On failure, throws an exception or returns YDisplay::ENABLED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_enabled(): int
     {
@@ -141,6 +142,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_enabled(int $newval): int
     {
@@ -154,6 +156,7 @@ class YDisplay extends YFunction
      * @return string  a string corresponding to the name of the sequence to play when the displayed is powered on
      *
      * On failure, throws an exception or returns YDisplay::STARTUPSEQ_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_startupSeq(): string
     {
@@ -178,6 +181,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_startupSeq(string $newval): int
     {
@@ -191,6 +195,7 @@ class YDisplay extends YFunction
      * @return int  an integer corresponding to the luminosity of the  module informative LEDs (from 0 to 100)
      *
      * On failure, throws an exception or returns YDisplay::BRIGHTNESS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_brightness(): int
     {
@@ -214,6 +219,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_brightness(int $newval): int
     {
@@ -229,6 +235,7 @@ class YDisplay extends YFunction
      * display orientation
      *
      * On failure, throws an exception or returns YDisplay::ORIENTATION_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_orientation(): int
     {
@@ -252,6 +259,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_orientation(int $newval): int
     {
@@ -265,6 +273,7 @@ class YDisplay extends YFunction
      * @return int  an integer corresponding to the display width, in pixels
      *
      * On failure, throws an exception or returns YDisplay::DISPLAYWIDTH_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_displayWidth(): int
     {
@@ -284,6 +293,7 @@ class YDisplay extends YFunction
      * @return int  an integer corresponding to the display height, in pixels
      *
      * On failure, throws an exception or returns YDisplay::DISPLAYHEIGHT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_displayHeight(): int
     {
@@ -304,6 +314,7 @@ class YDisplay extends YFunction
      * YDisplay::DISPLAYTYPE_RGB corresponding to the display type: monochrome, gray levels or full color
      *
      * On failure, throws an exception or returns YDisplay::DISPLAYTYPE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_displayType(): int
     {
@@ -323,6 +334,7 @@ class YDisplay extends YFunction
      * @return int  an integer corresponding to the width of the layers to draw on, in pixels
      *
      * On failure, throws an exception or returns YDisplay::LAYERWIDTH_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_layerWidth(): int
     {
@@ -342,6 +354,7 @@ class YDisplay extends YFunction
      * @return int  an integer corresponding to the height of the layers to draw on, in pixels
      *
      * On failure, throws an exception or returns YDisplay::LAYERHEIGHT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_layerHeight(): int
     {
@@ -361,6 +374,7 @@ class YDisplay extends YFunction
      * @return int  an integer corresponding to the number of available layers to draw on
      *
      * On failure, throws an exception or returns YDisplay::LAYERCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_layerCount(): int
     {
@@ -374,6 +388,9 @@ class YDisplay extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -386,6 +403,9 @@ class YDisplay extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -420,7 +440,7 @@ class YDisplay extends YFunction
      *
      * @return YDisplay  a YDisplay object allowing you to drive the display.
      */
-    public static function FindDisplay(string $func): ?YDisplay
+    public static function FindDisplay(string $func): YDisplay
     {
         // $obj                    is a YDisplay;
         $obj = YFunction::_FindFromCache('Display', $func);
@@ -439,6 +459,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function resetAll(): int
     {
@@ -457,6 +478,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function fade(int $brightness, int $duration): int
     {
@@ -472,6 +494,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function newSequence(): int
     {
@@ -491,6 +514,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function saveSequence(string $sequenceName): int
     {
@@ -511,6 +535,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function playSequence(string $sequenceName): int
     {
@@ -531,6 +556,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function pauseSequence(int $delay_ms): int
     {
@@ -545,6 +571,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function stopSequence(): int
     {
@@ -563,6 +590,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function upload(string $pathname, string $content): int
     {
@@ -582,6 +610,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function copyLayerContent(int $srcLayerId, int $dstLayerId): int
     {
@@ -603,6 +632,7 @@ class YDisplay extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function swapLayerContent(int $layerIdA, int $layerIdB): int
     {
@@ -617,9 +647,10 @@ class YDisplay extends YFunction
      *
      * @param int $layerId : the identifier of the layer (a number in range 0..layerCount-1)
      *
-     * @return YDisplayLayer  an YDisplayLayer object
+     * @return ?YDisplayLayer  an YDisplayLayer object
      *
      * On failure, throws an exception or returns null.
+     * @throws YAPI_Exception on error
      */
     public function get_displayLayer(int $layerId): ?YDisplayLayer
     {
@@ -637,82 +668,130 @@ class YDisplay extends YFunction
         return $this->_allDisplayLayers[$layerId];
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function enabled(): int
 {
     return $this->get_enabled();
 }
 
-    public function setEnabled(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setEnabled(int $newval): int
 {
     return $this->set_enabled($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function startupSeq(): string
 {
     return $this->get_startupSeq();
 }
 
-    public function setStartupSeq(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setStartupSeq(string $newval): int
 {
     return $this->set_startupSeq($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function brightness(): int
 {
     return $this->get_brightness();
 }
 
-    public function setBrightness(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setBrightness(int $newval): int
 {
     return $this->set_brightness($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function orientation(): int
 {
     return $this->get_orientation();
 }
 
-    public function setOrientation(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setOrientation(int $newval): int
 {
     return $this->set_orientation($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function displayWidth(): int
 {
     return $this->get_displayWidth();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function displayHeight(): int
 {
     return $this->get_displayHeight();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function displayType(): int
 {
     return $this->get_displayType();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function layerWidth(): int
 {
     return $this->get_layerWidth();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function layerHeight(): int
 {
     return $this->get_layerHeight();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function layerCount(): int
 {
     return $this->get_layerCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
@@ -723,7 +802,7 @@ class YDisplay extends YFunction
      * If you want to find a specific a display, use Display.findDisplay()
      * and a hardwareID or a logical name.
      *
-     * @return YDisplay  a pointer to a YDisplay object, corresponding to
+     * @return ?YDisplay  a pointer to a YDisplay object, corresponding to
      *         a display currently online, or a null pointer
      *         if there are no more displays to enumerate.
      */
@@ -745,11 +824,11 @@ class YDisplay extends YFunction
      * Use the method YDisplay::nextDisplay() to iterate on
      * next displays.
      *
-     * @return YDisplay  a pointer to a YDisplay object, corresponding to
+     * @return ?YDisplay  a pointer to a YDisplay object, corresponding to
      *         the first display currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstDisplay()
+    public static function FirstDisplay(): ?YDisplay
     {
         $next_hwid = YAPI::getFirstHardwareId('Display');
         if ($next_hwid == null) {
@@ -760,31 +839,27 @@ class YDisplay extends YFunction
 
     //--- (end of generated code: YDisplay implementation)
 
-    public function flushLayers()
+    public function flushLayers():int
     {
-        if( !is_null($this->_allDisplayLayers)) {
-            foreach ($this->_allDisplayLayers as $layer) {
-                $layer->flush_now();
-            }
+        foreach ($this->_allDisplayLayers as $layer) {
+            $layer->flush_now();
         }
         return YAPI::SUCCESS;
     }
 
-    public function resetHiddenLayerFlags()
+    public function resetHiddenLayerFlags():void
     {
-        if( !is_null($this->_allDisplayLayers)) {
-            foreach ($this->_allDisplayLayers as $layer) {
-                $layer->resetHiddenFlag();
-            }
+        foreach ($this->_allDisplayLayers as $layer) {
+            $layer->resetHiddenFlag();
         }
     }
 
-    public function sendCommand($str_cmd)
+    public function sendCommand(string $str_cmd): int
     {
-        if(!$this->_recording) {
+        if (!$this->_recording) {
             return $this->set_command($str_cmd);
         }
-        $this->_sequence .= str_replace("\n", "\x0b", $str_cmd)."\n";
+        $this->_sequence .= str_replace("\n", "\x0b", $str_cmd) . "\n";
         return YAPI::SUCCESS;
     }
-};
+}

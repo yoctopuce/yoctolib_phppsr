@@ -1,20 +1,21 @@
 <?php
 namespace Yoctopuce\YoctoAPI;
-//
-// Structure used internally to report results of a query. It only uses public attributes.
-// Do not instantiate directly
-//
+
+/**
+ * Structure used internally to report results of a query. It only uses public attributes.
+ * Do not instantiate directly
+ */
 class YAPI_YReq
 {
-    public $hwid = "";
-    public $deviceid = "";
-    public $functionid = "";
-    public $errorType;
-    public $errorMsg;
-    public $result;
-    public $obj_result = null;
+    public string $hwid = "";
+    public string $deviceid = "";
+    public string $functionid = "";
+    public int $errorType;
+    public string $errorMsg;
+    public mixed $result;
+    public mixed $obj_result = null;
 
-    function __construct($str_hwid, $int_errType, $str_errMsg, $bin_result, $obj_result = null)
+    function __construct(string $str_hwid, int $int_errType, string $str_errMsg, mixed $bin_result, mixed $obj_result = null)
     {
         $sep = strpos($str_hwid, ".");
         if ($sep !== false) {

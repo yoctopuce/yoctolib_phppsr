@@ -31,7 +31,7 @@ class YHubPort extends YFunction
 
     //--- (end of YHubPort attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YHubPort constructor)
         parent::__construct($str_func);
@@ -42,7 +42,7 @@ class YHubPort extends YFunction
 
     //--- (YHubPort implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'enabled':
@@ -65,6 +65,7 @@ class YHubPort extends YFunction
      * YoctoHub port is powered, false otherwise
      *
      * On failure, throws an exception or returns YHubPort::ENABLED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_enabled(): int
     {
@@ -88,6 +89,7 @@ class YHubPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_enabled(int $newval): int
     {
@@ -102,6 +104,7 @@ class YHubPort extends YFunction
      * YHubPort::PORTSTATE_RUN and YHubPort::PORTSTATE_PROG corresponding to the current state of the YoctoHub port
      *
      * On failure, throws an exception or returns YHubPort::PORTSTATE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_portState(): int
     {
@@ -123,6 +126,7 @@ class YHubPort extends YFunction
      * @return int  an integer corresponding to the current baud rate used by this YoctoHub port, in kbps
      *
      * On failure, throws an exception or returns YHubPort::BAUDRATE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_baudRate(): int
     {
@@ -164,7 +168,7 @@ class YHubPort extends YFunction
      *
      * @return YHubPort  a YHubPort object allowing you to drive the YoctoHub slave port.
      */
-    public static function FindHubPort(string $func): ?YHubPort
+    public static function FindHubPort(string $func): YHubPort
     {
         // $obj                    is a YHubPort;
         $obj = YFunction::_FindFromCache('HubPort', $func);
@@ -175,21 +179,33 @@ class YHubPort extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function enabled(): int
 {
     return $this->get_enabled();
 }
 
-    public function setEnabled(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setEnabled(int $newval): int
 {
     return $this->set_enabled($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function portState(): int
 {
     return $this->get_portState();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function baudRate(): int
 {
     return $this->get_baudRate();
@@ -201,7 +217,7 @@ class YHubPort extends YFunction
      * If you want to find a specific a YoctoHub slave port, use HubPort.findHubPort()
      * and a hardwareID or a logical name.
      *
-     * @return YHubPort  a pointer to a YHubPort object, corresponding to
+     * @return ?YHubPort  a pointer to a YHubPort object, corresponding to
      *         a YoctoHub slave port currently online, or a null pointer
      *         if there are no more YoctoHub slave ports to enumerate.
      */
@@ -223,11 +239,11 @@ class YHubPort extends YFunction
      * Use the method YHubPort::nextHubPort() to iterate on
      * next YoctoHub slave ports.
      *
-     * @return YHubPort  a pointer to a YHubPort object, corresponding to
+     * @return ?YHubPort  a pointer to a YHubPort object, corresponding to
      *         the first YoctoHub slave port currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstHubPort()
+    public static function FirstHubPort(): ?YHubPort
     {
         $next_hwid = YAPI::getFirstHardwareId('HubPort');
         if ($next_hwid == null) {

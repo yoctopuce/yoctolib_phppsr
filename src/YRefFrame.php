@@ -68,7 +68,7 @@ class YRefFrame extends YFunction
 
     //--- (end of YRefFrame attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YRefFrame constructor)
         parent::__construct($str_func);
@@ -79,7 +79,7 @@ class YRefFrame extends YFunction
 
     //--- (YRefFrame implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'mountPos':
@@ -98,6 +98,9 @@ class YRefFrame extends YFunction
         return parent::_parseAttr($name, $val);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_mountPos(): int
     {
         // $res                    is a int;
@@ -110,6 +113,9 @@ class YRefFrame extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_mountPos(int $newval): int
     {
         $rest_val = strval($newval);
@@ -137,6 +143,7 @@ class YRefFrame extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_bearing(float $newval): int
     {
@@ -152,6 +159,7 @@ class YRefFrame extends YFunction
      * @return float  a floating point number corresponding to the reference bearing used by the compass
      *
      * On failure, throws an exception or returns YRefFrame::BEARING_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_bearing(): float
     {
@@ -165,6 +173,9 @@ class YRefFrame extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_calibrationParam(): string
     {
         // $res                    is a string;
@@ -177,6 +188,9 @@ class YRefFrame extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_calibrationParam(string $newval): int
     {
         $rest_val = $newval;
@@ -192,6 +206,7 @@ class YRefFrame extends YFunction
      * YRefFrame::FUSIONMODE_INCLIN_10DEG corresponding to the sensor fusion mode
      *
      * On failure, throws an exception or returns YRefFrame::FUSIONMODE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_fusionMode(): int
     {
@@ -217,6 +232,7 @@ class YRefFrame extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_fusionMode(int $newval): int
     {
@@ -252,7 +268,7 @@ class YRefFrame extends YFunction
      *
      * @return YRefFrame  a YRefFrame object allowing you to drive the reference frame.
      */
-    public static function FindRefFrame(string $func): ?YRefFrame
+    public static function FindRefFrame(string $func): YRefFrame
     {
         // $obj                    is a YRefFrame;
         $obj = YFunction::_FindFromCache('RefFrame', $func);
@@ -275,6 +291,7 @@ class YRefFrame extends YFunction
      *         corresponding to the installation in a box, on one of the six faces.
      *
      * On failure, throws an exception or returns YRefFrame::MOUNTPOSITION_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_mountPosition(): int
     {
@@ -300,6 +317,7 @@ class YRefFrame extends YFunction
      *         on the top face, the 12H orientation points to the rear.
      *
      * On failure, throws an exception or returns YRefFrame::MOUNTORIENTATION_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_mountOrientation(): int
     {
@@ -335,6 +353,7 @@ class YRefFrame extends YFunction
      * method of the module if the modification must be kept.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_mountPosition(int $position, int $orientation): int
     {
@@ -356,6 +375,7 @@ class YRefFrame extends YFunction
      *
      * On failure, throws an exception or returns a negative error code.
      * For the Yocto-3D (V1), this function always return -3 (unsupported function).
+     * @throws YAPI_Exception on error
      */
     public function get_calibrationState(): int
     {
@@ -386,6 +406,7 @@ class YRefFrame extends YFunction
      *
      * On failure, throws an exception or returns a negative error code.
      * For the Yocto-3D (V1), this function always return -3 (unsupported function).
+     * @throws YAPI_Exception on error
      */
     public function get_measureQuality(): int
     {
@@ -404,6 +425,9 @@ class YRefFrame extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _calibSort(int $start, int $stopidx): int
     {
         // $idx                    is a int;
@@ -460,6 +484,7 @@ class YRefFrame extends YFunction
      * at any time using method cancel3DCalibration.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function start3DCalibration(): int
     {
@@ -506,6 +531,7 @@ class YRefFrame extends YFunction
      * the calibration process.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function more3DCalibration(): int
     {
@@ -515,6 +541,9 @@ class YRefFrame extends YFunction
         return $this->more3DCalibrationV1();
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function more3DCalibrationV1(): int
     {
         // $currTick               is a int;
@@ -717,6 +746,9 @@ class YRefFrame extends YFunction
         return YAPI::SUCCESS;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function more3DCalibrationV2(): int
     {
         // $currTick               is a int;
@@ -840,6 +872,7 @@ class YRefFrame extends YFunction
      * must be kept when the device is restarted.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function save3DCalibration(): int
     {
@@ -849,6 +882,9 @@ class YRefFrame extends YFunction
         return $this->save3DCalibrationV1();
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function save3DCalibrationV1(): int
     {
         // $shiftX                 is a int;
@@ -915,6 +951,9 @@ class YRefFrame extends YFunction
         return $this->set_calibrationParam($newcalib);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function save3DCalibrationV2(): int
     {
         return $this->set_calibrationParam('5,5,5,5,5,5');
@@ -924,6 +963,7 @@ class YRefFrame extends YFunction
      * Aborts the sensors tridimensional calibration process et restores normal settings.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function cancel3DCalibration(): int
     {
@@ -935,42 +975,66 @@ class YRefFrame extends YFunction
         return $this->set_calibrationParam($this->_calibSavedParams);
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function mountPos(): int
 {
     return $this->get_mountPos();
 }
 
-    public function setMountPos(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMountPos(int $newval): int
 {
     return $this->set_mountPos($newval);
 }
 
-    public function setBearing(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setBearing(float $newval): int
 {
     return $this->set_bearing($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function bearing(): float
 {
     return $this->get_bearing();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function calibrationParam(): string
 {
     return $this->get_calibrationParam();
 }
 
-    public function setCalibrationParam(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCalibrationParam(string $newval): int
 {
     return $this->set_calibrationParam($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function fusionMode(): int
 {
     return $this->get_fusionMode();
 }
 
-    public function setFusionMode(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setFusionMode(int $newval): int
 {
     return $this->set_fusionMode($newval);
 }
@@ -981,7 +1045,7 @@ class YRefFrame extends YFunction
      * If you want to find a specific a reference frame, use RefFrame.findRefFrame()
      * and a hardwareID or a logical name.
      *
-     * @return YRefFrame  a pointer to a YRefFrame object, corresponding to
+     * @return ?YRefFrame  a pointer to a YRefFrame object, corresponding to
      *         a reference frame currently online, or a null pointer
      *         if there are no more reference frames to enumerate.
      */
@@ -1003,11 +1067,11 @@ class YRefFrame extends YFunction
      * Use the method YRefFrame::nextRefFrame() to iterate on
      * next reference frames.
      *
-     * @return YRefFrame  a pointer to a YRefFrame object, corresponding to
+     * @return ?YRefFrame  a pointer to a YRefFrame object, corresponding to
      *         the first reference frame currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstRefFrame()
+    public static function FirstRefFrame(): ?YRefFrame
     {
         $next_hwid = YAPI::getFirstHardwareId('RefFrame');
         if ($next_hwid == null) {

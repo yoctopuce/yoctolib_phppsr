@@ -16,7 +16,7 @@ class YLongitude extends YSensor
 
     //--- (end of YLongitude attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YLongitude constructor)
         parent::__construct($str_func);
@@ -55,7 +55,7 @@ class YLongitude extends YSensor
      *
      * @return YLongitude  a YLongitude object allowing you to drive the longitude sensor.
      */
-    public static function FindLongitude(string $func): ?YLongitude
+    public static function FindLongitude(string $func): YLongitude
     {
         // $obj                    is a YLongitude;
         $obj = YFunction::_FindFromCache('Longitude', $func);
@@ -72,7 +72,7 @@ class YLongitude extends YSensor
      * If you want to find a specific a longitude sensor, use Longitude.findLongitude()
      * and a hardwareID or a logical name.
      *
-     * @return YLongitude  a pointer to a YLongitude object, corresponding to
+     * @return ?YLongitude  a pointer to a YLongitude object, corresponding to
      *         a longitude sensor currently online, or a null pointer
      *         if there are no more longitude sensors to enumerate.
      */
@@ -94,11 +94,11 @@ class YLongitude extends YSensor
      * Use the method YLongitude::nextLongitude() to iterate on
      * next longitude sensors.
      *
-     * @return YLongitude  a pointer to a YLongitude object, corresponding to
+     * @return ?YLongitude  a pointer to a YLongitude object, corresponding to
      *         the first longitude sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstLongitude()
+    public static function FirstLongitude(): ?YLongitude
     {
         $next_hwid = YAPI::getFirstHardwareId('Longitude');
         if ($next_hwid == null) {

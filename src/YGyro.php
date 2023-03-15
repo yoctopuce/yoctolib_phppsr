@@ -42,7 +42,7 @@ class YGyro extends YSensor
 
     //--- (end of generated code: YGyro attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (generated code: YGyro constructor)
         parent::__construct($str_func);
@@ -53,7 +53,7 @@ class YGyro extends YSensor
 
     //--- (generated code: YGyro implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'bandwidth':
@@ -78,6 +78,7 @@ class YGyro extends YSensor
      * @return int  an integer corresponding to the measure update frequency, measured in Hz
      *
      * On failure, throws an exception or returns YGyro::BANDWIDTH_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_bandwidth(): int
     {
@@ -102,6 +103,7 @@ class YGyro extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_bandwidth(int $newval): int
     {
@@ -116,6 +118,7 @@ class YGyro extends YSensor
      * the device, as a floating point number
      *
      * On failure, throws an exception or returns YGyro::XVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_xValue(): float
     {
@@ -136,6 +139,7 @@ class YGyro extends YSensor
      * the device, as a floating point number
      *
      * On failure, throws an exception or returns YGyro::YVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_yValue(): float
     {
@@ -156,6 +160,7 @@ class YGyro extends YSensor
      * the device, as a floating point number
      *
      * On failure, throws an exception or returns YGyro::ZVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_zValue(): float
     {
@@ -197,7 +202,7 @@ class YGyro extends YSensor
      *
      * @return YGyro  a YGyro object allowing you to drive the gyroscope.
      */
-    public static function FindGyro(string $func): ?YGyro
+    public static function FindGyro(string $func): YGyro
     {
         // $obj                    is a YGyro;
         $obj = YFunction::_FindFromCache('Gyro', $func);
@@ -208,6 +213,9 @@ class YGyro extends YSensor
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _loadQuaternion(): int
     {
         // $now_stamp              is a int;
@@ -245,6 +253,9 @@ class YGyro extends YSensor
         return YAPI::SUCCESS;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _loadAngles(): int
     {
         // $sqw                    is a float;
@@ -480,6 +491,9 @@ class YGyro extends YSensor
         return 0;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _invokeGyroCallbacks(int $qtIndex, float $qtValue): int
     {
         switch($qtIndex - 1) {
@@ -510,26 +524,41 @@ class YGyro extends YSensor
         return 0;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function bandwidth(): int
 {
     return $this->get_bandwidth();
 }
 
-    public function setBandwidth(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setBandwidth(int $newval): int
 {
     return $this->set_bandwidth($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function xValue(): float
 {
     return $this->get_xValue();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function yValue(): float
 {
     return $this->get_yValue();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function zValue(): float
 {
     return $this->get_zValue();
@@ -541,7 +570,7 @@ class YGyro extends YSensor
      * If you want to find a specific a gyroscope, use Gyro.findGyro()
      * and a hardwareID or a logical name.
      *
-     * @return YGyro  a pointer to a YGyro object, corresponding to
+     * @return ?YGyro  a pointer to a YGyro object, corresponding to
      *         a gyroscope currently online, or a null pointer
      *         if there are no more gyroscopes to enumerate.
      */
@@ -563,11 +592,11 @@ class YGyro extends YSensor
      * Use the method YGyro::nextGyro() to iterate on
      * next gyroscopes.
      *
-     * @return YGyro  a pointer to a YGyro object, corresponding to
+     * @return ?YGyro  a pointer to a YGyro object, corresponding to
      *         the first gyro currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstGyro()
+    public static function FirstGyro(): ?YGyro
     {
         $next_hwid = YAPI::getFirstHardwareId('Gyro');
         if ($next_hwid == null) {
@@ -578,4 +607,5 @@ class YGyro extends YSensor
 
     //--- (end of generated code: YGyro implementation)
 
-};
+}
+

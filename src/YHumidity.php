@@ -21,7 +21,7 @@ class YHumidity extends YSensor
 
     //--- (end of YHumidity attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YHumidity constructor)
         parent::__construct($str_func);
@@ -32,7 +32,7 @@ class YHumidity extends YSensor
 
     //--- (YHumidity implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'relHum':
@@ -59,6 +59,7 @@ class YHumidity extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_unit(string $newval): int
     {
@@ -72,6 +73,7 @@ class YHumidity extends YSensor
      * @return float  a floating point number corresponding to the current relative humidity, in per cents
      *
      * On failure, throws an exception or returns YHumidity::RELHUM_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_relHum(): float
     {
@@ -92,6 +94,7 @@ class YHumidity extends YSensor
      * cubic meter of air
      *
      * On failure, throws an exception or returns YHumidity::ABSHUM_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_absHum(): float
     {
@@ -133,7 +136,7 @@ class YHumidity extends YSensor
      *
      * @return YHumidity  a YHumidity object allowing you to drive the humidity sensor.
      */
-    public static function FindHumidity(string $func): ?YHumidity
+    public static function FindHumidity(string $func): YHumidity
     {
         // $obj                    is a YHumidity;
         $obj = YFunction::_FindFromCache('Humidity', $func);
@@ -144,16 +147,25 @@ class YHumidity extends YSensor
         return $obj;
     }
 
-    public function setUnit(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setUnit(string $newval): int
 {
     return $this->set_unit($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function relHum(): float
 {
     return $this->get_relHum();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function absHum(): float
 {
     return $this->get_absHum();
@@ -165,7 +177,7 @@ class YHumidity extends YSensor
      * If you want to find a specific a humidity sensor, use Humidity.findHumidity()
      * and a hardwareID or a logical name.
      *
-     * @return YHumidity  a pointer to a YHumidity object, corresponding to
+     * @return ?YHumidity  a pointer to a YHumidity object, corresponding to
      *         a humidity sensor currently online, or a null pointer
      *         if there are no more humidity sensors to enumerate.
      */
@@ -187,11 +199,11 @@ class YHumidity extends YSensor
      * Use the method YHumidity::nextHumidity() to iterate on
      * next humidity sensors.
      *
-     * @return YHumidity  a pointer to a YHumidity object, corresponding to
+     * @return ?YHumidity  a pointer to a YHumidity object, corresponding to
      *         the first humidity sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstHumidity()
+    public static function FirstHumidity(): ?YHumidity
     {
         $next_hwid = YAPI::getFirstHardwareId('Humidity');
         if ($next_hwid == null) {

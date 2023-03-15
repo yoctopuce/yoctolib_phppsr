@@ -27,7 +27,7 @@ class YMultiAxisController extends YFunction
 
     //--- (end of YMultiAxisController attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YMultiAxisController constructor)
         parent::__construct($str_func);
@@ -38,7 +38,7 @@ class YMultiAxisController extends YFunction
 
     //--- (YMultiAxisController implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'nAxis':
@@ -60,6 +60,7 @@ class YMultiAxisController extends YFunction
      * @return int  an integer corresponding to the number of synchronized controllers
      *
      * On failure, throws an exception or returns YMultiAxisController::NAXIS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_nAxis(): int
     {
@@ -81,6 +82,7 @@ class YMultiAxisController extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_nAxis(int $newval): int
     {
@@ -97,6 +99,7 @@ class YMultiAxisController extends YFunction
      * YMultiAxisController::GLOBALSTATE_BATCH corresponding to the stepper motor set overall state
      *
      * On failure, throws an exception or returns YMultiAxisController::GLOBALSTATE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_globalState(): int
     {
@@ -110,6 +113,9 @@ class YMultiAxisController extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -122,6 +128,9 @@ class YMultiAxisController extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -156,7 +165,7 @@ class YMultiAxisController extends YFunction
      *
      * @return YMultiAxisController  a YMultiAxisController object allowing you to drive the multi-axis controller.
      */
-    public static function FindMultiAxisController(string $func): ?YMultiAxisController
+    public static function FindMultiAxisController(string $func): YMultiAxisController
     {
         // $obj                    is a YMultiAxisController;
         $obj = YFunction::_FindFromCache('MultiAxisController', $func);
@@ -167,6 +176,9 @@ class YMultiAxisController extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function sendCommand(string $command): int
     {
         // $url                    is a str;
@@ -189,6 +201,7 @@ class YMultiAxisController extends YFunction
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function reset(): int
     {
@@ -202,6 +215,7 @@ class YMultiAxisController extends YFunction
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function findHomePosition(array $speed): int
     {
@@ -228,6 +242,7 @@ class YMultiAxisController extends YFunction
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function moveTo(array $absPos): int
     {
@@ -254,6 +269,7 @@ class YMultiAxisController extends YFunction
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function moveRel(array $relPos): int
     {
@@ -277,6 +293,7 @@ class YMultiAxisController extends YFunction
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function pause(int $waitMs): int
     {
@@ -288,6 +305,7 @@ class YMultiAxisController extends YFunction
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function emergencyStop(): int
     {
@@ -299,6 +317,7 @@ class YMultiAxisController extends YFunction
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function abortAndBrake(): int
     {
@@ -310,33 +329,49 @@ class YMultiAxisController extends YFunction
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function abortAndHiZ(): int
     {
         return $this->set_command('z');
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function nAxis(): int
 {
     return $this->get_nAxis();
 }
 
-    public function setNAxis(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setNAxis(int $newval): int
 {
     return $this->set_nAxis($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function globalState(): int
 {
     return $this->get_globalState();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
@@ -347,7 +382,7 @@ class YMultiAxisController extends YFunction
      * If you want to find a specific a multi-axis controller, use MultiAxisController.findMultiAxisController()
      * and a hardwareID or a logical name.
      *
-     * @return YMultiAxisController  a pointer to a YMultiAxisController object, corresponding to
+     * @return ?YMultiAxisController  a pointer to a YMultiAxisController object, corresponding to
      *         a multi-axis controller currently online, or a null pointer
      *         if there are no more multi-axis controllers to enumerate.
      */
@@ -369,11 +404,11 @@ class YMultiAxisController extends YFunction
      * Use the method YMultiAxisController::nextMultiAxisController() to iterate on
      * next multi-axis controllers.
      *
-     * @return YMultiAxisController  a pointer to a YMultiAxisController object, corresponding to
+     * @return ?YMultiAxisController  a pointer to a YMultiAxisController object, corresponding to
      *         the first multi-axis controller currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstMultiAxisController()
+    public static function FirstMultiAxisController(): ?YMultiAxisController
     {
         $next_hwid = YAPI::getFirstHardwareId('MultiAxisController');
         if ($next_hwid == null) {

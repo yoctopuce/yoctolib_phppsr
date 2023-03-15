@@ -60,7 +60,7 @@ class YSensor extends YFunction
 
     //--- (end of generated code: YSensor attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (generated code: YSensor constructor)
         parent::__construct($str_func);
@@ -69,14 +69,14 @@ class YSensor extends YFunction
         //--- (end of generated code: YSensor constructor)
     }
 
-    public function _getTimedReportCallback()
+    public function _getTimedReportCallback(): callable
     {
         return $this->_timedReportCallbackSensor;
     }
 
     //--- (generated code: YSensor implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'unit':
@@ -122,6 +122,7 @@ class YSensor extends YFunction
      * @return string  a string corresponding to the measuring unit for the measure
      *
      * On failure, throws an exception or returns YSensor.UNIT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_unit(): string
     {
@@ -149,6 +150,7 @@ class YSensor extends YFunction
      * specified unit, as a floating point number
      *
      * On failure, throws an exception or returns YSensor.CURRENTVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_currentValue(): float
     {
@@ -176,6 +178,7 @@ class YSensor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_lowestValue(float $newval): int
     {
@@ -191,6 +194,7 @@ class YSensor extends YFunction
      * since the device was started
      *
      * On failure, throws an exception or returns YSensor.LOWESTVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_lowestValue(): float
     {
@@ -214,6 +218,7 @@ class YSensor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_highestValue(float $newval): int
     {
@@ -229,6 +234,7 @@ class YSensor extends YFunction
      * since the device was started
      *
      * On failure, throws an exception or returns YSensor.HIGHESTVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_highestValue(): float
     {
@@ -251,6 +257,7 @@ class YSensor extends YFunction
      *         sensor, in the specified unit, as a floating point number
      *
      * On failure, throws an exception or returns YSensor.CURRENTRAWVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_currentRawValue(): float
     {
@@ -272,6 +279,7 @@ class YSensor extends YFunction
      *         when measures are not stored in the data logger flash memory
      *
      * On failure, throws an exception or returns YSensor.LOGFREQUENCY_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_logFrequency(): string
     {
@@ -300,6 +308,7 @@ class YSensor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_logFrequency(string $newval): int
     {
@@ -315,6 +324,7 @@ class YSensor extends YFunction
      *         value notifications are disabled for this function
      *
      * On failure, throws an exception or returns YSensor.REPORTFREQUENCY_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_reportFrequency(): string
     {
@@ -344,6 +354,7 @@ class YSensor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_reportFrequency(string $newval): int
     {
@@ -359,6 +370,7 @@ class YSensor extends YFunction
      * for the advertised value pushed to the parent hub
      *
      * On failure, throws an exception or returns YSensor.ADVMODE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_advMode(): int
     {
@@ -383,6 +395,7 @@ class YSensor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_advMode(int $newval): int
     {
@@ -390,6 +403,9 @@ class YSensor extends YFunction
         return $this->_setAttr("advMode", $rest_val);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_calibrationParam(): string
     {
         // $res                    is a string;
@@ -402,6 +418,9 @@ class YSensor extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_calibrationParam(string $newval): int
     {
         $rest_val = $newval;
@@ -418,6 +437,7 @@ class YSensor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_resolution(float $newval): int
     {
@@ -433,6 +453,7 @@ class YSensor extends YFunction
      * @return float  a floating point number corresponding to the resolution of the measured values
      *
      * On failure, throws an exception or returns YSensor.RESOLUTION_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_resolution(): float
     {
@@ -455,6 +476,7 @@ class YSensor extends YFunction
      *         available or a positive code if the sensor is not able to provide a measure right now
      *
      * On failure, throws an exception or returns YSensor.SENSORSTATE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_sensorState(): int
     {
@@ -496,7 +518,7 @@ class YSensor extends YFunction
      *
      * @return YSensor  a YSensor object allowing you to drive the sensor.
      */
-    public static function FindSensor(string $func): ?YSensor
+    public static function FindSensor(string $func): YSensor
     {
         // $obj                    is a YSensor;
         $obj = YFunction::_FindFromCache('Sensor', $func);
@@ -507,6 +529,9 @@ class YSensor extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _parserHelper(): int
     {
         // $position               is a int;
@@ -669,7 +694,7 @@ class YSensor extends YFunction
      * that can control global parameters of the data logger. The returned object
      * should not be freed.
      *
-     * @return YDataLogger  an YDatalogger object, or null on error.
+     * @return ?YDataLogger  an YDatalogger object, or null on error.
      */
     public function get_dataLogger(): ?YDataLogger
     {
@@ -740,7 +765,7 @@ class YSensor extends YFunction
      *         January 1, 1970 UTC. The special value 0 can be used
      *         to include any measure, without ending limit.
      *
-     * @return YDataSet  an instance of YDataSet, providing access to historical
+     * @return ?YDataSet  an instance of YDataSet, providing access to historical
      *         data. Past measures can be loaded progressively
      *         using methods from the YDataSet object.
      */
@@ -779,11 +804,13 @@ class YSensor extends YFunction
         return 0;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _invokeTimedReportCallback(YMeasure $value): int
     {
         if (!is_null($this->_timedReportCallbackSensor)) {
             call_user_func($this->_timedReportCallbackSensor, $this, $value);
-        } else {
         }
         return 0;
     }
@@ -808,6 +835,7 @@ class YSensor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function calibrateFromPoints(array $rawValues, array $refValues): int
     {
@@ -831,6 +859,7 @@ class YSensor extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function loadCalibrationPoints(array &$rawValues, array &$refValues): int
     {
@@ -865,6 +894,9 @@ class YSensor extends YFunction
         return YAPI::SUCCESS;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _encodeCalibrationPoints(array $rawValues, array $refValues): string
     {
         // $res                    is a str;
@@ -900,6 +932,9 @@ class YSensor extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _applyCalibration(float $rawValue): float
     {
         if ($rawValue == self::CURRENTVALUE_INVALID) {
@@ -917,6 +952,9 @@ class YSensor extends YFunction
         return call_user_func($this->_calhdl, $rawValue, $this->_caltyp, $this->_calpar, $this->_calraw, $this->_calref);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _decodeTimedReport(float $timestamp, float $duration, array $report): ?YMeasure
     {
         // $i                      is a int;
@@ -1019,6 +1057,9 @@ class YSensor extends YFunction
         return new YMeasure($startTime, $endTime, $minVal, $avgVal, $maxVal);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _decodeVal(int $w): float
     {
         // $val                    is a float;
@@ -1031,6 +1072,9 @@ class YSensor extends YFunction
         return $val;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _decodeAvg(int $dw): float
     {
         // $val                    is a float;
@@ -1043,91 +1087,145 @@ class YSensor extends YFunction
         return $val;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function unit(): string
 {
     return $this->get_unit();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function currentValue(): float
 {
     return $this->get_currentValue();
 }
 
-    public function setLowestValue(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setLowestValue(float $newval): int
 {
     return $this->set_lowestValue($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function lowestValue(): float
 {
     return $this->get_lowestValue();
 }
 
-    public function setHighestValue(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setHighestValue(float $newval): int
 {
     return $this->set_highestValue($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function highestValue(): float
 {
     return $this->get_highestValue();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function currentRawValue(): float
 {
     return $this->get_currentRawValue();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function logFrequency(): string
 {
     return $this->get_logFrequency();
 }
 
-    public function setLogFrequency(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setLogFrequency(string $newval): int
 {
     return $this->set_logFrequency($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function reportFrequency(): string
 {
     return $this->get_reportFrequency();
 }
 
-    public function setReportFrequency(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setReportFrequency(string $newval): int
 {
     return $this->set_reportFrequency($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function advMode(): int
 {
     return $this->get_advMode();
 }
 
-    public function setAdvMode(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setAdvMode(int $newval): int
 {
     return $this->set_advMode($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function calibrationParam(): string
 {
     return $this->get_calibrationParam();
 }
 
-    public function setCalibrationParam(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCalibrationParam(string $newval): int
 {
     return $this->set_calibrationParam($newval);
 }
 
-    public function setResolution(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setResolution(float $newval): int
 {
     return $this->set_resolution($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function resolution(): float
 {
     return $this->get_resolution();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function sensorState(): int
 {
     return $this->get_sensorState();
@@ -1139,7 +1237,7 @@ class YSensor extends YFunction
      * If you want to find a specific a sensor, use Sensor.findSensor()
      * and a hardwareID or a logical name.
      *
-     * @return YSensor  a pointer to a YSensor object, corresponding to
+     * @return ?YSensor  a pointer to a YSensor object, corresponding to
      *         a sensor currently online, or a null pointer
      *         if there are no more sensors to enumerate.
      */
@@ -1161,11 +1259,11 @@ class YSensor extends YFunction
      * Use the method YSensor::nextSensor() to iterate on
      * next sensors.
      *
-     * @return YSensor  a pointer to a YSensor object, corresponding to
+     * @return ?YSensor  a pointer to a YSensor object, corresponding to
      *         the first sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstSensor()
+    public static function FirstSensor(): ?YSensor
     {
         $next_hwid = YAPI::getFirstHardwareId('Sensor');
         if ($next_hwid == null) {

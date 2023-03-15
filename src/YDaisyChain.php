@@ -27,7 +27,7 @@ class YDaisyChain extends YFunction
 
     //--- (end of YDaisyChain attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YDaisyChain constructor)
         parent::__construct($str_func);
@@ -38,7 +38,7 @@ class YDaisyChain extends YFunction
 
     //--- (YDaisyChain implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'daisyState':
@@ -62,6 +62,7 @@ class YDaisyChain extends YFunction
      * YDaisyChain::DAISYSTATE_CHILD_LOST corresponding to the state of the daisy-link between modules
      *
      * On failure, throws an exception or returns YDaisyChain::DAISYSTATE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_daisyState(): int
     {
@@ -81,6 +82,7 @@ class YDaisyChain extends YFunction
      * @return int  an integer corresponding to the number of child nodes currently detected
      *
      * On failure, throws an exception or returns YDaisyChain::CHILDCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_childCount(): int
     {
@@ -100,6 +102,7 @@ class YDaisyChain extends YFunction
      * @return int  an integer corresponding to the number of child nodes expected in normal conditions
      *
      * On failure, throws an exception or returns YDaisyChain::REQUIREDCHILDCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_requiredChildCount(): int
     {
@@ -125,6 +128,7 @@ class YDaisyChain extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_requiredChildCount(int $newval): int
     {
@@ -160,7 +164,7 @@ class YDaisyChain extends YFunction
      *
      * @return YDaisyChain  a YDaisyChain object allowing you to drive the module chain.
      */
-    public static function FindDaisyChain(string $func): ?YDaisyChain
+    public static function FindDaisyChain(string $func): YDaisyChain
     {
         // $obj                    is a YDaisyChain;
         $obj = YFunction::_FindFromCache('DaisyChain', $func);
@@ -171,22 +175,34 @@ class YDaisyChain extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function daisyState(): int
 {
     return $this->get_daisyState();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function childCount(): int
 {
     return $this->get_childCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function requiredChildCount(): int
 {
     return $this->get_requiredChildCount();
 }
 
-    public function setRequiredChildCount(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setRequiredChildCount(int $newval): int
 {
     return $this->set_requiredChildCount($newval);
 }
@@ -197,7 +213,7 @@ class YDaisyChain extends YFunction
      * If you want to find a specific a module chain, use DaisyChain.findDaisyChain()
      * and a hardwareID or a logical name.
      *
-     * @return YDaisyChain  a pointer to a YDaisyChain object, corresponding to
+     * @return ?YDaisyChain  a pointer to a YDaisyChain object, corresponding to
      *         a module chain currently online, or a null pointer
      *         if there are no more module chains to enumerate.
      */
@@ -219,11 +235,11 @@ class YDaisyChain extends YFunction
      * Use the method YDaisyChain::nextDaisyChain() to iterate on
      * next module chains.
      *
-     * @return YDaisyChain  a pointer to a YDaisyChain object, corresponding to
+     * @return ?YDaisyChain  a pointer to a YDaisyChain object, corresponding to
      *         the first module chain currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstDaisyChain()
+    public static function FirstDaisyChain(): ?YDaisyChain
     {
         $next_hwid = YAPI::getFirstHardwareId('DaisyChain');
         if ($next_hwid == null) {

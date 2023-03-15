@@ -1,45 +1,43 @@
 <?php
 namespace Yoctopuce\YoctoAPI;
-//
-// YTcpHub Class (used internally)
-//
-// Instances of this class represent a VirtualHub or a networked Yoctopuce device
-// to which we can connect to get access to device functions. For historical reasons,
-// this class is mostly used like a structure, rather than a real object.
-//
+
+/**
+ * YTcpHub Class (used internally)
+ *
+ * Instances of this class represent a VirtualHub or a networked Yoctopuce device
+ * to which we can connect to get access to device functions. For historical reasons,
+ * this class is mostly used like a structure, rather than a real object.
+ */
 class YTcpHub
 {
     // attributes
-    public $rooturl;                    // root url of the hub (without auth parameters)
-    public $streamaddr;                 // stream address of the hub ("tcp://addr:port")
-    public $url_info;                   // $url parsed
-    public $notifurl;                   // notification file used by this hub
-    public $use_pure_http;              // boolean that is true if the hub is VirtualHub-4web
-    /** @var  YTcpReq */
-    public $notifReq;                   // notification request, or null if not open
-    public $notifPos;                   // absolute position in notification stream
-    /** @var  boolean */
-    public $isNotifWorking;            // boolean that is true when we receive ping notification
-    public $devListExpires;             // timestamp of next useful updateDeviceList
-    /** @var  YTcpReq */
-    public $devListReq;                 // updateDeviceList request, or null if not open
-    public $serialByYdx;                // serials by hub-specific devYdx
-    public $retryDelay;                 // delay before reconnecting in case of error
-    public $retryExpires;               // timestamp of next reconnection attempt
-    public $missing;                    // list of missing devices during updateDeviceList
-    public $writeProtected;             // true if an adminPassword is set
-    public $user;                       // user for authentication
-    public $callbackData;               // raw HTTP callback data received
-    public $callbackCache;              // pre-parsed cache for callback-based API
-    public $reuseskt;                   // keep-alive socket to be reused
-    protected $realm;                   // hub authentication realm
-    protected $pwd;                     // password for authentication
-    protected $nonce;                   // lasPrint(t received nonce
-    protected $opaque;                  // last received opaque
-    protected $ha1;                     // our authentication ha1 string
-    protected $nc;                      // nounce usage count
+    public string $rooturl;                    // root url of the hub (without auth parameters)
+    public string $streamaddr;                 // stream address of the hub ("tcp://addr:port")
+    public array $url_info;                   // $url parsed
+    public string $notifurl;                   // notification file used by this hub
+    public bool $use_pure_http;              // boolean that is true if the hub is VirtualHub-4web
+    public ?YTcpReq $notifReq;                   // notification request, or null if not open
+    public int $notifPos;                   // absolute position in notification stream
+    public bool $isNotifWorking;            // boolean that is true when we receive ping notification
+    public float $devListExpires;             // timestamp of next useful updateDeviceList
+    public ?YTcpReq $devListReq;                 // updateDeviceList request, or null if not open
+    public array $serialByYdx;                // serials by hub-specific devYdx
+    public float $retryDelay;                 // delay before reconnecting in case of error
+    public float $retryExpires;               // timestamp of next reconnection attempt
+    public array $missing;                    // list of missing devices during updateDeviceList
+    public bool $writeProtected;             // true if an adminPassword is set
+    public string $user;                       // user for authentication
+    public mixed $callbackData;               // raw HTTP callback data received
+    public ?array $callbackCache;              // pre-parsed cache for callback-based API
+    public mixed $reuseskt;                   // keep-alive socket to be reused
+    protected string $realm;                   // hub authentication realm
+    protected string $pwd;                     // password for authentication
+    protected string $nonce;                   // lasPrint(t received nonce
+    protected string $opaque;                  // last received opaque
+    protected string $ha1;                     // our authentication ha1 string
+    protected string $nc;                      // nounce usage count
 
-    function __construct($url_info)
+    function __construct(array $url_info)
     {
         $this->rooturl = $url_info['rooturl'];
         $this->url_info = $url_info;
@@ -54,7 +52,6 @@ class YTcpHub
             $this->pwd = substr($url_info['auth'], $colon + 1);
         }
         $this->notifurl = 'not.byn';
-        $this->notifHandle = null;
         $this->notifPos = -1;
         $this->isNotifWorking = false;
         $this->devListExpires = 0;
@@ -63,14 +60,12 @@ class YTcpHub
         $this->retryExpires = 0;
         $this->writeProtected = false;
         $this->use_pure_http = false;
+        $this->reuseskt = null;
+        $this->notifReq = null;
+        $this->realm = '';
     }
 
-    /**
-     * @param mixed
-     * @param mixed
-     * @return mixed
-     */
-    static function decodeJZONReq($jzon, $ref)
+    static function decodeJZONReq(mixed $jzon, mixed $ref): mixed
     {
         $res = array();
         $ofs = 0;
@@ -88,12 +83,7 @@ class YTcpHub
         return $jzon;
     }
 
-    /**
-     * @param mixed
-     * @param mixed
-     * @return mixed
-     */
-    static function decodeJZONService($jzon, $ref)
+    static function decodeJZONService(array $jzon, array $ref): array
     {
         $wp = array();
         $yp = array();
@@ -113,12 +103,7 @@ class YTcpHub
     }
 
 
-    /**
-     * @param mixed
-     * @param mixed
-     * @return mixed
-     */
-    static function decodeJZON($jzon, $ref)
+    static function decodeJZON(array $jzon, array $ref): mixed
     {
         $decoded = self::decodeJZONReq($jzon, $ref);
         if (array_key_exists('services', $ref)) {
@@ -131,11 +116,7 @@ class YTcpHub
     }
 
 
-    /**
-     * @param array
-     * @return mixed
-     */
-    static function cleanJsonRef($ref)
+    static function cleanJsonRef(array $ref): array
     {
         $res = array();
         foreach ($ref as $key => $value) {
@@ -153,7 +134,7 @@ class YTcpHub
     }
 
 
-    function verfiyStreamAddr($fullTest = true, &$errmsg = '')
+    function verfiyStreamAddr(bool $fullTest = true, string &$errmsg = ''): int
     {
         if ($this->streamaddr == 'tcp://CALLBACK') {
 
@@ -318,9 +299,12 @@ class YTcpHub
         }
         return 0;
     }
-    // Update the hub internal variables according
-    // to a received header with WWW-Authenticate
-    function parseWWWAuthenticate($header)
+
+    /**
+     * Update the hub internal variables according
+     * to a received header with WWW-Authenticate
+     */
+    function parseWWWAuthenticate(string $header): void
     {
         $pos = stripos($header, "\r\nWWW-Authenticate:");
         if ($pos === false) {
@@ -336,14 +320,11 @@ class YTcpHub
             return;
         }
         $this->realm = '';
-        $this->qop = '';
         $this->nonce = '';
         $this->opaque = '';
         for ($i = 0; $i < sizeof($tags['tag']); $i++) {
             if ($tags['tag'][$i] == "realm") {
                 $this->realm = $tags['value'][$i];
-            } elseif ($tags['tag'][$i] == "qop") {
-                $this->qop = $tags['value'][$i];
             } elseif ($tags['tag'][$i] == "nonce") {
                 $this->nonce = $tags['value'][$i];
             } elseif ($tags['tag'][$i] == "opaque") {
@@ -354,8 +335,12 @@ class YTcpHub
         $this->ha1 = md5($this->user . ':' . $this->realm . ':' . $this->pwd);
     }
 
-    // Return an Authorization header for a given request
-    function getAuthorization($request)
+    /**
+     * Return an Authorization header for a given request
+     * @param string $request
+     * @return string
+     */
+    function getAuthorization(string $request): string
     {
         if ($this->user == '' || $this->realm == '') {
             return '';
@@ -377,13 +362,13 @@ class YTcpHub
     }
 
     // Return true if a hub is just a virtual cache (for callback mode)
-    function isCachedHub()
+    function isCachedHub(): bool
     {
         return !is_null($this->callbackCache);
     }
 
     // Execute a query for cached hub (for callback mode)
-    function cachedQuery($str_query, $str_body)
+    function cachedQuery(string $str_query, string $str_body): ?string
     {
         // apply POST remotely
         if (substr($str_query, 0, 5) == 'POST ') {
@@ -451,6 +436,11 @@ class YTcpHub
             print("\n@YoctoAPI:$str_query \n");
             return "OK\r\n\r\n";
         }
+    }
+
+    public function getBaseURL(): string
+    {
+        return $this->url_info['rooturl'] . $this->url_info['subdomain'] . '/';
     }
 }
 

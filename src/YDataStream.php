@@ -46,7 +46,7 @@ class YDataStream
     //--- (end of generated code: YDataStream attributes)
     private mixed $_calhdl;
 
-    public function __construct($obj_parent, $obj_dataset = null, $encoded = null)
+    public function __construct(YFunction $obj_parent, ?YDataSet $obj_dataset = null, array $encoded = null)
     {
         //--- (generated code: YDataStream constructor)
         //--- (end of generated code: YDataStream constructor)
@@ -59,6 +59,9 @@ class YDataStream
 
     //--- (generated code: YDataStream implementation)
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _initFromDataSet(?YDataSet $dataset, array $encoded): int
     {
         // $val                    is a int;
@@ -167,6 +170,9 @@ class YDataStream
         return 0;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _parseStream(string $sdata): int
     {
         // $idx                    is a int;
@@ -222,11 +228,17 @@ class YDataStream
         return YAPI::SUCCESS;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _wasLoaded(): bool
     {
         return $this->_isLoaded;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _get_url(): string
     {
         // $url                    is a str;
@@ -235,6 +247,9 @@ class YDataStream
         return $url;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _get_baseurl(): string
     {
         // $url                    is a str;
@@ -243,6 +258,9 @@ class YDataStream
         return $url;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _get_urlsuffix(): string
     {
         // $url                    is a str;
@@ -250,11 +268,17 @@ class YDataStream
         return $url;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function loadStream(): int
     {
         return $this->_parseStream($this->_parent->_download($this->_get_url()));
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _decodeVal(int $w): float
     {
         // $val                    is a float;
@@ -268,6 +292,9 @@ class YDataStream
         return $val;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _decodeAvg(int $dw, int $count): float
     {
         // $val                    is a float;
@@ -281,6 +308,9 @@ class YDataStream
         return $val;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function isClosed(): bool
     {
         return $this->_isClosed;
@@ -360,11 +390,17 @@ class YDataStream
         return round($this->_dataSamplesInterval*1000);
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_dataSamplesInterval(): float
     {
         return $this->_dataSamplesInterval;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_firstDataSamplesInterval(): float
     {
         return $this->_firstMeasureDuration;
@@ -380,6 +416,7 @@ class YDataStream
      * @return int  an unsigned number corresponding to the number of rows.
      *
      * On failure, throws an exception or returns zero.
+     * @throws YAPI_Exception on error
      */
     public function get_rowCount(): int
     {
@@ -402,6 +439,7 @@ class YDataStream
      * @return int  an unsigned number corresponding to the number of columns.
      *
      * On failure, throws an exception or returns zero.
+     * @throws YAPI_Exception on error
      */
     public function get_columnCount(): int
     {
@@ -428,6 +466,7 @@ class YDataStream
      *         data stream.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function get_columnNames(): array
     {
@@ -447,6 +486,7 @@ class YDataStream
      *         or YDataStream::DATA_INVALID if the stream is not yet complete (still recording).
      *
      * On failure, throws an exception or returns YDataStream::DATA_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_minValue(): float
     {
@@ -462,6 +502,7 @@ class YDataStream
      *         or YDataStream::DATA_INVALID if the stream is not yet complete (still recording).
      *
      * On failure, throws an exception or returns YDataStream::DATA_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_averageValue(): float
     {
@@ -477,12 +518,16 @@ class YDataStream
      *         or YDataStream::DATA_INVALID if the stream is not yet complete (still recording).
      *
      * On failure, throws an exception or returns YDataStream::DATA_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_maxValue(): float
     {
         return $this->_maxVal;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_realDuration(): float
     {
         if ($this->_isClosed) {
@@ -505,6 +550,7 @@ class YDataStream
      *         numbers.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function get_dataRows(): array
     {
@@ -529,6 +575,7 @@ class YDataStream
      * @return float  a floating-point number
      *
      * On failure, throws an exception or returns YDataStream::DATA_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_data(int $row, int $col): float
     {

@@ -28,7 +28,7 @@ class YMultiSensController extends YFunction
 
     //--- (end of YMultiSensController attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YMultiSensController constructor)
         parent::__construct($str_func);
@@ -39,7 +39,7 @@ class YMultiSensController extends YFunction
 
     //--- (YMultiSensController implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'nSensors':
@@ -67,6 +67,7 @@ class YMultiSensController extends YFunction
      * @return int  an integer corresponding to the number of sensors to poll
      *
      * On failure, throws an exception or returns YMultiSensController::NSENSORS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_nSensors(): int
     {
@@ -92,6 +93,7 @@ class YMultiSensController extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_nSensors(int $newval): int
     {
@@ -105,6 +107,7 @@ class YMultiSensController extends YFunction
      * @return int  an integer corresponding to the maximum configurable sensor count allowed on this device
      *
      * On failure, throws an exception or returns YMultiSensController::MAXSENSORS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_maxSensors(): int
     {
@@ -125,6 +128,7 @@ class YMultiSensController extends YFunction
      * YMultiSensController::MAINTENANCEMODE_TRUE, according to true when the device is in maintenance mode
      *
      * On failure, throws an exception or returns YMultiSensController::MAINTENANCEMODE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_maintenanceMode(): int
     {
@@ -150,6 +154,7 @@ class YMultiSensController extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_maintenanceMode(int $newval): int
     {
@@ -166,6 +171,7 @@ class YMultiSensController extends YFunction
      * @return int  an integer corresponding to the I2C address of the most recently detected sensor
      *
      * On failure, throws an exception or returns YMultiSensController::LASTADDRESSDETECTED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_lastAddressDetected(): int
     {
@@ -179,6 +185,9 @@ class YMultiSensController extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -191,6 +200,9 @@ class YMultiSensController extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -225,7 +237,7 @@ class YMultiSensController extends YFunction
      *
      * @return YMultiSensController  a YMultiSensController object allowing you to drive the multi-sensor controller.
      */
-    public static function FindMultiSensController(string $func): ?YMultiSensController
+    public static function FindMultiSensController(string $func): YMultiSensController
     {
         // $obj                    is a YMultiSensController;
         $obj = YFunction::_FindFromCache('MultiSensController', $func);
@@ -250,6 +262,7 @@ class YMultiSensController extends YFunction
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function setupAddress(int $addr): int
     {
@@ -273,6 +286,7 @@ class YMultiSensController extends YFunction
      * @return int  the I2C address of the detected sensor, or 0 if none is found
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function get_sensorAddress(): int
     {
@@ -284,42 +298,66 @@ class YMultiSensController extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function nSensors(): int
 {
     return $this->get_nSensors();
 }
 
-    public function setNSensors(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setNSensors(int $newval): int
 {
     return $this->set_nSensors($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function maxSensors(): int
 {
     return $this->get_maxSensors();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function maintenanceMode(): int
 {
     return $this->get_maintenanceMode();
 }
 
-    public function setMaintenanceMode(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMaintenanceMode(int $newval): int
 {
     return $this->set_maintenanceMode($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function lastAddressDetected(): int
 {
     return $this->get_lastAddressDetected();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
@@ -330,7 +368,7 @@ class YMultiSensController extends YFunction
      * If you want to find a specific a multi-sensor controller, use MultiSensController.findMultiSensController()
      * and a hardwareID or a logical name.
      *
-     * @return YMultiSensController  a pointer to a YMultiSensController object, corresponding to
+     * @return ?YMultiSensController  a pointer to a YMultiSensController object, corresponding to
      *         a multi-sensor controller currently online, or a null pointer
      *         if there are no more multi-sensor controllers to enumerate.
      */
@@ -352,11 +390,11 @@ class YMultiSensController extends YFunction
      * Use the method YMultiSensController::nextMultiSensController() to iterate on
      * next multi-sensor controllers.
      *
-     * @return YMultiSensController  a pointer to a YMultiSensController object, corresponding to
+     * @return ?YMultiSensController  a pointer to a YMultiSensController object, corresponding to
      *         the first multi-sensor controller currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstMultiSensController()
+    public static function FirstMultiSensController(): ?YMultiSensController
     {
         $next_hwid = YAPI::getFirstHardwareId('MultiSensController');
         if ($next_hwid == null) {

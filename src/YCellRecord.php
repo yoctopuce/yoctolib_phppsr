@@ -23,17 +23,10 @@ class YCellRecord
 
     //--- (end of generated code: YCellRecord attributes)
 
-    function __construct($int_mcc, $int_mnc, $int_lac, $int_cellId, $int_dbm, $int_tad, $str_oper)
+    function __construct(string $str_func)
     {
         //--- (generated code: YCellRecord constructor)
         //--- (end of generated code: YCellRecord constructor)
-        $this->_oper = $str_oper;
-        $this->_mcc = $int_mcc;
-        $this->_mnc = $int_mnc;
-        $this->_lac = $int_lac;
-        $this->_cid = $int_cellId;
-        $this->_dbm = $int_dbm;
-        $this->_tad = $int_tad;
     }
 
     //--- (generated code: YCellRecord implementation)
@@ -115,4 +108,4 @@ class YCellRecord
 
     //--- (end of generated code: YCellRecord implementation)
 
-};
+}

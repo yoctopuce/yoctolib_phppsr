@@ -21,7 +21,7 @@ class YPwmPowerSource extends YFunction
 
     //--- (end of YPwmPowerSource attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YPwmPowerSource constructor)
         parent::__construct($str_func);
@@ -32,7 +32,7 @@ class YPwmPowerSource extends YFunction
 
     //--- (YPwmPowerSource implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'powerMode':
@@ -50,6 +50,7 @@ class YPwmPowerSource extends YFunction
      * power source for the PWM on the same device
      *
      * On failure, throws an exception or returns YPwmPowerSource::POWERMODE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_powerMode(): int
     {
@@ -79,6 +80,7 @@ class YPwmPowerSource extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_powerMode(int $newval): int
     {
@@ -114,7 +116,7 @@ class YPwmPowerSource extends YFunction
      *
      * @return YPwmPowerSource  a YPwmPowerSource object allowing you to drive the PWM generator power source.
      */
-    public static function FindPwmPowerSource(string $func): ?YPwmPowerSource
+    public static function FindPwmPowerSource(string $func): YPwmPowerSource
     {
         // $obj                    is a YPwmPowerSource;
         $obj = YFunction::_FindFromCache('PwmPowerSource', $func);
@@ -125,12 +127,18 @@ class YPwmPowerSource extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function powerMode(): int
 {
     return $this->get_powerMode();
 }
 
-    public function setPowerMode(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPowerMode(int $newval): int
 {
     return $this->set_powerMode($newval);
 }
@@ -141,7 +149,7 @@ class YPwmPowerSource extends YFunction
      * If you want to find a specific a PWM generator power source, use PwmPowerSource.findPwmPowerSource()
      * and a hardwareID or a logical name.
      *
-     * @return YPwmPowerSource  a pointer to a YPwmPowerSource object, corresponding to
+     * @return ?YPwmPowerSource  a pointer to a YPwmPowerSource object, corresponding to
      *         a PWM generator power source currently online, or a null pointer
      *         if there are no more PWM generator power sources to enumerate.
      */
@@ -163,11 +171,11 @@ class YPwmPowerSource extends YFunction
      * Use the method YPwmPowerSource::nextPwmPowerSource() to iterate on
      * next PWM generator power sources.
      *
-     * @return YPwmPowerSource  a pointer to a YPwmPowerSource object, corresponding to
+     * @return ?YPwmPowerSource  a pointer to a YPwmPowerSource object, corresponding to
      *         the first PWM generator power source currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstPwmPowerSource()
+    public static function FirstPwmPowerSource(): ?YPwmPowerSource
     {
         $next_hwid = YAPI::getFirstHardwareId('PwmPowerSource');
         if ($next_hwid == null) {

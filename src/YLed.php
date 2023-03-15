@@ -31,7 +31,7 @@ class YLed extends YFunction
 
     //--- (end of YLed attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YLed constructor)
         parent::__construct($str_func);
@@ -42,7 +42,7 @@ class YLed extends YFunction
 
     //--- (YLed implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'power':
@@ -64,6 +64,7 @@ class YLed extends YFunction
      * @return int  either YLed::POWER_OFF or YLed::POWER_ON, according to the current LED state
      *
      * On failure, throws an exception or returns YLed::POWER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_power(): int
     {
@@ -85,6 +86,7 @@ class YLed extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_power(int $newval): int
     {
@@ -98,6 +100,7 @@ class YLed extends YFunction
      * @return int  an integer corresponding to the current LED intensity (in per cent)
      *
      * On failure, throws an exception or returns YLed::LUMINOSITY_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_luminosity(): int
     {
@@ -120,6 +123,7 @@ class YLed extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_luminosity(int $newval): int
     {
@@ -134,6 +138,7 @@ class YLed extends YFunction
      * YLed::BLINKING_RUN, YLed::BLINKING_CALL and YLed::BLINKING_PANIC corresponding to the current LED signaling mode
      *
      * On failure, throws an exception or returns YLed::BLINKING_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_blinking(): int
     {
@@ -156,6 +161,7 @@ class YLed extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_blinking(int $newval): int
     {
@@ -191,7 +197,7 @@ class YLed extends YFunction
      *
      * @return YLed  a YLed object allowing you to drive the monochrome LED.
      */
-    public static function FindLed(string $func): ?YLed
+    public static function FindLed(string $func): YLed
     {
         // $obj                    is a YLed;
         $obj = YFunction::_FindFromCache('Led', $func);
@@ -202,32 +208,50 @@ class YLed extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function power(): int
 {
     return $this->get_power();
 }
 
-    public function setPower(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPower(int $newval): int
 {
     return $this->set_power($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function luminosity(): int
 {
     return $this->get_luminosity();
 }
 
-    public function setLuminosity(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setLuminosity(int $newval): int
 {
     return $this->set_luminosity($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function blinking(): int
 {
     return $this->get_blinking();
 }
 
-    public function setBlinking(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setBlinking(int $newval): int
 {
     return $this->set_blinking($newval);
 }
@@ -238,7 +262,7 @@ class YLed extends YFunction
      * If you want to find a specific a monochrome LED, use Led.findLed()
      * and a hardwareID or a logical name.
      *
-     * @return YLed  a pointer to a YLed object, corresponding to
+     * @return ?YLed  a pointer to a YLed object, corresponding to
      *         a monochrome LED currently online, or a null pointer
      *         if there are no more monochrome LEDs to enumerate.
      */
@@ -260,11 +284,11 @@ class YLed extends YFunction
      * Use the method YLed::nextLed() to iterate on
      * next monochrome LEDs.
      *
-     * @return YLed  a pointer to a YLed object, corresponding to
+     * @return ?YLed  a pointer to a YLed object, corresponding to
      *         the first monochrome LED currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstLed()
+    public static function FirstLed(): ?YLed
     {
         $next_hwid = YAPI::getFirstHardwareId('Led');
         if ($next_hwid == null) {

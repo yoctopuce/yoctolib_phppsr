@@ -24,7 +24,7 @@ class YMeasure
 
     //--- (end of generated code: YMeasure attributes)
 
-    public function __construct($float_start, $float_end, $float_minVal, $float_avgVal, $float_maxVal)
+    public function __construct(float $float_start, float $float_end, float $float_minVal, float $float_avgVal, float $float_maxVal)
     {
         //--- (generated code: YMeasure constructor)
         //--- (end of generated code: YMeasure constructor)

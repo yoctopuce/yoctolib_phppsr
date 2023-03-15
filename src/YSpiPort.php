@@ -78,7 +78,7 @@ class YSpiPort extends YFunction
 
     //--- (generated code: YSpiPort implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'rxCount':
@@ -139,6 +139,7 @@ class YSpiPort extends YFunction
      * @return int  an integer corresponding to the total number of bytes received since last reset
      *
      * On failure, throws an exception or returns YSpiPort::RXCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_rxCount(): int
     {
@@ -158,6 +159,7 @@ class YSpiPort extends YFunction
      * @return int  an integer corresponding to the total number of bytes transmitted since last reset
      *
      * On failure, throws an exception or returns YSpiPort::TXCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_txCount(): int
     {
@@ -177,6 +179,7 @@ class YSpiPort extends YFunction
      * @return int  an integer corresponding to the total number of communication errors detected since last reset
      *
      * On failure, throws an exception or returns YSpiPort::ERRCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_errCount(): int
     {
@@ -196,6 +199,7 @@ class YSpiPort extends YFunction
      * @return int  an integer corresponding to the total number of messages received since last reset
      *
      * On failure, throws an exception or returns YSpiPort::RXMSGCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_rxMsgCount(): int
     {
@@ -215,6 +219,7 @@ class YSpiPort extends YFunction
      * @return int  an integer corresponding to the total number of messages send since last reset
      *
      * On failure, throws an exception or returns YSpiPort::TXMSGCOUNT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_txMsgCount(): int
     {
@@ -234,6 +239,7 @@ class YSpiPort extends YFunction
      * @return string  a string corresponding to the latest message fully received (for Line and Frame protocols)
      *
      * On failure, throws an exception or returns YSpiPort::LASTMSG_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_lastMsg(): string
     {
@@ -253,6 +259,7 @@ class YSpiPort extends YFunction
      * @return string  a string corresponding to the name of the job file currently in use
      *
      * On failure, throws an exception or returns YSpiPort::CURRENTJOB_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_currentJob(): string
     {
@@ -275,6 +282,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_currentJob(string $newval): int
     {
@@ -288,6 +296,7 @@ class YSpiPort extends YFunction
      * @return string  a string corresponding to the job file to use when the device is powered on
      *
      * On failure, throws an exception or returns YSpiPort::STARTUPJOB_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_startupJob(): string
     {
@@ -311,6 +320,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_startupJob(string $newval): int
     {
@@ -324,6 +334,7 @@ class YSpiPort extends YFunction
      * @return int  an integer corresponding to the maximum number of tasks in a job that the device can handle
      *
      * On failure, throws an exception or returns YSpiPort::JOBMAXTASK_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_jobMaxTask(): int
     {
@@ -343,6 +354,7 @@ class YSpiPort extends YFunction
      * @return int  an integer corresponding to maximum size allowed for job files
      *
      * On failure, throws an exception or returns YSpiPort::JOBMAXSIZE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_jobMaxSize(): int
     {
@@ -356,6 +368,9 @@ class YSpiPort extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -368,6 +383,9 @@ class YSpiPort extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -384,6 +402,7 @@ class YSpiPort extends YFunction
      * @return string  a string corresponding to the type of protocol used over the serial line, as a string
      *
      * On failure, throws an exception or returns YSpiPort::PROTOCOL_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_protocol(): string
     {
@@ -413,6 +432,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_protocol(string $newval): int
     {
@@ -429,6 +449,7 @@ class YSpiPort extends YFunction
      * YSpiPort::VOLTAGELEVEL_SDI12 corresponding to the voltage level used on the serial line
      *
      * On failure, throws an exception or returns YSpiPort::VOLTAGELEVEL_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_voltageLevel(): int
     {
@@ -459,6 +480,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_voltageLevel(int $newval): int
     {
@@ -475,6 +497,7 @@ class YSpiPort extends YFunction
      *         "125000,0,msb"
      *
      * On failure, throws an exception or returns YSpiPort::SPIMODE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_spiMode(): string
     {
@@ -501,6 +524,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_spiMode(string $newval): int
     {
@@ -515,6 +539,7 @@ class YSpiPort extends YFunction
      * the SS line polarity
      *
      * On failure, throws an exception or returns YSpiPort::SSPOLARITY_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_ssPolarity(): int
     {
@@ -539,6 +564,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_ssPolarity(int $newval): int
     {
@@ -553,6 +579,7 @@ class YSpiPort extends YFunction
      * the SDI line phase is shifted with regards to the SDO line
      *
      * On failure, throws an exception or returns YSpiPort::SHIFTSAMPLING_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_shiftSampling(): int
     {
@@ -579,6 +606,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_shiftSampling(int $newval): int
     {
@@ -614,7 +642,7 @@ class YSpiPort extends YFunction
      *
      * @return YSpiPort  a YSpiPort object allowing you to drive the SPI port.
      */
-    public static function FindSpiPort(string $func): ?YSpiPort
+    public static function FindSpiPort(string $func): YSpiPort
     {
         // $obj                    is a YSpiPort;
         $obj = YFunction::_FindFromCache('SpiPort', $func);
@@ -625,6 +653,9 @@ class YSpiPort extends YFunction
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function sendCommand(string $text): int
     {
         return $this->set_command($text);
@@ -642,6 +673,7 @@ class YSpiPort extends YFunction
      * @return string  a string with a single line of text
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function readLine(): string
     {
@@ -688,6 +720,7 @@ class YSpiPort extends YFunction
      *         Binary messages are converted to hexadecimal representation.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function readMessages(string $pattern, int $maxWait): array
     {
@@ -761,6 +794,9 @@ class YSpiPort extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function end_tell(): int
     {
         // $availPosStr            is a str;
@@ -786,6 +822,7 @@ class YSpiPort extends YFunction
      *         Additional lines can be obtained by calling readLine or readMessages.
      *
      * On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
     public function queryLine(string $query, int $maxWait): string
     {
@@ -833,6 +870,7 @@ class YSpiPort extends YFunction
      *         Additional frames can be obtained by calling readHex or readMessages.
      *
      * On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
     public function queryHex(string $hexString, int $maxWait): string
     {
@@ -878,6 +916,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function uploadJob(string $jobfile, string $jsonDef): int
     {
@@ -895,6 +934,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function selectJob(string $jobfile): int
     {
@@ -907,6 +947,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function reset(): int
     {
@@ -926,6 +967,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeByte(int $code): int
     {
@@ -940,6 +982,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeStr(string $text): int
     {
@@ -977,6 +1020,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeBin(string $buff): int
     {
@@ -991,6 +1035,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeArray(array $byteList): int
     {
@@ -1020,6 +1065,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeHex(string $hexString): int
     {
@@ -1053,6 +1099,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function writeLine(string $text): int
     {
@@ -1090,6 +1137,7 @@ class YSpiPort extends YFunction
      * @return int  the next byte
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function readByte(): int
     {
@@ -1161,6 +1209,7 @@ class YSpiPort extends YFunction
      * @return string  a string with receive buffer contents
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function readStr(int $nChars): string
     {
@@ -1197,6 +1246,7 @@ class YSpiPort extends YFunction
      * @return string  a binary object with receive buffer contents
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function readBin(int $nChars): string
     {
@@ -1239,6 +1289,7 @@ class YSpiPort extends YFunction
      * @return Integer[]  a sequence of bytes with receive buffer contents
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function readArray(int $nChars): array
     {
@@ -1285,6 +1336,7 @@ class YSpiPort extends YFunction
      * @return string  a string with receive buffer contents, encoded in hexadecimal
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function readHex(int $nBytes): string
     {
@@ -1330,6 +1382,7 @@ class YSpiPort extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_SS(int $val): int
     {
@@ -1348,6 +1401,7 @@ class YSpiPort extends YFunction
      * @return YSpiSnoopingRecord[]  an array of YSpiSnoopingRecord objects containing the messages found, if any.
      *
      * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
      */
     public function snoopMessages(int $maxWait): array
     {
@@ -1376,122 +1430,194 @@ class YSpiPort extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function rxCount(): int
 {
     return $this->get_rxCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function txCount(): int
 {
     return $this->get_txCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function errCount(): int
 {
     return $this->get_errCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function rxMsgCount(): int
 {
     return $this->get_rxMsgCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function txMsgCount(): int
 {
     return $this->get_txMsgCount();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function lastMsg(): string
 {
     return $this->get_lastMsg();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function currentJob(): string
 {
     return $this->get_currentJob();
 }
 
-    public function setCurrentJob(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCurrentJob(string $newval): int
 {
     return $this->set_currentJob($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function startupJob(): string
 {
     return $this->get_startupJob();
 }
 
-    public function setStartupJob(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setStartupJob(string $newval): int
 {
     return $this->set_startupJob($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function jobMaxTask(): int
 {
     return $this->get_jobMaxTask();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function jobMaxSize(): int
 {
     return $this->get_jobMaxSize();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function protocol(): string
 {
     return $this->get_protocol();
 }
 
-    public function setProtocol(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setProtocol(string $newval): int
 {
     return $this->set_protocol($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function voltageLevel(): int
 {
     return $this->get_voltageLevel();
 }
 
-    public function setVoltageLevel(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setVoltageLevel(int $newval): int
 {
     return $this->set_voltageLevel($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function spiMode(): string
 {
     return $this->get_spiMode();
 }
 
-    public function setSpiMode(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setSpiMode(string $newval): int
 {
     return $this->set_spiMode($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function ssPolarity(): int
 {
     return $this->get_ssPolarity();
 }
 
-    public function setSsPolarity(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setSsPolarity(int $newval): int
 {
     return $this->set_ssPolarity($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function shiftSampling(): int
 {
     return $this->get_shiftSampling();
 }
 
-    public function setShiftSampling(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setShiftSampling(int $newval): int
 {
     return $this->set_shiftSampling($newval);
 }
@@ -1502,7 +1628,7 @@ class YSpiPort extends YFunction
      * If you want to find a specific a SPI port, use SpiPort.findSpiPort()
      * and a hardwareID or a logical name.
      *
-     * @return YSpiPort  a pointer to a YSpiPort object, corresponding to
+     * @return ?YSpiPort  a pointer to a YSpiPort object, corresponding to
      *         a SPI port currently online, or a null pointer
      *         if there are no more SPI ports to enumerate.
      */
@@ -1524,11 +1650,11 @@ class YSpiPort extends YFunction
      * Use the method YSpiPort::nextSpiPort() to iterate on
      * next SPI ports.
      *
-     * @return YSpiPort  a pointer to a YSpiPort object, corresponding to
+     * @return ?YSpiPort  a pointer to a YSpiPort object, corresponding to
      *         the first SPI port currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstSpiPort()
+    public static function FirstSpiPort(): ?YSpiPort
     {
         $next_hwid = YAPI::getFirstHardwareId('SpiPort');
         if ($next_hwid == null) {
@@ -1581,7 +1707,7 @@ function yFindSpiPort(string $func): YSpiPort
  * Use the method YSpiPort::nextSpiPort() to iterate on
  * next SPI ports.
  *
- * @return YSpiPort  a pointer to a YSpiPort object, corresponding to
+ * @return ?YSpiPort  a pointer to a YSpiPort object, corresponding to
  *         the first SPI port currently online, or a null pointer
  *         if there are none.
  */
@@ -1591,4 +1717,4 @@ function yFirstSpiPort(): ?YSpiPort
 }
 
 //--- (end of generated code: YSpiPort functions)
-?>
+

@@ -19,7 +19,7 @@ class YQt extends YSensor
 
     //--- (end of generated code: YQt attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (generated code: YQt constructor)
         parent::__construct($str_func);
@@ -58,7 +58,7 @@ class YQt extends YSensor
      *
      * @return YQt  a YQt object allowing you to drive the quaternion component.
      */
-    public static function FindQt(string $func): ?YQt
+    public static function FindQt(string $func): YQt
     {
         // $obj                    is a YQt;
         $obj = YFunction::_FindFromCache('Qt', $func);
@@ -75,7 +75,7 @@ class YQt extends YSensor
      * If you want to find a specific a quaternion component, use Qt.findQt()
      * and a hardwareID or a logical name.
      *
-     * @return YQt  a pointer to a YQt object, corresponding to
+     * @return ?YQt  a pointer to a YQt object, corresponding to
      *         a quaternion component currently online, or a null pointer
      *         if there are no more quaternion components to enumerate.
      */
@@ -97,11 +97,11 @@ class YQt extends YSensor
      * Use the method YQt::nextQt() to iterate on
      * next quaternion components.
      *
-     * @return YQt  a pointer to a YQt object, corresponding to
+     * @return ?YQt  a pointer to a YQt object, corresponding to
      *         the first quaternion component currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstQt()
+    public static function FirstQt(): ?YQt
     {
         $next_hwid = YAPI::getFirstHardwareId('Qt');
         if ($next_hwid == null) {
@@ -112,4 +112,6 @@ class YQt extends YSensor
 
     //--- (end of generated code: YQt implementation)
 
-};
+}
+
+

@@ -45,7 +45,7 @@ class YProximity extends YSensor
 
     //--- (end of YProximity attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YProximity constructor)
         parent::__construct($str_func);
@@ -56,7 +56,7 @@ class YProximity extends YSensor
 
     //--- (YProximity implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'signalValue':
@@ -103,6 +103,7 @@ class YProximity extends YSensor
      * proximity sensor
      *
      * On failure, throws an exception or returns YProximity::SIGNALVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_signalValue(): float
     {
@@ -125,6 +126,7 @@ class YProximity extends YSensor
      *         as a binary input (on/off)
      *
      * On failure, throws an exception or returns YProximity::DETECTIONTHRESHOLD_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_detectionThreshold(): int
     {
@@ -150,6 +152,7 @@ class YProximity extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_detectionThreshold(int $newval): int
     {
@@ -166,6 +169,7 @@ class YProximity extends YSensor
      *         as a binary input (on/off)
      *
      * On failure, throws an exception or returns YProximity::DETECTIONHYSTERESIS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_detectionHysteresis(): int
     {
@@ -191,6 +195,7 @@ class YProximity extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_detectionHysteresis(int $newval): int
     {
@@ -205,6 +210,7 @@ class YProximity extends YSensor
      * @return int  an integer corresponding to the minimal detection duration before signalling a presence event
      *
      * On failure, throws an exception or returns YProximity::PRESENCEMINTIME_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_presenceMinTime(): int
     {
@@ -229,6 +235,7 @@ class YProximity extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_presenceMinTime(int $newval): int
     {
@@ -243,6 +250,7 @@ class YProximity extends YSensor
      * @return int  an integer corresponding to the minimal detection duration before signalling a removal event
      *
      * On failure, throws an exception or returns YProximity::REMOVALMINTIME_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_removalMinTime(): int
     {
@@ -267,6 +275,7 @@ class YProximity extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_removalMinTime(int $newval): int
     {
@@ -283,6 +292,7 @@ class YProximity extends YSensor
      * threshold), and false otherwise
      *
      * On failure, throws an exception or returns YProximity::ISPRESENT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_isPresent(): int
     {
@@ -305,6 +315,7 @@ class YProximity extends YSensor
      *         detection (the input contact transitioned from absent to present)
      *
      * On failure, throws an exception or returns YProximity::LASTTIMEAPPROACHED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_lastTimeApproached(): float
     {
@@ -327,6 +338,7 @@ class YProximity extends YSensor
      *         detection (the input contact transitioned from present to absent)
      *
      * On failure, throws an exception or returns YProximity::LASTTIMEREMOVED_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_lastTimeRemoved(): float
     {
@@ -348,6 +360,7 @@ class YProximity extends YSensor
      * @return float  an integer corresponding to the pulse counter value
      *
      * On failure, throws an exception or returns YProximity::PULSECOUNTER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pulseCounter(): float
     {
@@ -361,6 +374,9 @@ class YProximity extends YSensor
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_pulseCounter(float $newval): int
     {
         $rest_val = strval($newval);
@@ -373,6 +389,7 @@ class YProximity extends YSensor
      * @return float  an integer corresponding to the timer of the pulse counter (ms)
      *
      * On failure, throws an exception or returns YProximity::PULSETIMER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pulseTimer(): float
     {
@@ -395,6 +412,7 @@ class YProximity extends YSensor
      * to the parameter (sensor value, presence or pulse count) returned by the get_currentValue function and callbacks
      *
      * On failure, throws an exception or returns YProximity::PROXIMITYREPORTMODE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_proximityReportMode(): int
     {
@@ -423,6 +441,7 @@ class YProximity extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_proximityReportMode(int $newval): int
     {
@@ -458,7 +477,7 @@ class YProximity extends YSensor
      *
      * @return YProximity  a YProximity object allowing you to drive the proximity sensor.
      */
-    public static function FindProximity(string $func): ?YProximity
+    public static function FindProximity(string $func): YProximity
     {
         // $obj                    is a YProximity;
         $obj = YFunction::_FindFromCache('Proximity', $func);
@@ -475,93 +494,145 @@ class YProximity extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function resetCounter(): int
     {
         return $this->set_pulseCounter(0);
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function signalValue(): float
 {
     return $this->get_signalValue();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function detectionThreshold(): int
 {
     return $this->get_detectionThreshold();
 }
 
-    public function setDetectionThreshold(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setDetectionThreshold(int $newval): int
 {
     return $this->set_detectionThreshold($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function detectionHysteresis(): int
 {
     return $this->get_detectionHysteresis();
 }
 
-    public function setDetectionHysteresis(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setDetectionHysteresis(int $newval): int
 {
     return $this->set_detectionHysteresis($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function presenceMinTime(): int
 {
     return $this->get_presenceMinTime();
 }
 
-    public function setPresenceMinTime(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPresenceMinTime(int $newval): int
 {
     return $this->set_presenceMinTime($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function removalMinTime(): int
 {
     return $this->get_removalMinTime();
 }
 
-    public function setRemovalMinTime(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setRemovalMinTime(int $newval): int
 {
     return $this->set_removalMinTime($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function isPresent(): int
 {
     return $this->get_isPresent();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function lastTimeApproached(): float
 {
     return $this->get_lastTimeApproached();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function lastTimeRemoved(): float
 {
     return $this->get_lastTimeRemoved();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pulseCounter(): float
 {
     return $this->get_pulseCounter();
 }
 
-    public function setPulseCounter(float $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPulseCounter(float $newval): int
 {
     return $this->set_pulseCounter($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pulseTimer(): float
 {
     return $this->get_pulseTimer();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function proximityReportMode(): int
 {
     return $this->get_proximityReportMode();
 }
 
-    public function setProximityReportMode(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setProximityReportMode(int $newval): int
 {
     return $this->set_proximityReportMode($newval);
 }
@@ -572,7 +643,7 @@ class YProximity extends YSensor
      * If you want to find a specific a proximity sensor, use Proximity.findProximity()
      * and a hardwareID or a logical name.
      *
-     * @return YProximity  a pointer to a YProximity object, corresponding to
+     * @return ?YProximity  a pointer to a YProximity object, corresponding to
      *         a proximity sensor currently online, or a null pointer
      *         if there are no more proximity sensors to enumerate.
      */
@@ -594,11 +665,11 @@ class YProximity extends YSensor
      * Use the method YProximity::nextProximity() to iterate on
      * next proximity sensors.
      *
-     * @return YProximity  a pointer to a YProximity object, corresponding to
+     * @return ?YProximity  a pointer to a YProximity object, corresponding to
      *         the first proximity sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstProximity()
+    public static function FirstProximity(): ?YProximity
     {
         $next_hwid = YAPI::getFirstHardwareId('Proximity');
         if ($next_hwid == null) {

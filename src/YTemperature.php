@@ -45,7 +45,7 @@ class YTemperature extends YSensor
 
     //--- (end of YTemperature attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YTemperature constructor)
         parent::__construct($str_func);
@@ -56,7 +56,7 @@ class YTemperature extends YSensor
 
     //--- (YTemperature implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'sensorType':
@@ -91,6 +91,7 @@ class YTemperature extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_unit(string $newval): int
     {
@@ -112,6 +113,7 @@ class YTemperature extends YSensor
      * temperature sensor type
      *
      * On failure, throws an exception or returns YTemperature::SENSORTYPE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_sensorType(): int
     {
@@ -145,6 +147,7 @@ class YTemperature extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_sensorType(int $newval): int
     {
@@ -159,6 +162,7 @@ class YTemperature extends YSensor
      * measured by the sensor
      *
      * On failure, throws an exception or returns YTemperature::SIGNALVALUE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_signalValue(): float
     {
@@ -178,6 +182,7 @@ class YTemperature extends YSensor
      * @return string  a string corresponding to the measuring unit of the electrical signal used by the sensor
      *
      * On failure, throws an exception or returns YTemperature::SIGNALUNIT_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_signalUnit(): string
     {
@@ -191,6 +196,9 @@ class YTemperature extends YSensor
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -203,6 +211,9 @@ class YTemperature extends YSensor
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -237,7 +248,7 @@ class YTemperature extends YSensor
      *
      * @return YTemperature  a YTemperature object allowing you to drive the temperature sensor.
      */
-    public static function FindTemperature(string $func): ?YTemperature
+    public static function FindTemperature(string $func): YTemperature
     {
         // $obj                    is a YTemperature;
         $obj = YFunction::_FindFromCache('Temperature', $func);
@@ -260,6 +271,7 @@ class YTemperature extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_ntcParameters(float $res25, float $beta): int
     {
@@ -299,6 +311,7 @@ class YTemperature extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_thermistorResponseTable(array $tempValues, array $resValues): int
     {
@@ -357,6 +370,7 @@ class YTemperature extends YSensor
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function loadThermistorResponseTable(array &$tempValues, array &$resValues): int
     {
@@ -428,37 +442,58 @@ class YTemperature extends YSensor
         return YAPI::SUCCESS;
     }
 
-    public function setUnit(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setUnit(string $newval): int
 {
     return $this->set_unit($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function sensorType(): int
 {
     return $this->get_sensorType();
 }
 
-    public function setSensorType(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setSensorType(int $newval): int
 {
     return $this->set_sensorType($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function signalValue(): float
 {
     return $this->get_signalValue();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function signalUnit(): string
 {
     return $this->get_signalUnit();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
@@ -469,7 +504,7 @@ class YTemperature extends YSensor
      * If you want to find a specific a temperature sensor, use Temperature.findTemperature()
      * and a hardwareID or a logical name.
      *
-     * @return YTemperature  a pointer to a YTemperature object, corresponding to
+     * @return ?YTemperature  a pointer to a YTemperature object, corresponding to
      *         a temperature sensor currently online, or a null pointer
      *         if there are no more temperature sensors to enumerate.
      */
@@ -491,11 +526,11 @@ class YTemperature extends YSensor
      * Use the method YTemperature::nextTemperature() to iterate on
      * next temperature sensors.
      *
-     * @return YTemperature  a pointer to a YTemperature object, corresponding to
+     * @return ?YTemperature  a pointer to a YTemperature object, corresponding to
      *         the first temperature sensor currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstTemperature()
+    public static function FirstTemperature(): ?YTemperature
     {
         $next_hwid = YAPI::getFirstHardwareId('Temperature');
         if ($next_hwid == null) {

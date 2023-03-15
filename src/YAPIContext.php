@@ -10,8 +10,8 @@ class YAPIContext
 {
     //--- (end of generated code: YAPIContext declaration)
 
-    public $_deviceListValidityMs = 10000;                        // ulong
-    public $_networkTimeoutMs = YAPI_BLOCKING_REQUEST_TIMEOUT;
+    public float $_deviceListValidityMs = 10000;                        // ulong
+    public float $_networkTimeoutMs = YAPI_BLOCKING_REQUEST_TIMEOUT;
     //--- (generated code: YAPIContext attributes)
     protected float $_defaultCacheValidity = 5;                            // ulong
 
@@ -23,7 +23,7 @@ class YAPIContext
         //--- (end of generated code: YAPIContext constructor)
     }
 
-    private function AddUdevRule_internal($force)
+    private function AddUdevRule_internal(bool $force): string
     {
         return "error: Not supported in PHP";
     }
@@ -151,23 +151,23 @@ class YAPIContext
 
     //--- (end of generated code: YAPIContext implementation)
 
-    public function SetDeviceListValidity_internal($deviceListValidity)
+    public function SetDeviceListValidity_internal(float $deviceListValidity): void
     {
         $this->_deviceListValidityMs = $deviceListValidity * 1000;
     }
 
-    public function GetDeviceListValidity_internal()
+    public function GetDeviceListValidity_internal(): float
     {
         return intval($this->_deviceListValidityMs / 1000);
     }
 
 
-    public function SetNetworkTimeout_internal($networkMsTimeout)
+    public function SetNetworkTimeout_internal(float $networkMsTimeout): void
     {
         $this->_networkTimeoutMs = $networkMsTimeout;
     }
 
-    public function GetNetworkTimeout_internal()
+    public function GetNetworkTimeout_internal(): float
     {
         return $this->_networkTimeoutMs;
     }

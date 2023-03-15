@@ -43,7 +43,7 @@ class YBluetoothLink extends YFunction
 
     //--- (end of YBluetoothLink attributes)
 
-    function __construct($str_func)
+    function __construct(string $str_func)
     {
         //--- (YBluetoothLink constructor)
         parent::__construct($str_func);
@@ -54,7 +54,7 @@ class YBluetoothLink extends YFunction
 
     //--- (YBluetoothLink implementation)
 
-    function _parseAttr($name, $val): int
+    function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
         case 'ownAddress':
@@ -98,6 +98,7 @@ class YBluetoothLink extends YFunction
      * unique on the bluetooth network
      *
      * On failure, throws an exception or returns YBluetoothLink::OWNADDRESS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_ownAddress(): string
     {
@@ -122,6 +123,7 @@ class YBluetoothLink extends YFunction
      *         was rejected by the SIM card
      *
      * On failure, throws an exception or returns YBluetoothLink::PAIRINGPIN_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_pairingPin(): string
     {
@@ -145,6 +147,7 @@ class YBluetoothLink extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_pairingPin(string $newval): int
     {
@@ -158,6 +161,7 @@ class YBluetoothLink extends YFunction
      * @return string  a string corresponding to the MAC-48 address of the remote device to connect to
      *
      * On failure, throws an exception or returns YBluetoothLink::REMOTEADDRESS_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_remoteAddress(): string
     {
@@ -181,6 +185,7 @@ class YBluetoothLink extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_remoteAddress(string $newval): int
     {
@@ -195,6 +200,7 @@ class YBluetoothLink extends YFunction
      * bluetooth network
      *
      * On failure, throws an exception or returns YBluetoothLink::REMOTENAME_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_remoteName(): string
     {
@@ -215,6 +221,7 @@ class YBluetoothLink extends YFunction
      * of the mute function
      *
      * On failure, throws an exception or returns YBluetoothLink::MUTE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_mute(): int
     {
@@ -238,6 +245,7 @@ class YBluetoothLink extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_mute(int $newval): int
     {
@@ -251,6 +259,7 @@ class YBluetoothLink extends YFunction
      * @return int  an integer corresponding to the audio pre-amplifier volume, in per cents
      *
      * On failure, throws an exception or returns YBluetoothLink::PREAMPLIFIER_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_preAmplifier(): int
     {
@@ -274,6 +283,7 @@ class YBluetoothLink extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_preAmplifier(int $newval): int
     {
@@ -287,6 +297,7 @@ class YBluetoothLink extends YFunction
      * @return int  an integer corresponding to the connected headset volume, in per cents
      *
      * On failure, throws an exception or returns YBluetoothLink::VOLUME_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_volume(): int
     {
@@ -308,6 +319,7 @@ class YBluetoothLink extends YFunction
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function set_volume(int $newval): int
     {
@@ -323,6 +335,7 @@ class YBluetoothLink extends YFunction
      * and YBluetoothLink::LINKSTATE_PLAY corresponding to the bluetooth link state
      *
      * On failure, throws an exception or returns YBluetoothLink::LINKSTATE_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_linkState(): int
     {
@@ -343,6 +356,7 @@ class YBluetoothLink extends YFunction
      * if no connection is established
      *
      * On failure, throws an exception or returns YBluetoothLink::LINKQUALITY_INVALID.
+     * @throws YAPI_Exception on error
      */
     public function get_linkQuality(): int
     {
@@ -356,6 +370,9 @@ class YBluetoothLink extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function get_command(): string
     {
         // $res                    is a string;
@@ -368,6 +385,9 @@ class YBluetoothLink extends YFunction
         return $res;
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function set_command(string $newval): int
     {
         $rest_val = $newval;
@@ -402,7 +422,7 @@ class YBluetoothLink extends YFunction
      *
      * @return YBluetoothLink  a YBluetoothLink object allowing you to drive the Bluetooth sound controller.
      */
-    public static function FindBluetoothLink(string $func): ?YBluetoothLink
+    public static function FindBluetoothLink(string $func): YBluetoothLink
     {
         // $obj                    is a YBluetoothLink;
         $obj = YFunction::_FindFromCache('BluetoothLink', $func);
@@ -419,6 +439,7 @@ class YBluetoothLink extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function connect(): int
     {
@@ -431,88 +452,137 @@ class YBluetoothLink extends YFunction
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
      */
     public function disconnect(): int
     {
         return $this->set_command('D');
     }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function ownAddress(): string
 {
     return $this->get_ownAddress();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function pairingPin(): string
 {
     return $this->get_pairingPin();
 }
 
-    public function setPairingPin(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPairingPin(string $newval): int
 {
     return $this->set_pairingPin($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function remoteAddress(): string
 {
     return $this->get_remoteAddress();
 }
 
-    public function setRemoteAddress(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setRemoteAddress(string $newval): int
 {
     return $this->set_remoteAddress($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function remoteName(): string
 {
     return $this->get_remoteName();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function mute(): int
 {
     return $this->get_mute();
 }
 
-    public function setMute(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMute(int $newval): int
 {
     return $this->set_mute($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function preAmplifier(): int
 {
     return $this->get_preAmplifier();
 }
 
-    public function setPreAmplifier(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setPreAmplifier(int $newval): int
 {
     return $this->set_preAmplifier($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function volume(): int
 {
     return $this->get_volume();
 }
 
-    public function setVolume(int $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setVolume(int $newval): int
 {
     return $this->set_volume($newval);
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function linkState(): int
 {
     return $this->get_linkState();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function linkQuality(): int
 {
     return $this->get_linkQuality();
 }
 
+    /**
+     * @throws YAPI_Exception
+     */
     public function command(): string
 {
     return $this->get_command();
 }
 
-    public function setCommand(string $newval)
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
 {
     return $this->set_command($newval);
 }
@@ -523,7 +593,7 @@ class YBluetoothLink extends YFunction
      * If you want to find a specific a Bluetooth sound controller, use BluetoothLink.findBluetoothLink()
      * and a hardwareID or a logical name.
      *
-     * @return YBluetoothLink  a pointer to a YBluetoothLink object, corresponding to
+     * @return ?YBluetoothLink  a pointer to a YBluetoothLink object, corresponding to
      *         a Bluetooth sound controller currently online, or a null pointer
      *         if there are no more Bluetooth sound controllers to enumerate.
      */
@@ -545,11 +615,11 @@ class YBluetoothLink extends YFunction
      * Use the method YBluetoothLink::nextBluetoothLink() to iterate on
      * next Bluetooth sound controllers.
      *
-     * @return YBluetoothLink  a pointer to a YBluetoothLink object, corresponding to
+     * @return ?YBluetoothLink  a pointer to a YBluetoothLink object, corresponding to
      *         the first Bluetooth sound controller currently online, or a null pointer
      *         if there are none.
      */
-    public static function FirstBluetoothLink()
+    public static function FirstBluetoothLink(): ?YBluetoothLink
     {
         $next_hwid = YAPI::getFirstHardwareId('BluetoothLink');
         if ($next_hwid == null) {
