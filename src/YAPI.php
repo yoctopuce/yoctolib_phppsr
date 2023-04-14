@@ -1661,7 +1661,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "1.10.53532";
+        return "1.10.54037";
     }
 
     /**
@@ -1705,6 +1705,8 @@ class YAPI
      * can additionally cleanup the cache directory.
      *
      * @param boolean $removeFiles : True to clear the content of the cache.
+     *         On failure, throws an exception.
+     * @throws YAPI_Exception on error
      */
     public static function ClearHTTPCallbackCacheDir(bool $removeFiles): void
     {

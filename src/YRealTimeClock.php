@@ -212,6 +212,9 @@ class YRealTimeClock extends YFunction
      * To disable automatic synchronization, set the value to true.
      * To enable automatic synchronization (default), set the value to false.
      *
+     * If you want the change to be kept after a device reboot,
+     * make sure  to call the matching module saveToFlash().
+     *
      * @param int $newval : either YRealTimeClock::DISABLEHOSTSYNC_FALSE or
      * YRealTimeClock::DISABLEHOSTSYNC_TRUE, according to the automatic clock synchronization with host working state
      *

@@ -191,6 +191,9 @@ class YInputChain extends YFunction
      * The connectivity test requires a cable connecting the end of the chain
      * to the loopback test connector.
      *
+     * If you want the change to be kept after a device reboot,
+     * make sure  to call the matching module saveToFlash().
+     *
      * @param int $newval : either YInputChain::LOOPBACKTEST_OFF or YInputChain::LOOPBACKTEST_ON, according
      * to the activation state of the exhaustive chain connectivity test
      *

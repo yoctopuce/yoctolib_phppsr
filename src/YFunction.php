@@ -300,10 +300,11 @@ class YFunction
     }
 
     /**
-     * Test if the function is readOnly. Return true if the function is write protected
-     * or that the function is not available.
+     * Indicates whether changes to the function are prohibited or allowed.
+     * Returns true if the function is blocked by an admin password
+     * or if the function is not available.
      *
-     * @return boolean  true if the function is readOnly or not online.
+     * @return boolean  true if the function is write-protected or not online.
      */
     public function isReadOnly(): bool
     {
