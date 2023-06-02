@@ -725,7 +725,7 @@ class YSensor extends YFunction
         // $res                    is a bin;
 
         $res = $this->_download('api/dataLogger/recording?recording=1');
-        if (!(strlen($res)>0)) return $this->_throw( YAPI::IO_ERROR, 'unable to start datalogger',YAPI::IO_ERROR);
+        if (!(strlen($res) > 0)) return $this->_throw( YAPI::IO_ERROR, 'unable to start datalogger',YAPI::IO_ERROR);
         return YAPI::SUCCESS;
     }
 
@@ -739,7 +739,7 @@ class YSensor extends YFunction
         // $res                    is a bin;
 
         $res = $this->_download('api/dataLogger/recording?recording=0');
-        if (!(strlen($res)>0)) return $this->_throw( YAPI::IO_ERROR, 'unable to stop datalogger',YAPI::IO_ERROR);
+        if (!(strlen($res) > 0)) return $this->_throw( YAPI::IO_ERROR, 'unable to stop datalogger',YAPI::IO_ERROR);
         return YAPI::SUCCESS;
     }
 

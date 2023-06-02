@@ -92,7 +92,7 @@ class YDataStream
             $this->_startTime = $this->_utcStamp + ($ms_offset / 1000.0);
         } else {
             // legacy encoding subtract the measure interval form the UTC timestamp
-            $this->_startTime = $this->_utcStamp -  $this->_dataSamplesInterval;
+            $this->_startTime = $this->_utcStamp - $this->_dataSamplesInterval;
         }
         $this->_firstMeasureDuration = $encoded[5];
         if (!($this->_isAvg)) {

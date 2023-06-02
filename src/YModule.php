@@ -675,7 +675,7 @@ class YModule extends YFunction
         $prodname = $this->get_productName();
         $prodrel = $this->get_productRelease();
         if ($prodrel > 1) {
-            $fullname = sprintf('%s rev. %c', $prodname, 64+$prodrel);
+            $fullname = sprintf('%s rev. %c', $prodname, 64 + $prodrel);
         } else {
             $fullname = $prodname;
         }

@@ -102,7 +102,7 @@ class YAPI
     /**
      * @var YTcpHub[]
      */
-    protected static ?array $_hubs = null;           // array of root urls
+    private static ?array $_hubs = null;           // array of root urls
     /**
      * @var YDevice[]
      */
@@ -239,8 +239,11 @@ class YAPI
         // Prepare to scan all expired hubs
         $hubs = array();
         foreach (self::$_hubs as $hub) {
+            if (!$hub->isEnable()) {
+                continue;
+            }
             if ($hub->devListExpires <= $now) {
-                $tcpreq = new YTcpReq($hub, 'GET /api.json', false, '', YAPI::$_yapiContext->_networkTimeoutMs);
+                $tcpreq = new YTcpReq($hub, 'GET /api.json', false, '', $hub->get_networkTimeout());
                 self::$_pendingRequests[] = $tcpreq;
                 $hubs[] = $hub;
                 $hub->devListReq = $tcpreq;
@@ -252,6 +255,9 @@ class YAPI
         foreach (self::$_devs as $serial => $dev) {
             $rooturl = $dev->getRootUrl();
             foreach ($hubs as $hub) {
+                if (!$hub->isEnable()) {
+                    continue;
+                }
                 $huburl = $hub->rooturl;
                 if (substr($rooturl, 0, strlen($huburl)) == $huburl) {
                     $hub->missing[$serial] = true;
@@ -266,6 +272,9 @@ class YAPI
             $alldone = true;
             foreach ($hubs as $hub) {
                 /** @var YTcpHub $hub */
+                if (!$hub->isEnable()) {
+                    continue;
+                }
                 $req = $hub->devListReq;
                 if (!$req->eof()) {
                     $alldone = false;
@@ -316,9 +325,6 @@ class YAPI
                     $currdev = null;
                     if (isset(self::$_devs[$serial])) {
                         $currdev = self::$_devs[$serial];
-                        if (!is_null(self::$_arrivalCallback) && self::$_firstArrival) {
-                            self::$_pendingCallbacks[] = "+$serial";
-                        }
                         foreach (YFunction::$_ValueCallbackList as $fun) {
                             $hwId = $fun->_getHwId();
                             if (!$hwId) {
@@ -410,6 +416,9 @@ class YAPI
 
         // report any error seen during scan
         foreach ($hubs as $hub) {
+            if (!$hub->isEnable()) {
+                continue;
+            }
             $req = $hub->devListReq;
             if ($req->errorType != YAPI::SUCCESS) {
                 return new YAPI_YReq("", $req->errorType,
@@ -429,6 +438,9 @@ class YAPI
 
         // start event monitoring if needed
         foreach (self::$_hubs as $hub) {
+            if (!$hub->isEnable()) {
+                continue;
+            }
             $req = $hub->notifReq;
             if ($req) {
                 if ($req->eof()) {
@@ -1083,7 +1095,7 @@ class YAPI
     }
 
 
-   // Queue a function value event
+    // Queue a function value event
     public static function addRefreshEvent(YFunction $obj_func): void
     {
         self::$_data_events[] = array($obj_func);
@@ -1175,7 +1187,7 @@ class YAPI
         $lines = explode("\n", $str_request);
         $dev = null;
         $baseUrl = $str_device;
-        if (substr($str_device, 0, 7) == 'http://'|| substr($str_device, 0, 8) == 'https://') {
+        if (substr($str_device, 0, 7) == 'http://' || substr($str_device, 0, 8) == 'https://') {
             if (substr($baseUrl, -1) != '/') {
                 $baseUrl .= '/';
             }
@@ -1214,13 +1226,13 @@ class YAPI
         $pos = strpos($baseUrl, '/bySerial');
         if ($pos !== false) {
             // $baseURL end with a / and $devUrl start with / -> remove first char or $devUrl
-            $devUrl = substr($baseUrl, $pos) . substr($devUrl,1);
+            $devUrl = substr($baseUrl, $pos) . substr($devUrl, 1);
             $rooturl = substr($baseUrl, 0, $pos);
         } else {
             $devUrl = "$devUrl";
-            if (substr($baseUrl, -1) == '/'){
-                $rooturl = substr($baseUrl,0,-1);
-            } else{
+            if (substr($baseUrl, -1) == '/') {
+                $rooturl = substr($baseUrl, 0, -1);
+            } else {
                 $rooturl = $baseUrl;
             }
         }
@@ -1267,8 +1279,8 @@ class YAPI
             } elseif (strpos($devUrl, '/flash.json') !== false) {
                 $mstimeout = YIO_10_MINUTES_TCP_TIMEOUT;
             }
-            if ($mstimeout < YAPI::$_yapiContext->_networkTimeoutMs) {
-                $mstimeout = YAPI::$_yapiContext->_networkTimeoutMs;
+            if ($mstimeout < $hub->get_networkTimeout()) {
+                $mstimeout = $hub->get_networkTimeout();
             }
             $timeout = YAPI::GetTickCount() + $mstimeout;
             do {
@@ -1330,7 +1342,7 @@ class YAPI
         if ($pos >= 0) {
             $rooturl = substr($rooturl, 0, $pos + 1);
         }
-        if (substr($rooturl,-1) =='/'){
+        if (substr($rooturl, -1) == '/') {
             $rooturl = substr($rooturl, 0, -1);
         }
 
@@ -1364,8 +1376,8 @@ class YAPI
         if ($pos !== false) {
             $baseUrl = substr($baseUrl, 0, $pos);
         }
-        if (substr($baseUrl,-1) =='/'){
-            $baseUrl=substr($baseUrl,0,-1);
+        if (substr($baseUrl, -1) == '/') {
+            $baseUrl = substr($baseUrl, 0, -1);
         }
         $rooturl = $baseUrl;
         if (!isset(self::$_hubs[$rooturl])) {
@@ -1396,8 +1408,8 @@ class YAPI
         if ($pos !== false) {
             $baseUrl = substr($baseUrl, 0, $pos);
         }
-        if (substr($baseUrl,-1) =='/'){
-            $baseUrl=substr($baseUrl,0,-1);
+        if (substr($baseUrl, -1) == '/') {
+            $baseUrl = substr($baseUrl, 0, -1);
         }
         $rooturl = $baseUrl;
         if (!isset(self::$_hubs[$rooturl])) {
@@ -1417,17 +1429,17 @@ class YAPI
         $devurl = "";
         $pos = strpos($baseUrl, '/bySerial');
         if ($pos !== false) {
-            $devurl = substr($baseUrl,$pos+1);
-            $baseUrl = substr($baseUrl,0, $pos);
+            $devurl = substr($baseUrl, $pos + 1);
+            $baseUrl = substr($baseUrl, 0, $pos);
         }
-        if (substr($baseUrl,-1) == '/'){
-            $baseUrl=substr($baseUrl,0,-1);
+        if (substr($baseUrl, -1) == '/') {
+            $baseUrl = substr($baseUrl, 0, -1);
         }
         if (!isset(self::$_hubs[$baseUrl])) {
             throw new YAPI_Exception('No hub registered on ' . $baseUrl, YAPI::DEVICE_NOT_FOUND);
         }
         $hub = self::$_hubs[$baseUrl];
-        $url = $hub->getBaseURL() .$devurl;
+        $url = $hub->getBaseURL() . $devurl;
         return $url;
     }
 
@@ -1640,6 +1652,20 @@ class YAPI
     {
         return self::$_yapiContext->GetCacheValidity();
     }
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public static function nextHubInUseInternal(int $hubref): ?YHub
+    {
+        return self::$_yapiContext->nextHubInUseInternal($hubref);
+    }
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public static function getYHubObj(int $hubref): ?YHub
+    {
+        return self::$_yapiContext->getYHubObj($hubref);
+    }
    #--- (end of generated code: YAPIContext yapiwrapper)
 
 
@@ -1661,7 +1687,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "1.10.54037";
+        return "1.10.54821";
     }
 
     /**
@@ -1743,8 +1769,7 @@ class YAPI
      *
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
-     * On failure, throws an exception or returns a negative error code.
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public static function InitAPI(int $mode = YAPI::DETECT_NONE, string &$errmsg = ''): int
     {
@@ -1815,9 +1840,7 @@ class YAPI
      * Re-enables the use of exceptions for runtime error handling.
      * Be aware than when exceptions are enabled, every function that fails
      * triggers an exception. If the exception is not caught by the user code,
-     * it  either fires the debugger or aborts (i.e. crash) the program.
-     * On failure, throws an exception or returns a negative error code.
-     * @throws YAPI_Exception on error
+     * it either fires the debugger or aborts (i.e. crash) the program.
      */
     public static function EnableExceptions(): void
     {
@@ -1831,6 +1854,7 @@ class YAPI
     private static function _parseRegisteredURL(string $str_url): array
     {
         $res = [];
+        $res['org_url'] = $str_url;
         $res['proto'] = 'http';
         if (substr($str_url, 0, 7) == 'http://') {
             $str_url = substr($str_url, 7);
@@ -1873,6 +1897,27 @@ class YAPI
         }
         return $res;
     }
+
+    private static function getHubFromUrl(string $url): array
+    {
+        if (is_null(self::$_hubs)) {
+            return [];
+        }
+        $res =[];
+        $url_detail = self::_parseRegisteredURL($url);
+        foreach (self::$_hubs as $hub_url => $hub) {
+            if ($hub_url == $url_detail['rooturl']) {
+                $res[]=$hub;
+            } else {
+                /** @var YTcpHub $hub */
+                if ($hub->isURLKnown($url)) {
+                    $res[]=$hub;
+                }
+            }
+        }
+        return $res;
+    }
+
 
     /**
      * Setup the Yoctopuce library to use modules connected on a given machine. Idealy this
@@ -1925,8 +1970,7 @@ class YAPI
      *
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
-     * On failure, throws an exception or returns a negative error code.
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public static function RegisterHub(string $url, string &$errmsg = ''): int
     {
@@ -1934,16 +1978,27 @@ class YAPI
             self::_init();
         }
 
+        $previousHub = self::getHubFromUrl($url);
+        if (sizeof($previousHub) > 0) {
+            /** @var YTcpHub $h */
+            foreach ($previousHub as $h) {
+                if ($h->isEnable()) {
+                    $h->addKnownUrl($url);
+                    $h->setMandatory(true);
+                }
+            }
+            return YAPI::SUCCESS;
+        }
         $url_detail = self::_parseRegisteredURL($url);
         // Test hub
-        $tcphub = new YTcpHub($url_detail);
+        $tcphub = new YTcpHub($url_detail, true);
         $res = $tcphub->verfiyStreamAddr(true, $errmsg);
         if ($res < 0) {
             return self::_throw(YAPI::IO_ERROR, $errmsg, YAPI::IO_ERROR);
         }
 
-        $timeout = YAPI::GetTickCount() + YAPI::$_yapiContext->_networkTimeoutMs;
-        $tcpreq = new YTcpReq($tcphub, "GET /api/module.json", false, '', YAPI::$_yapiContext->_networkTimeoutMs);
+        $timeout = YAPI::GetTickCount() + $tcphub->get_networkTimeout();
+        $tcpreq = new YTcpReq($tcphub, "GET /api/module.json", false, '', $tcphub->get_networkTimeout());
         if ($tcpreq->process($errmsg) != YAPI::SUCCESS) {
             return self::_throw($tcpreq->errorType, $errmsg, $tcpreq->errorType);
         }
@@ -1962,6 +2017,17 @@ class YAPI
         } elseif ($tcpreq->errorType != YAPI::SUCCESS) {
             $errmsg = 'Network error while testing hub :' . $tcpreq->errorMsg;
             return self::_throw($tcpreq->errorType, $errmsg, $tcpreq->errorType);
+        }
+        /** @var YTcpHub $hub */
+        foreach (self::$_hubs as $hub) {
+            if ($hub->getSerialNumber() == $tcphub->getSerialNumber()) {
+                print("Find duplicate hub: new=" . $tcphub->url_info['org_url']. " old=" . $hub->url_info['org_url']."\n");
+                $hub->mergeFrom($tcphub);
+                return YAPI::SUCCESS;
+            }
+        }
+        if (!isset(self::$_hubs[$url_detail['rooturl']])) {
+            self::$_hubs[$url_detail['rooturl']] = $tcphub;
         }
 
         // Add hub to known list
@@ -1993,19 +2059,28 @@ class YAPI
      *
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
-     * On failure, throws an exception or returns a negative error code.
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public static function PreregisterHub(string $url, string &$errmsg = ''): int
     {
         if (is_null(self::$_hubs)) {
             self::_init();
         }
-
+        $previousHub = self::getHubFromUrl($url);
+        if (sizeof($previousHub) > 0) {
+            /** @var YTcpHub $h */
+            foreach ($previousHub as $h) {
+                if ($h->isEnable()) {
+                    $h->addKnownUrl($url);
+                    $h->setMandatory(false);
+                }
+            }
+            return YAPI::SUCCESS;
+        }
         $url_detail = self::_parseRegisteredURL($url);
         // Add hub to known list
         if (!isset(self::$_hubs[$url_detail['rooturl']])) {
-            self::$_hubs[$url_detail['rooturl']] = new YTcpHub($url_detail);
+            self::$_hubs[$url_detail['rooturl']] = new YTcpHub($url_detail, false);
             if (self::$_hubs[$url_detail['rooturl']]->verfiyStreamAddr(true, $errmsg) < 0) {
                 return self::_throw(YAPI::IO_ERROR, $errmsg, YAPI::IO_ERROR);
             }
@@ -2028,41 +2103,46 @@ class YAPI
             return;
         }
 
-        $url_detail = self::_parseRegisteredURL($url);
-        $new_hubs = array();
-        foreach (self::$_hubs as $hub_url => $hubst) {
-            if ($hub_url == $url_detail['rooturl']) {
-                // leave max 10 second to finish pending requests
-                $timeout = YAPI::GetTickCount() + 10000;
-                foreach (self::$_pendingRequests as $tcpreq) {
-                    if ($tcpreq->hub->rooturl === $hubst->rooturl) {
-                        $request = trim($tcpreq->request);
-                        if (substr($request, 0, 12) == 'GET /not.byn') {
-                            continue;
-                        }
-                        while (!$tcpreq->eof() && YAPI::GetTickCount() < $timeout) {
-                            self::_handleEvents_internal(100);
-                        }
+        $hubs = self::getHubFromUrl($url);
+        foreach ($hubs as $hub) {
+            // leave max 10 second to finish pending requests
+            $timeout = YAPI::GetTickCount() + 10000;
+            foreach (self::$_pendingRequests as $tcpreq) {
+                if ($tcpreq->hub->rooturl === $hub->rooturl) {
+                    $request = trim($tcpreq->request);
+                    if (substr($request, 0, 12) == 'GET /not.byn') {
+                        continue;
+                    }
+                    while (!$tcpreq->eof() && YAPI::GetTickCount() < $timeout) {
+                        self::_handleEvents_internal(100);
                     }
                 }
-                // remove all connected devices
-                foreach (self::$_hubs[$hub_url]->serialByYdx as $serial) {
+            }
+            // remove all connected devices
+            foreach ($hub->serialByYdx as $serial) {
+                if (!is_null(self::$_removalCallback)) {
+                    self::$_pendingCallbacks[] = "-$serial";
+                } else {
                     self::forgetDevice(self::$_devs[$serial]);
                 }
-                if ($hubst->notifReq) {
-                    $hubst->notifReq->close();
-                    for ($idx = 0; $idx < sizeof(self::$_pendingRequests); $idx++) {
-                        $req = self::$_pendingRequests[$idx];
-                        if ($req == $hubst->notifReq) {
-                            array_splice(self::$_pendingRequests, $idx, 1);
-                        }
+
+            }
+            if ($hub->notifReq) {
+                $hub->notifReq->close();
+                for ($idx = 0; $idx < sizeof(self::$_pendingRequests); $idx++) {
+                    $req = self::$_pendingRequests[$idx];
+                    if ($req == $hub->notifReq) {
+                        array_splice(self::$_pendingRequests, $idx, 1);
                     }
                 }
-            } else {
-                $new_hubs[$hub_url] = self::$_hubs[$hub_url];
+            }
+
+            $key = $hub->url_info['rooturl'];
+            if (key_exists($key, self::$_hubs)) {
+                unset(self::$_hubs[$key]);
             }
         }
-        self::$_hubs = $new_hubs;
+
     }
 
     /**
@@ -2088,7 +2168,7 @@ class YAPI
 
         $url_detail = self::_parseRegisteredURL($url);
         // Test hub
-        $tcphub = new YTcpHub($url_detail);
+        $tcphub = new YTcpHub($url_detail, false);
         $res = $tcphub->verfiyStreamAddr(false, $errmsg);
         if ($res < 0) {
             return YAPI::IO_ERROR;
@@ -2279,7 +2359,7 @@ class YAPI
         if (isset(self::$_hubs[$url_detail['rooturl']])) {
             $cb_hub = self::$_hubs[$url_detail['rooturl']];
             // data to post is found in $cb_hub->callbackData
-            $url = str_replace(['http://', 'https://'], ['',''], $url);
+            $url = str_replace(['http://', 'https://'], ['', ''], $url);
             $pos = strpos($url, '/');
             if ($pos === false) {
                 $relurl = '/';
@@ -2309,8 +2389,7 @@ class YAPI
      *
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
-     * On failure, throws an exception or returns a negative error code.
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public static function UpdateDeviceList(string &$errmsg = ''): int
     {
@@ -2337,8 +2416,7 @@ class YAPI
      *
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
-     * On failure, throws an exception or returns a negative error code.
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public static function HandleEvents(string &$errmsg = ''): int
     {
@@ -2395,8 +2473,7 @@ class YAPI
      *
      * @return int  YAPI::SUCCESS when the call succeeds.
      *
-     * On failure, throws an exception or returns a negative error code.
-     * @throws YAPI_Exception on error
+     * On failure returns a negative error code.
      */
     public static function Sleep(float $ms_duration, string &$errmsg = ''): int
     {
@@ -2656,5 +2733,52 @@ class YAPI
         return $buffer;
     }
 
-}
+    public static function nextHubRef(int $hubref): int
+    {
+        if (is_null(self::$_hubs)) {
+            self::_init();
+        }
 
+        if ($hubref < 0) {
+            $next = 0;
+        } else {
+            $next = $hubref + 1;
+        }
+        $c = 0;
+        foreach (self::$_hubs as $hub) {
+            /** @var YTcpHub $hub */
+            if ($c == $next && $hub->isEnable()) {
+                return $c;
+            }
+            $c++;
+        }
+
+        return -1;
+    }
+
+    public static function getTcpHubFromRef(int $hubref): ?YTcpHub
+    {
+        $c = 0;
+        foreach (self::$_hubs as $hub) {
+            /** @var YTcpHub $hub */
+            if ($c == $hubref && $hub->isEnable()) {
+                return $hub;
+            }
+            $c++;
+        }
+        return null;
+    }
+
+    public static function _checkForDuplicateHub(YTcpHub  $newHub):bool
+    {
+        $serialNumber = $newHub->getSerialNumber();
+        foreach (self::$_hubs as $hub) {
+            if ($hub->isEnable() && $hub !== $newHub && $hub->getSerialNumber() == $serialNumber) {
+                $hub->mergeFrom($newHub);
+                return true;
+            }
+        }
+        return false;
+    }
+
+}

@@ -496,7 +496,7 @@ class YGyro extends YSensor
      */
     public function _invokeGyroCallbacks(int $qtIndex, float $qtValue): int
     {
-        switch($qtIndex - 1) {
+        switch ($qtIndex - 1) {
         case 0:
             $this->_w = $qtValue;
             break;

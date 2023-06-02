@@ -199,7 +199,7 @@ class YConsolidatedDataSet
                 $newvalue = $measures[$idx]->get_averageValue();
                 $datarec[] = $newvalue;
                 $this->_nexttim[$s] = 0.0;
-                $this->_nextidx[$s] = $idx+1;
+                $this->_nextidx[$s] = $idx + 1;
             } else {
                 $datarec[] = NAN;
             }

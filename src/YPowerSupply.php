@@ -15,14 +15,9 @@ class YPowerSupply extends YFunction
     const POWEROUTPUT_OFF = 0;
     const POWEROUTPUT_ON = 1;
     const POWEROUTPUT_INVALID = -1;
-    const VOLTAGESENSE_INT = 0;
-    const VOLTAGESENSE_EXT = 1;
-    const VOLTAGESENSE_INVALID = -1;
     const MEASUREDVOLTAGE_INVALID = YAPI::INVALID_DOUBLE;
     const MEASUREDCURRENT_INVALID = YAPI::INVALID_DOUBLE;
     const INPUTVOLTAGE_INVALID = YAPI::INVALID_DOUBLE;
-    const VINT_INVALID = YAPI::INVALID_DOUBLE;
-    const LDOTEMPERATURE_INVALID = YAPI::INVALID_DOUBLE;
     const VOLTAGETRANSITION_INVALID = YAPI::INVALID_STRING;
     const VOLTAGEATSTARTUP_INVALID = YAPI::INVALID_DOUBLE;
     const CURRENTATSTARTUP_INVALID = YAPI::INVALID_DOUBLE;
@@ -33,12 +28,9 @@ class YPowerSupply extends YFunction
     protected float $_voltageSetPoint = self::VOLTAGESETPOINT_INVALID; // MeasureVal
     protected float $_currentLimit = self::CURRENTLIMIT_INVALID;   // MeasureVal
     protected int $_powerOutput = self::POWEROUTPUT_INVALID;    // OnOff
-    protected int $_voltageSense = self::VOLTAGESENSE_INVALID;   // VoltageSense
     protected float $_measuredVoltage = self::MEASUREDVOLTAGE_INVALID; // MeasureVal
     protected float $_measuredCurrent = self::MEASUREDCURRENT_INVALID; // MeasureVal
     protected float $_inputVoltage = self::INPUTVOLTAGE_INVALID;   // MeasureVal
-    protected float $_vInt = self::VINT_INVALID;           // MeasureVal
-    protected float $_ldoTemperature = self::LDOTEMPERATURE_INVALID; // MeasureVal
     protected string $_voltageTransition = self::VOLTAGETRANSITION_INVALID; // AnyFloatTransition
     protected float $_voltageAtStartUp = self::VOLTAGEATSTARTUP_INVALID; // MeasureVal
     protected float $_currentAtStartUp = self::CURRENTATSTARTUP_INVALID; // MeasureVal
@@ -69,9 +61,6 @@ class YPowerSupply extends YFunction
         case 'powerOutput':
             $this->_powerOutput = intval($val);
             return 1;
-        case 'voltageSense':
-            $this->_voltageSense = intval($val);
-            return 1;
         case 'measuredVoltage':
             $this->_measuredVoltage = round($val / 65.536) / 1000.0;
             return 1;
@@ -80,12 +69,6 @@ class YPowerSupply extends YFunction
             return 1;
         case 'inputVoltage':
             $this->_inputVoltage = round($val / 65.536) / 1000.0;
-            return 1;
-        case 'vInt':
-            $this->_vInt = round($val / 65.536) / 1000.0;
-            return 1;
-        case 'ldoTemperature':
-            $this->_ldoTemperature = round($val / 65.536) / 1000.0;
             return 1;
         case 'voltageTransition':
             $this->_voltageTransition = $val;
@@ -214,44 +197,6 @@ class YPowerSupply extends YFunction
     }
 
     /**
-     * Returns the output voltage control point.
-     *
-     * @return int  either YPowerSupply::VOLTAGESENSE_INT or YPowerSupply::VOLTAGESENSE_EXT, according to
-     * the output voltage control point
-     *
-     * On failure, throws an exception or returns YPowerSupply::VOLTAGESENSE_INVALID.
-     * @throws YAPI_Exception on error
-     */
-    public function get_voltageSense(): int
-    {
-        // $res                    is a enumVOLTAGESENSE;
-        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
-            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
-                return self::VOLTAGESENSE_INVALID;
-            }
-        }
-        $res = $this->_voltageSense;
-        return $res;
-    }
-
-    /**
-     * Changes the voltage control point.
-     *
-     * @param int $newval : either YPowerSupply::VOLTAGESENSE_INT or YPowerSupply::VOLTAGESENSE_EXT,
-     * according to the voltage control point
-     *
-     * @return int  YAPI::SUCCESS if the call succeeds.
-     *
-     * On failure, throws an exception or returns a negative error code.
-     * @throws YAPI_Exception on error
-     */
-    public function set_voltageSense(int $newval): int
-    {
-        $rest_val = strval($newval);
-        return $this->_setAttr("voltageSense", $rest_val);
-    }
-
-    /**
      * Returns the measured output voltage, in V.
      *
      * @return float  a floating point number corresponding to the measured output voltage, in V
@@ -308,46 +253,6 @@ class YPowerSupply extends YFunction
             }
         }
         $res = $this->_inputVoltage;
-        return $res;
-    }
-
-    /**
-     * Returns the internal voltage, in V.
-     *
-     * @return float  a floating point number corresponding to the internal voltage, in V
-     *
-     * On failure, throws an exception or returns YPowerSupply::VINT_INVALID.
-     * @throws YAPI_Exception on error
-     */
-    public function get_vInt(): float
-    {
-        // $res                    is a double;
-        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
-            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
-                return self::VINT_INVALID;
-            }
-        }
-        $res = $this->_vInt;
-        return $res;
-    }
-
-    /**
-     * Returns the LDO temperature, in Celsius.
-     *
-     * @return float  a floating point number corresponding to the LDO temperature, in Celsius
-     *
-     * On failure, throws an exception or returns YPowerSupply::LDOTEMPERATURE_INVALID.
-     * @throws YAPI_Exception on error
-     */
-    public function get_ldoTemperature(): float
-    {
-        // $res                    is a double;
-        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
-            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
-                return self::LDOTEMPERATURE_INVALID;
-            }
-        }
-        $res = $this->_ldoTemperature;
         return $res;
     }
 
@@ -584,22 +489,6 @@ class YPowerSupply extends YFunction
     /**
      * @throws YAPI_Exception
      */
-    public function voltageSense(): int
-{
-    return $this->get_voltageSense();
-}
-
-    /**
-     * @throws YAPI_Exception
-     */
-    public function setVoltageSense(int $newval): int
-{
-    return $this->set_voltageSense($newval);
-}
-
-    /**
-     * @throws YAPI_Exception
-     */
     public function measuredVoltage(): float
 {
     return $this->get_measuredVoltage();
@@ -619,22 +508,6 @@ class YPowerSupply extends YFunction
     public function inputVoltage(): float
 {
     return $this->get_inputVoltage();
-}
-
-    /**
-     * @throws YAPI_Exception
-     */
-    public function vInt(): float
-{
-    return $this->get_vInt();
-}
-
-    /**
-     * @throws YAPI_Exception
-     */
-    public function ldoTemperature(): float
-{
-    return $this->get_ldoTemperature();
 }
 
     /**

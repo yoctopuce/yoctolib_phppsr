@@ -36,8 +36,16 @@ class YTcpHub
     protected string $opaque;                  // last received opaque
     protected string $ha1;                     // our authentication ha1 string
     protected string $nc;                      // nounce usage count
+    protected string $serial;                  // the serial number of the hub
+    private float $networkTimeout;
+    private array $knownUrls = [];
+    /**
+     * @var true
+     */
+    private bool $mandatory;
+    private bool $enabled;
 
-    function __construct(array $url_info)
+    function __construct(array $url_info, bool $mandatory)
     {
         $this->rooturl = $url_info['rooturl'];
         $this->url_info = $url_info;
@@ -51,6 +59,7 @@ class YTcpHub
             $this->user = substr($url_info['auth'], 0, $colon);
             $this->pwd = substr($url_info['auth'], $colon + 1);
         }
+        $this->knownUrls[] = $url_info['org_url'];
         $this->notifurl = 'not.byn';
         $this->notifPos = -1;
         $this->isNotifWorking = false;
@@ -63,6 +72,15 @@ class YTcpHub
         $this->reuseskt = null;
         $this->notifReq = null;
         $this->realm = '';
+        $this->serial = '';
+        $this->networkTimeout = YAPI::$_yapiContext->_networkTimeoutMs;
+        $this->mandatory = $mandatory;
+        $this->enabled = true;
+    }
+
+    function isEnable(): bool
+    {
+        return $this->enabled;
     }
 
     static function decodeJZONReq(mixed $jzon, mixed $ref): mixed
@@ -292,8 +310,13 @@ class YTcpHub
             $info_json_url = $this->rooturl . $this->url_info['subdomain'] . '/info.json';
             $info_json = @file_get_contents($info_json_url);
             $jsonData = json_decode($info_json, true);
-            if ($jsonData != null && array_key_exists('protocol', $jsonData) && $jsonData['protocol'] == 'HTTP/1.1') {
-                $this->use_pure_http = true;
+            if ($jsonData != null) {
+                if (array_key_exists('protocol', $jsonData) && $jsonData['protocol'] == 'HTTP/1.1') {
+                    $this->use_pure_http = true;
+                }
+                if (array_key_exists('serialNumber', $jsonData)) {
+                    $this->updateSerial($jsonData['serialNumber']);
+                }
             }
             $this->callbackCache = null;
         }
@@ -442,5 +465,87 @@ class YTcpHub
     {
         return $this->url_info['rooturl'] . $this->url_info['subdomain'] . '/';
     }
+
+    public function getSerialNumber(): string
+    {
+        return $this->serial;
+    }
+
+    public function getLastErrorMessage(): string
+    {
+        //fixme:  implement this
+        return "";
+    }
+
+    public function getRegisteredUrl()
+    {
+        return $this->url_info['org_url'];
+    }
+
+    public function getConnectionUrl()
+    {
+        return $this->rooturl;
+    }
+
+    public function isOnline(): bool
+    {
+        //fixme: implement this
+        return true;
+    }
+
+    public function isReadOnly(): bool
+    {
+        return $this->writeProtected;
+    }
+
+    public function get_networkTimeout(): float
+    {
+        return $this->networkTimeout;
+    }
+
+    public function getLastErrorType(): int
+    {
+        // fixme: implement this
+        return YAPI::SUCCESS;
+    }
+
+    public function set_networkTimeout(int $value): void
+    {
+        $this->networkTimeout = $value;
+    }
+
+    public function mergeFrom(YTcpHub $tcphub): void
+    {
+        $this->addKnownUrl($tcphub->url_info['org_url']);
+    }
+
+    public function isURLKnown(string $url): bool
+    {
+        return in_array($url, $this->knownUrls);
+    }
+
+    public function setMandatory(bool $true)
+    {
+        $this->mandatory = true;
+    }
+
+    private function updateSerial(mixed $serialNumber): void
+    {
+        $this->serial = $serialNumber;
+        $this->enabled = !YAPI::_checkForDuplicateHub($this);
+    }
+
+    public function getKnownUrls(): array
+    {
+        return $this->knownUrls;
+    }
+
+    public function addKnownUrl(string $url): void
+    {
+        if (!in_array($url, $this->knownUrls)) {
+            $this->knownUrls[] = $url;
+        }
+    }
+
 }
 

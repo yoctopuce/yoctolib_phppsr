@@ -16,6 +16,7 @@ class YAPIContext
     protected float $_defaultCacheValidity = 5;                            // ulong
 
     //--- (end of generated code: YAPIContext attributes)
+    private array $_yhub_cache = [];
 
     function __construct()
     {
@@ -149,8 +150,56 @@ class YAPIContext
         return $this->_defaultCacheValidity;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function nextHubInUseInternal(int $hubref): ?YHub
+    {
+        return $this->nextHubInUseInternal_internal($hubref);
+    }
+
+    //cannot be generated for PHP:
+    //private function nextHubInUseInternal_internal(int $hubref)
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function getYHubObj(int $hubref): ?YHub
+    {
+        // $obj                    is a YHub;
+        $obj = $this->_findYHubFromCache($hubref);
+        if ($obj == null) {
+            $obj = new YHub($this, $hubref);
+            $this->_addYHubToCache($hubref, $obj);
+        }
+        return $obj;
+    }
+
     //--- (end of generated code: YAPIContext implementation)
 
+    private function nextHubInUseInternal_internal(int $hubref): ?YHub
+    {
+
+
+        $nextref = YAPI::nextHubRef($hubref);
+        if ($nextref >= 0) {
+            return $this->getYHubObj($nextref);
+        }
+        return null;
+    }
+
+    private function _findYHubFromCache(int $hubref): ?YHub
+    {
+        if (array_key_exists($hubref, $this->_yhub_cache)) {
+            return $this->_yhub_cache[$hubref];
+        }
+        return null;
+    }
+
+    private function _addYHubToCache(int $hubref, YHub $obj): void
+    {
+        $this->_yhub_cache[$hubref] = $obj;
+    }
     public function SetDeviceListValidity_internal(float $deviceListValidity): void
     {
         $this->_deviceListValidityMs = $deviceListValidity * 1000;
@@ -172,6 +221,10 @@ class YAPIContext
         return $this->_networkTimeoutMs;
     }
 
+    public function getTcpHubFromRef(int $hubref): ?YTcpHub
+    {
+        return YAPI::getTcpHubFromRef($hubref);
+    }
 
 }
 

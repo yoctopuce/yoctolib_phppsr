@@ -138,8 +138,8 @@ class YDataSet
 
         // Parse complete streams
         foreach ( $this->_streams as $each) {
-            $streamStartTimeMs = round($each->get_realStartTimeUTC() *1000);
-            $streamDuration = $each->get_realDuration() ;
+            $streamStartTimeMs = round($each->get_realStartTimeUTC() * 1000);
+            $streamDuration = $each->get_realDuration();
             $streamEndTimeMs = $streamStartTimeMs + round($streamDuration * 1000);
             if (($streamStartTimeMs >= $this->_startTimeMs) && (($this->_endTimeMs == 0) || ($streamEndTimeMs <= $this->_endTimeMs))) {
                 // stream that are completely inside the dataset
@@ -184,7 +184,7 @@ class YDataSet
                 $previewMaxVal = YAPI::MIN_DOUBLE;
                 $m_pos = 0;
                 while ($m_pos < sizeof($dataRows)) {
-                    $measure_data  = $dataRows[$m_pos];
+                    $measure_data = $dataRows[$m_pos];
                     if ($m_pos == 0) {
                         $mitv = $fitv;
                     } else {
@@ -341,7 +341,7 @@ class YDataSet
             $url = $stream->_get_url();
             $suffix = $stream->_get_urlsuffix();
             $suffixes[] = $suffix;
-            $idx = $this->_progress+1;
+            $idx = $this->_progress + 1;
             while (($idx < sizeof($this->_streams)) && (sizeof($suffixes) < $this->_bulkLoad)) {
                 $stream = $this->_streams[$idx];
                 if (!($stream->_wasLoaded()) && ($stream->_get_baseurl() == $baseurl)) {
@@ -518,7 +518,7 @@ class YDataSet
                 $url = sprintf('%s&from=%u',$url,$this->imm_get_startTimeUTC());
             }
             if ($this->_endTimeMs != 0) {
-                $url = sprintf('%s&to=%u',$url,$this->imm_get_endTimeUTC()+1);
+                $url = sprintf('%s&to=%u',$url,$this->imm_get_endTimeUTC() + 1);
             }
         } else {
             if ($this->_progress >= sizeof($this->_streams)) {
