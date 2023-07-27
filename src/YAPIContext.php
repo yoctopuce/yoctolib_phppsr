@@ -11,7 +11,7 @@ class YAPIContext
     //--- (end of generated code: YAPIContext declaration)
 
     public float $_deviceListValidityMs = 10000;                        // ulong
-    public float $_networkTimeoutMs = YAPI_BLOCKING_REQUEST_TIMEOUT;
+    public int $_networkTimeoutMs = YAPI_BLOCKING_REQUEST_TIMEOUT;
     //--- (generated code: YAPIContext attributes)
     protected float $_defaultCacheValidity = 5;                            // ulong
 
@@ -216,7 +216,7 @@ class YAPIContext
         $this->_networkTimeoutMs = $networkMsTimeout;
     }
 
-    public function GetNetworkTimeout_internal(): float
+    public function GetNetworkTimeout_internal(): int
     {
         return $this->_networkTimeoutMs;
     }

@@ -37,7 +37,7 @@ class YTcpHub
     protected string $ha1;                     // our authentication ha1 string
     protected string $nc;                      // nounce usage count
     protected string $serial;                  // the serial number of the hub
-    private float $networkTimeout;
+    private int $networkTimeout;
     private array $knownUrls = [];
     /**
      * @var true
@@ -498,7 +498,7 @@ class YTcpHub
         return $this->writeProtected;
     }
 
-    public function get_networkTimeout(): float
+    public function get_networkTimeout(): int
     {
         return $this->networkTimeout;
     }
