@@ -78,6 +78,7 @@ class YHub
             $hub->set_networkTimeout($value);
         }
     }
+
     private function get_knownUrls_internal(): array
     {
         $hub = $this->_ctx->getTcpHubFromRef($this->_hubref);

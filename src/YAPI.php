@@ -1714,7 +1714,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "1.10.55677";
+        return "1.10.55993";
     }
 
     /**
@@ -1937,15 +1937,15 @@ class YAPI
         if (is_null(self::$_hubs)) {
             return [];
         }
-        $res =[];
+        $res = [];
         $url_detail = self::_parseRegisteredURL($url);
         foreach (self::$_hubs as $hub_url => $hub) {
             if ($hub_url == $url_detail['rooturl']) {
-                $res[]=$hub;
+                $res[] = $hub;
             } else {
                 /** @var YTcpHub $hub */
                 if ($hub->isURLKnown($url)) {
-                    $res[]=$hub;
+                    $res[] = $hub;
                 }
             }
         }
@@ -2055,7 +2055,7 @@ class YAPI
         /** @var YTcpHub $hub */
         foreach (self::$_hubs as $hub) {
             if ($hub->getSerialNumber() == $tcphub->getSerialNumber()) {
-                print("Find duplicate hub: new=" . $tcphub->url_info['org_url']. " old=" . $hub->url_info['org_url']."\n");
+                print("Find duplicate hub: new=" . $tcphub->url_info['org_url'] . " old=" . $hub->url_info['org_url'] . "\n");
                 $hub->mergeFrom($tcphub);
                 return YAPI::SUCCESS;
             }
@@ -2239,15 +2239,19 @@ class YAPI
      * @param string $errmsg
      * @return int
      */
-    static public function _forwardHTTPreq(string $host, string $relurl, $cbdata, string &$errmsg): int
+    static public function _forwardHTTPreq(string $proto, string $host, string $relurl, $cbdata, string &$errmsg): int
     {
         $errno = 0;
         $errstr = '';
         $implicitPort = '';
         if (strpos($host, ':') === false) {
-            $implicitPort = ':80';
+            if ($proto=='tls://') {
+                $implicitPort = ':443';
+            } else {
+                $implicitPort = ':80';
+            }
         }
-        $skt = stream_socket_client("tcp://$host$implicitPort", $errno, $errstr, 10);
+        $skt = stream_socket_client($proto.$host.$implicitPort, $errno, $errstr, 10);
         if ($skt === false) {
             $errmsg = "failed to open socket ($errno): $errstr";
             return YAPI::IO_ERROR;
@@ -2329,7 +2333,7 @@ class YAPI
                         return YAPI::NOT_SUPPORTED;
                     } elseif ($code >= '300' && $code <= '302' && isset($meta['Location'])) {
                         fclose($skt);
-                        return self::_forwardHTTPreq($host, $meta['Location'], $cbdata, $errmsg);
+                        return self::_forwardHTTPreq($proto, $host, $meta['Location'], $cbdata, $errmsg);
                     } elseif (substr($code, 0, 2) != '20' || $code[2] == '3') {
                         fclose($skt);
                         $errmsg = "HTTP error" . substr($firstline, strlen($words[0]));
@@ -2393,6 +2397,13 @@ class YAPI
         if (isset(self::$_hubs[$url_detail['rooturl']])) {
             $cb_hub = self::$_hubs[$url_detail['rooturl']];
             // data to post is found in $cb_hub->callbackData
+            $fwd_proto ='tcp://';
+            if (strpos($url,'http://')===0) {
+                $url = substr($url,7);
+            } else if (strpos($url,'https://')===0) {
+                $fwd_proto = 'tls://';
+                $url = substr($url,8);
+            }
             $url = str_replace(['http://', 'https://'], ['', ''], $url);
             $pos = strpos($url, '/');
             if ($pos === false) {
@@ -2401,7 +2412,7 @@ class YAPI
                 $relurl = substr($url, $pos);
                 $url = substr($url, 0, $pos);
             }
-            return self::_forwardHTTPreq($url, $relurl, $cb_hub->callbackData, $errmsg);
+            return self::_forwardHTTPreq($fwd_proto, $url, $relurl, $cb_hub->callbackData, $errmsg);
         } else {
             $errmsg = 'ForwardHTTPCallback must be called AFTER RegisterHub("callback")';
             return YAPI::NOT_INITIALIZED;
@@ -2803,7 +2814,7 @@ class YAPI
         return null;
     }
 
-    public static function _checkForDuplicateHub(YTcpHub  $newHub):bool
+    public static function _checkForDuplicateHub(YTcpHub $newHub): bool
     {
         $serialNumber = $newHub->getSerialNumber();
         foreach (self::$_hubs as $hub) {
@@ -2816,3 +2827,4 @@ class YAPI
     }
 
 }
+

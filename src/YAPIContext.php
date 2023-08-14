@@ -200,6 +200,7 @@ class YAPIContext
     {
         $this->_yhub_cache[$hubref] = $obj;
     }
+
     public function SetDeviceListValidity_internal(float $deviceListValidity): void
     {
         $this->_deviceListValidityMs = $deviceListValidity * 1000;
