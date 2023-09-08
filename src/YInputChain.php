@@ -40,7 +40,7 @@ class YInputChain extends YFunction
     protected string $_bitChain7 = self::BITCHAIN7_INVALID;      // Text
     protected int $_watchdogPeriod = self::WATCHDOGPERIOD_INVALID; // UInt31
     protected int $_chainDiags = self::CHAINDIAGS_INVALID;     // InputChainDiags
-    protected mixed $_eventCallback = null;                         // YEventCallback
+    protected mixed $_stateChangeCallback = null;                         // YStateChangeCallback
     protected int $_prevPos = 0;                            // int
     protected int $_eventPos = 0;                            // int
     protected int $_eventStamp = 0;                            // int
@@ -561,7 +561,7 @@ class YInputChain extends YFunction
      *         On failure, throws an exception or returns a negative error code.
      * @throws YAPI_Exception on error
      */
-    public function registerEventCallback(mixed $callback): int
+    public function registerStateChangeCallback(mixed $callback): int
     {
         if (!is_null($callback)) {
             $this->registerValueCallback('yInternalEventCallback');
@@ -570,7 +570,7 @@ class YInputChain extends YFunction
         }
         // register user callback AFTER the internal pseudo-event,
         // to make sure we start with future events only
-        $this->_eventCallback = $callback;
+        $this->_stateChangeCallback = $callback;
         return 0;
     }
 
@@ -605,7 +605,7 @@ class YInputChain extends YFunction
         if ($newPos < $this->_eventPos) {
             return YAPI::SUCCESS;
         }
-        if (!(!is_null($this->_eventCallback))) {
+        if (!(!is_null($this->_stateChangeCallback))) {
             // first simulated event, use it to initialize reference values
             $this->_eventPos = $newPos;
             while (sizeof($this->_eventChains) > 0) {
@@ -656,7 +656,7 @@ class YInputChain extends YFunction
                             $this->_eventChains[$chainIdx] = $evtData;
                         }
                     }
-                    call_user_func($this->_eventCallback, $this, $evtStamp, $evtType, $evtData, $evtChange);
+                    call_user_func($this->_stateChangeCallback, $this, $evtStamp, $evtType, $evtData, $evtChange);
                 }
             }
             $arrPos = $arrPos + 1;

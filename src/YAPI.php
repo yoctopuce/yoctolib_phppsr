@@ -85,7 +85,15 @@ class YAPI
     const RTC_NOT_READY         = -13;     // real-time clock has not been initialized (or time was lost)
     const FILE_NOT_FOUND        = -14;     // the file is not found
     const SSL_ERROR             = -15;     // Error reported by mbedSSL
+    const RFID_SOFT_ERROR       = -16;     // Recoverable error with RFID tag (eg. tag out of reach), check YRfidStatus for details
+    const RFID_HARD_ERROR       = -17;     // Serious RFID error (eg. write-protected, out-of-boundary), check YRfidStatus for details
+    const BUFFER_TOO_SMALL      = -18;     // The buffer provided is too small
 //--- (end of generated code: YFunction return codes)
+
+    // TLS / SSL definitions
+    const NO_TRUSTED_CA_CHECK   = 1;       // Disables certificate checking
+    const NO_HOSTNAME_CHECK     = 4;       // Disable hostname checking
+
 
     // yInitAPI constants (not really useful in JavaScript)
     const DETECT_NONE = 0;
@@ -1552,7 +1560,80 @@ class YAPI
     }
 
 
-    //--- (generated code: YAPIContext yapiwrapper)
+    /**
+     * Download the TLS/SSL certificate from the hub. This function allows to download a TLS/SSL certificate to add it
+     * to the list of trusted certificates using the AddTrustedCertificates method.
+     *
+     * @param string $url : the root URL of the VirtualHub V2 or HTTP server.
+     * @param int $mstimeout : the number of milliseconds available to download the certificate.
+     *
+     * @return  string containing the certificate. In case of error, returns a string starting with "error:".
+     */
+    public static function DownloadHostCertificate(string $url,int $mstimeout):string
+    {
+        $contextOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'allow_self_signed'=>true,
+                'verify_peer_name' =>false,
+                'capture_peer_cert_chain'=>true
+            )
+        );
+        $url = str_replace('http://', 'tls://', $url);
+        $url = str_replace('https://', 'tls://', $url);
+        if (strpos($url, 'tls://')!==0){
+            $url ='tls://'.$url;
+        }
+
+        $sslContext = @stream_context_create($contextOptions);
+        $resource = @stream_socket_client($url, $errno, $errstr, 10,STREAM_CLIENT_CONNECT,$sslContext);
+        if ($resource) {
+            $params = stream_context_get_params($resource);
+            $ca = "";
+            foreach ($params["options"]["ssl"]["peer_certificate_chain"] as $cert)
+            {
+                openssl_x509_export($cert, $output);
+                $ca .= $output;
+            }
+            return $ca;
+        }
+        return "";
+    }
+    /**
+     * Adds a TLS/SSL certificate to the list of trusted certificates. By default, the library
+     * library will reject TLS/SSL connections to servers whose certificate is not known. This function
+     * function allows to add a list of known certificates. It is also possible to disable the verification
+     * using the SetNetworkSecurityOptions method.
+     *
+     * @param string certificate : a string containing the path of the certificate
+     * @noreturn
+     */
+    public static function SetTrustedCertificatesList(string $certificatePath):void
+    {
+        if (is_null(self::$_hubs)) {
+            self::_init();
+        }
+        self::$_yapiContext->SetTrustedCertificatesList($certificatePath);
+    }
+
+    /**
+     * Enables or disables certain TLS/SSSL certificate checks.
+     *
+     * @param int $options: The options: YAPI::ALL_CHECK, YAPI::NO_TRUSTED_CA_CHECK,
+     *         YAPI::NO_HOSTNAME_CHECK.
+     * @noreturn
+     */
+    public static function SetNetworkSecurityOptions(int $options):void
+    {
+        if (is_null(self::$_hubs)) {
+            self::_init();
+        }
+        self::$_yapiContext->SetNetworkSecurityOptions($options);
+    }
+
+
+
+//--- (generated code: YAPIContext yapiwrapper)
 
     /**
      * Modifies the delay between each forced enumeration of the used YoctoHubs.
@@ -1714,7 +1795,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "1.10.55993";
+        return "1.10.56419";
     }
 
     /**

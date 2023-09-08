@@ -12,6 +12,8 @@ class YAPIContext
 
     public float $_deviceListValidityMs = 10000;                        // ulong
     public int $_networkTimeoutMs = YAPI_BLOCKING_REQUEST_TIMEOUT;
+    public int $_sslCertOptions = 0;
+    public string $_sslCertPath = '';
     //--- (generated code: YAPIContext attributes)
     protected float $_defaultCacheValidity = 5;                            // ulong
 
@@ -215,6 +217,14 @@ class YAPIContext
     public function SetNetworkTimeout_internal(float $networkMsTimeout): void
     {
         $this->_networkTimeoutMs = $networkMsTimeout;
+    }
+    public function SetTrustedCertificatesList(string $certificatePath):void
+    {
+        $this->_sslCertPath = $certificatePath;
+    }
+    public function SetNetworkSecurityOptions(int $options):void
+    {
+        $this->_sslCertOptions = $options;
     }
 
     public function GetNetworkTimeout_internal(): int

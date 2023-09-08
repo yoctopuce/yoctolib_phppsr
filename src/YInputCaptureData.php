@@ -117,6 +117,9 @@ class YInputCaptureData
         // $ms                     is a int;
         // $recSize                is a int;
         // $count                  is a int;
+        // $mult1                  is a int;
+        // $mult2                  is a int;
+        // $mult3                  is a int;
         // $v                      is a float;
 
         $buffSize = strlen($sdata);
@@ -167,11 +170,31 @@ class YInputCaptureData
                 $recOfs = $recOfs + 1;
             }
         }
+        if ((($recOfs) & (1)) == 1) {
+            // align to next word
+            $recOfs = $recOfs + 1;
+        }
+        $mult1 = 1;
+        $mult2 = 1;
+        $mult3 = 1;
+        if ($recOfs < $this->_recOfs) {
+            // load optional value multiplier
+            $mult1 = $this->_decodeU16($sdata, $this->_recOfs);
+            $recOfs = $recOfs + 2;
+            if ($this->_var2size > 0) {
+                $mult2 = $this->_decodeU16($sdata, $this->_recOfs);
+                $recOfs = $recOfs + 2;
+            }
+            if ($this->_var3size > 0) {
+                $mult3 = $this->_decodeU16($sdata, $this->_recOfs);
+                $recOfs = $recOfs + 2;
+            }
+        }
         $recOfs = $this->_recOfs;
         $count = $this->_nRecs;
         while (($count > 0) && ($recOfs + $this->_var1size <= $buffSize)) {
             $v = $this->_decodeVal($sdata, $recOfs, $this->_var1size) / 1000.0;
-            $this->_var1samples[] = $v;
+            $this->_var1samples[] = $v*$mult1;
             $recOfs = $recOfs + $recSize;
         }
         if ($this->_var2size > 0) {
@@ -179,7 +202,7 @@ class YInputCaptureData
             $count = $this->_nRecs;
             while (($count > 0) && ($recOfs + $this->_var2size <= $buffSize)) {
                 $v = $this->_decodeVal($sdata, $recOfs, $this->_var2size) / 1000.0;
-                $this->_var2samples[] = $v;
+                $this->_var2samples[] = $v*$mult2;
                 $recOfs = $recOfs + $recSize;
             }
         }
@@ -188,7 +211,7 @@ class YInputCaptureData
             $count = $this->_nRecs;
             while (($count > 0) && ($recOfs + $this->_var3size <= $buffSize)) {
                 $v = $this->_decodeVal($sdata, $recOfs, $this->_var3size) / 1000.0;
-                $this->_var3samples[] = $v;
+                $this->_var3samples[] = $v*$mult3;
                 $recOfs = $recOfs + $recSize;
             }
         }

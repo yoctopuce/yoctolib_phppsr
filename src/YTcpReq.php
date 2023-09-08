@@ -124,7 +124,24 @@ class YTcpReq
         if ($pos !== false) {
             $addr = substr($addr, 0, $pos);
         }
-        return @stream_socket_client($addr, $errno, $errstr, $mstimeout / 1000);
+        if (substr($addr,0,6) == 'tls://') {
+            $ssl_options = [];
+            if (YAPI::$_yapiContext->_sslCertOptions & YAPI::NO_TRUSTED_CA_CHECK) {
+                $ssl_options['verify_peer'] = false;
+            }
+            if (YAPI::$_yapiContext->_sslCertOptions & YAPI::NO_HOSTNAME_CHECK) {
+                $ssl_options['verify_peer_name'] = false;
+            }
+            if (YAPI::$_yapiContext->_sslCertPath  !='') {
+                $ssl_options['cafile'] = YAPI::$_yapiContext->_sslCertPath;
+            }
+            $sslContext = stream_context_create(['ssl' => $ssl_options]);
+            $resource = @stream_socket_client($addr, $errno, $errstr, $mstimeout / 1000,STREAM_CLIENT_CONNECT,$sslContext);
+        } else{
+            $resource = @stream_socket_client($addr, $errno, $errstr, $mstimeout / 1000);
+
+        }
+        return $resource;
     }
 
 

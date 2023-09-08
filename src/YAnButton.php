@@ -33,6 +33,7 @@ class YAnButton extends YFunction
     const INPUTTYPE_ANALOG_FAST = 0;
     const INPUTTYPE_DIGITAL4 = 1;
     const INPUTTYPE_ANALOG_SMOOTH = 2;
+    const INPUTTYPE_DIGITAL_FAST = 3;
     const INPUTTYPE_INVALID = -1;
     //--- (end of YAnButton declaration)
 
@@ -429,9 +430,9 @@ class YAnButton extends YFunction
     /**
      * Returns the decoding method applied to the input (analog or multiplexed binary switches).
      *
-     * @return int  a value among YAnButton::INPUTTYPE_ANALOG_FAST, YAnButton::INPUTTYPE_DIGITAL4 and
-     * YAnButton::INPUTTYPE_ANALOG_SMOOTH corresponding to the decoding method applied to the input (analog
-     * or multiplexed binary switches)
+     * @return int  a value among YAnButton::INPUTTYPE_ANALOG_FAST, YAnButton::INPUTTYPE_DIGITAL4,
+     * YAnButton::INPUTTYPE_ANALOG_SMOOTH and YAnButton::INPUTTYPE_DIGITAL_FAST corresponding to the
+     * decoding method applied to the input (analog or multiplexed binary switches)
      *
      * On failure, throws an exception or returns YAnButton::INPUTTYPE_INVALID.
      * @throws YAPI_Exception on error
@@ -452,9 +453,9 @@ class YAnButton extends YFunction
      * Changes the decoding method applied to the input (analog or multiplexed binary switches).
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
-     * @param int $newval : a value among YAnButton::INPUTTYPE_ANALOG_FAST, YAnButton::INPUTTYPE_DIGITAL4
-     * and YAnButton::INPUTTYPE_ANALOG_SMOOTH corresponding to the decoding method applied to the input
-     * (analog or multiplexed binary switches)
+     * @param int $newval : a value among YAnButton::INPUTTYPE_ANALOG_FAST, YAnButton::INPUTTYPE_DIGITAL4,
+     * YAnButton::INPUTTYPE_ANALOG_SMOOTH and YAnButton::INPUTTYPE_DIGITAL_FAST corresponding to the
+     * decoding method applied to the input (analog or multiplexed binary switches)
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *

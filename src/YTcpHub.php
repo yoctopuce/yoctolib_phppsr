@@ -309,13 +309,15 @@ class YTcpHub
         } else {
             $info_json_url = $this->rooturl . $this->url_info['subdomain'] . '/info.json';
             $info_json = @file_get_contents($info_json_url);
-            $jsonData = json_decode($info_json, true);
-            if ($jsonData != null) {
-                if (array_key_exists('protocol', $jsonData) && $jsonData['protocol'] == 'HTTP/1.1') {
-                    $this->use_pure_http = true;
-                }
-                if (array_key_exists('serialNumber', $jsonData)) {
-                    $this->updateSerial($jsonData['serialNumber']);
+            if ($info_json !== false) {
+                $jsonData = json_decode($info_json, true);
+                if ($jsonData != null) {
+                    if (array_key_exists('protocol', $jsonData) && $jsonData['protocol'] == 'HTTP/1.1') {
+                        $this->use_pure_http = true;
+                    }
+                    if (array_key_exists('serialNumber', $jsonData)) {
+                        $this->updateSerial($jsonData['serialNumber']);
+                    }
                 }
             }
             $this->callbackCache = null;

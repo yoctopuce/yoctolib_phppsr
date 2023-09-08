@@ -112,12 +112,13 @@ class YModule extends YFunction
     }
 
     /**
-     * Retrieves the type of the <i>n</i>th function on the module.
+     * Retrieves the type of the <i>n</i>th function on the module. Yoctopuce functions type names match
+     * their class names without the <i>Y</i> prefix, for instance <i>Relay</i>, <i>Temperature</i> etc..
      *
      * @param int $functionIndex : the index of the function for which the information is desired,
      * starting at 0 for the first function.
      *
-     * @return string  a string corresponding to the type of the function
+     * @return string  a string corresponding to the type of the function.
      *
      * On failure, throws an exception or returns an empty string.
      * @throws YAPI_Exception on error
