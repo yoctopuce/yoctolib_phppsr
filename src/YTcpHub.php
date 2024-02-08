@@ -419,7 +419,10 @@ class YTcpHub
             strpos($str_query, '/logs.txt') !== false ||
             strpos($str_query, '/tRep.bin') !== false ||
             strpos($str_query, '/logger.json') !== false ||
+            strpos($str_query, '/rxmsg.json') !== false ||
             strpos($str_query, '/ping.txt') !== false ||
+            strpos($str_query, '/flash.json?a=list') !== false ||
+            strpos($str_query, '/flash.json?a=stat') !== false ||
             strpos($str_query, '/files.json?a=dir') !== false) {
             // read request, load from cache
             $parts = explode(' ', $str_query);

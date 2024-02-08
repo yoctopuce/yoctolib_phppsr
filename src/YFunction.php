@@ -610,12 +610,23 @@ class YFunction
         return $this->_cache[$str_attr];
     }
 
-    protected function _escapeAttr(string $str_newval): string
+    /**
+     * urlencode according to RFC 3986 instead of php default RFC 1738
+     * BUT use iso-8859-1 encoding since this is for Yoctopuce modules
+     */
+    public function _escapeAttr(string $str_val): string
     {
-        // urlencode according to RFC 3986 instead of php default RFC 1738
-        $safecodes = array('%21', '%23', '%24', '%27', '%28', '%29', '%2A', '%2C', '%2F', '%3A', '%3B', '%40', '%3F', '%5B', '%5D');
-        $safechars = array('!', "#", "$", "'", "(", ")", '*', ",", "/", ":", ";", "@", "?", "[", "]");
-        return str_replace($safecodes, $safechars, urlencode($str_newval));
+        $safecodes = [ '%21', '%23', '%24', '%27', '%28', '%29', '%2A', '%2C', '%2F', '%3A', '%3B', '%40', '%3F', '%5B', '%5D' ];
+        $safechars = [ '!', "#", "$", "'", "(", ")", '*', ",", "/", ":", ";", "@", "?", "[", "]" ];
+        $isAscii = !preg_match('~[\x7f-\xff]~', $str_val);
+        if(!$isAscii) {
+            // check if string is made of utf-8 characters that can be converted to iso-8859-1
+            $isUtf8 = preg_match('~^([\x00-\x7f]|[\xC2-\xC3][\x80-\xBF])+$~', $str_val);
+            if($isUtf8) {
+                $str_val = iconv("UTF-8", "ISO-8859-1", $str_val);
+            }
+        }
+        return str_replace($safecodes, $safechars, urlencode($str_val));
     }
 
     /**
@@ -628,11 +639,9 @@ class YFunction
         if (!isset($str_newval)) {
             $this->_throw(YAPI::INVALID_ARGUMENT, "Undefined value to set for attribute $str_attr", null);
         }
-        // urlencode according to RFC 3986 instead of php default RFC 1738
-        $safecodes = array('%21', '%23', '%24', '%27', '%28', '%29', '%2A', '%2C', '%2F', '%3A', '%3B', '%40', '%3F', '%5B', '%5D');
-        $safechars = array('!', "#", "$", "'", "(", ")", '*', ",", "/", ":", ";", "@", "?", "[", "]");
-        $attrname = str_replace($safecodes, $safechars, urlencode($str_attr));
-        $extra = "/$attrname?$attrname=" . $this->_escapeAttr($str_newval) . "&.";
+        $attrname = $this->_escapeAttr($str_attr);
+        $str_newval = $this->_escapeAttr($str_newval);
+        $extra = "/{$attrname}?{$attrname}={$str_newval}&.";
         $yreq = YAPI::funcRequest($this->_className, $this->_func, $extra);
         if ($this->_cacheExpiration != 0) {
             $this->_cacheExpiration = YAPI::GetTickCount();

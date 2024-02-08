@@ -870,7 +870,7 @@ class YSensor extends YFunction
             array_pop($refValues);
         };
         // Load function parameters if not yet loaded
-        if ($this->_scale == 0) {
+        if (($this->_scale == 0) || ($this->_cacheExpiration <= YAPI::GetTickCount())) {
             if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
                 return YAPI::DEVICE_NOT_FOUND;
             }

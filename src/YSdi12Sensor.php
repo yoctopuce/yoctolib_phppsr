@@ -32,7 +32,9 @@ class YSdi12Sensor
     //--- (generated code: YSdi12Sensor implementation)
 
     /**
-     * @throws YAPI_Exception on error
+     * Returns the sensor address.
+     *
+     * @return string  the sensor address.
      */
     public function get_sensorAddress(): string
     {
@@ -40,7 +42,9 @@ class YSdi12Sensor
     }
 
     /**
-     * @throws YAPI_Exception on error
+     * Returns the compatible SDI-12 version of the sensor.
+     *
+     * @return string  the compatible SDI-12 version of the sensor.
      */
     public function get_sensorProtocol(): string
     {
@@ -48,7 +52,9 @@ class YSdi12Sensor
     }
 
     /**
-     * @throws YAPI_Exception on error
+     * Returns the sensor vendor identification.
+     *
+     * @return string  the sensor vendor identification.
      */
     public function get_sensorVendor(): string
     {
@@ -56,7 +62,9 @@ class YSdi12Sensor
     }
 
     /**
-     * @throws YAPI_Exception on error
+     * Returns the sensor model number.
+     *
+     * @return string  the sensor model number.
      */
     public function get_sensorModel(): string
     {
@@ -64,7 +72,9 @@ class YSdi12Sensor
     }
 
     /**
-     * @throws YAPI_Exception on error
+     * Returns the sensor version.
+     *
+     * @return string  the sensor version.
      */
     public function get_sensorVersion(): string
     {
@@ -72,7 +82,9 @@ class YSdi12Sensor
     }
 
     /**
-     * @throws YAPI_Exception on error
+     * Returns the sensor serial number.
+     *
+     * @return string  the sensor serial number.
      */
     public function get_sensorSerial(): string
     {
@@ -80,7 +92,9 @@ class YSdi12Sensor
     }
 
     /**
-     * @throws YAPI_Exception on error
+     * Returns the number of sensor measurements.
+     *
+     * @return int  the number of sensor measurements.
      */
     public function get_measureCount(): int
     {
@@ -88,7 +102,11 @@ class YSdi12Sensor
     }
 
     /**
-     * @throws YAPI_Exception on error
+     * Returns the sensor measurement command.
+     *
+     * @param int $measureIndex : measurement index
+     *
+     * @return string  the sensor measurement command.
      */
     public function get_measureCommand(int $measureIndex): string
     {
@@ -96,7 +114,11 @@ class YSdi12Sensor
     }
 
     /**
-     * @throws YAPI_Exception on error
+     * Returns sensor measurement position.
+     *
+     * @param int $measureIndex : measurement index
+     *
+     * @return int  the sensor measurement command.
      */
     public function get_measurePosition(int $measureIndex): int
     {
@@ -104,7 +126,11 @@ class YSdi12Sensor
     }
 
     /**
-     * @throws YAPI_Exception on error
+     * Returns the measured value symbol.
+     *
+     * @param int $measureIndex : measurement index
+     *
+     * @return string  the sensor measurement command.
      */
     public function get_measureSymbol(int $measureIndex): string
     {
@@ -112,7 +138,11 @@ class YSdi12Sensor
     }
 
     /**
-     * @throws YAPI_Exception on error
+     * Returns the unit of the measured value.
+     *
+     * @param int $measureIndex : measurement index
+     *
+     * @return string  the sensor measurement command.
      */
     public function get_measureUnit(int $measureIndex): string
     {
@@ -120,7 +150,11 @@ class YSdi12Sensor
     }
 
     /**
-     * @throws YAPI_Exception on error
+     * Returns the description of the measured value.
+     *
+     * @param int $measureIndex : measurement index
+     *
+     * @return string  the sensor measurement command.
      */
     public function get_measureDescription(int $measureIndex): string
     {
@@ -178,8 +212,10 @@ class YSdi12Sensor
         // $i                      is a int;
         // $j                      is a int;
         $listVal = [];          // strArr;
+        // $size                   is a int;
 
         $k = 0;
+        $size = 4;
         while ($k < 10) {
             $infoNbVal = $this->_sdi12Port->querySdi12($this->_addr, sprintf('IM%d', $k), 5000);
             if (strlen($infoNbVal) > 1) {
@@ -201,6 +237,9 @@ class YSdi12Sensor
                         $listVal[] = sprintf('M%d', $k);
                         $listVal[] = $i+1;
                         $j = 0;
+                        while (sizeof($data) < $size) {
+                            $data[] = '';
+                        }
                         while ($j < sizeof($data)) {
                             $listVal[] = $data[$j];
                             $j = $j + 1;

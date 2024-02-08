@@ -12,6 +12,7 @@ class YI2cSnoopingRecord
 
     //--- (generated code: YI2cSnoopingRecord attributes)
     protected int $_tim = 0;                            // int
+    protected int $_pos = 0;                            // int
     protected int $_dir = 0;                            // int
     protected string $_msg = "";                           // str
 
@@ -23,9 +24,16 @@ class YI2cSnoopingRecord
         //--- (end of generated code: YI2cSnoopingRecord constructor)
 
         $loadval = json_decode($str_json, true);
-        $this->_tim = $loadval['t'];
-        $this->_dir = $loadval['m'][0] == '<' ? 1 : 0;
-        $this->_msg = substr($loadval['m'], 1);
+        if (array_key_exists('t', $loadval)) {
+            $this->_tim = $loadval['t'];
+        }
+        if (array_key_exists('p', $loadval)) {
+            $this->_pos = $loadval['p'];
+        }
+        if (array_key_exists('m', $loadval)) {
+            $this->_dir = $loadval['m'][0] == '<' ? 1 : 0;
+            $this->_msg = substr($loadval['m'], 1);
+        }
     }
 
     //--- (generated code: YI2cSnoopingRecord implementation)
@@ -38,6 +46,17 @@ class YI2cSnoopingRecord
     public function get_time(): int
     {
         return $this->_tim;
+    }
+
+    /**
+     * Returns the absolute position of the message end.
+     *
+     * @return the absolute position of the message end.
+     * @throws YAPI_Exception on error
+     */
+    public function get_pos(): int
+    {
+        return $this->_pos;
     }
 
     /**

@@ -103,7 +103,7 @@ class YRfidOptions
     /**
      * @throws YAPI_Exception on error
      */
-    public function _getParams(): string
+    public function imm_getParams(): string
     {
         // $opt                    is a int;
         // $res                    is a str;

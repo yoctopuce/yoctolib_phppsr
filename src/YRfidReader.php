@@ -69,9 +69,9 @@ class YRfidReader extends YFunction
     }
 
     /**
-     * Returns the desired refresh rate, measured in Hz.
+     * Returns the tag list refresh rate, measured in Hz.
      *
-     * @return int  an integer corresponding to the desired refresh rate, measured in Hz
+     * @return int  an integer corresponding to the tag list refresh rate, measured in Hz
      *
      * On failure, throws an exception or returns YRfidReader::REFRESHRATE_INVALID.
      * @throws YAPI_Exception on error
@@ -89,11 +89,14 @@ class YRfidReader extends YFunction
     }
 
     /**
-     * Changes the desired refresh rate, measured in Hz.
+     * Changes the present tag list refresh rate, measured in Hz. The reader will do
+     * its best to respect it. Note that the reader cannot detect tag arrival or removal
+     * while it is  communicating with a tag.  Maximum frequency is limited to 100Hz,
+     * but in real life it will be difficult to do better than 50Hz.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     * @param int $newval : an integer corresponding to the desired refresh rate, measured in Hz
+     * @param int $newval : an integer corresponding to the present tag list refresh rate, measured in Hz
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
@@ -174,7 +177,7 @@ class YRfidReader extends YFunction
                 $lab = -1;
             }
         }
-        $status->_init($tagId, $errCode, $errBlk, $fab, $lab);
+        $status->imm_init($tagId, $errCode, $errBlk, $fab, $lab);
         $retcode = $status->get_yapiError();
         if (!($retcode == YAPI::SUCCESS)) return $this->_throw( $retcode, $status->get_errorMessage(),$retcode);
         return YAPI::SUCCESS;
@@ -228,7 +231,7 @@ class YRfidReader extends YFunction
      * @param YRfidStatus $status : an RfidStatus object that will contain
      *         the detailled status of the operation
      *
-     * @return ?YRfidTagInfo  YAPI::SUCCESS if the call succeeds.
+     * @return ?YRfidTagInfo  a YRfidTagInfo object.
      *
      * On failure, throws an exception or returns an empty YRfidTagInfo objact.
      * When it happens, you can get more information from the status object.
@@ -256,7 +259,7 @@ class YRfidReader extends YFunction
         $fblk = intVal($this->_json_get_key($json, 'fblk'));
         $lblk = intVal($this->_json_get_key($json, 'lblk'));
         $res = new YRfidTagInfo();
-        $res->_init($tagId, $tagType, $size, $usable, $blksize, $fblk, $lblk);
+        $res->imm_init($tagId, $tagType, $size, $usable, $blksize, $fblk, $lblk);
         return $res;
     }
 
@@ -281,12 +284,12 @@ class YRfidReader extends YFunction
      * happens, you can get more information from the status object.
      * @throws YAPI_Exception on error
      */
-    public function lockBlocks(string $tagId, int $firstBlock, int $nBlocks, YRfidOptions $options, YRfidStatus &$status): int
+    public function tagLockBlocks(string $tagId, int $firstBlock, int $nBlocks, YRfidOptions $options, YRfidStatus &$status): int
     {
         // $optstr                 is a str;
         // $url                    is a str;
         // $json                   is a bin;
-        $optstr = $options->_getParams();
+        $optstr = $options->imm_getParams();
         $url = sprintf('rfid.json?a=lock&t=%s&b=%d&n=%d%s',$tagId,$firstBlock,$nBlocks,$optstr);
 
         $json = $this->_download($url);
@@ -314,19 +317,67 @@ class YRfidReader extends YFunction
      * happens, you can get more information from the status object.
      * @throws YAPI_Exception on error
      */
-    public function get_lockState(string $tagId, int $firstBlock, int $nBlocks, YRfidOptions $options, YRfidStatus &$status): array
+    public function get_tagLockState(string $tagId, int $firstBlock, int $nBlocks, YRfidOptions $options, YRfidStatus &$status): array
     {
         // $optstr                 is a str;
         // $url                    is a str;
         // $json                   is a bin;
-        // $hexbuf                 is a str;
         // $binRes                 is a bin;
         $res = [];              // boolArr;
         // $idx                    is a int;
         // $val                    is a int;
         // $isLocked               is a bool;
-        $optstr = $options->_getParams();
+        $optstr = $options->imm_getParams();
         $url = sprintf('rfid.json?a=chkl&t=%s&b=%d&n=%d%s',$tagId,$firstBlock,$nBlocks,$optstr);
+
+        $json = $this->_download($url);
+        $this->_chkerror($tagId, $json, $status);
+        if ($status->get_yapiError() != YAPI::SUCCESS) {
+            return $res;
+        }
+        $binRes = YAPI::_hexStrToBin($this->_json_get_key($json, 'bitmap'));
+        $idx = 0;
+        while ($idx < $nBlocks) {
+            $val = ord($binRes[(($idx) >> (3))]);
+            $isLocked = ((($val) & (((1) << ((($idx) & (7)))))) != 0);
+            $res[] = $isLocked;
+            $idx = $idx + 1;
+        }
+        return $res;
+    }
+
+    /**
+     * Tells which block of a RFID tag memory are special and cannot be used
+     * to store user data. Mistakely writing a special block can lead to
+     * an irreversible alteration of the tag.
+     *
+     * @param string $tagId : identifier of the tag to use
+     * @param int $firstBlock : number of the first block to check
+     * @param int $nBlocks : number of blocks to check
+     * @param YRfidOptions $options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param YRfidStatus $status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return Boolean[]  a list of booleans with the lock state of selected blocks
+     *
+     * On failure, throws an exception or returns an empty list. When it
+     * happens, you can get more information from the status object.
+     * @throws YAPI_Exception on error
+     */
+    public function get_tagSpecialBlocks(string $tagId, int $firstBlock, int $nBlocks, YRfidOptions $options, YRfidStatus &$status): array
+    {
+        // $optstr                 is a str;
+        // $url                    is a str;
+        // $json                   is a bin;
+        // $binRes                 is a bin;
+        $res = [];              // boolArr;
+        // $idx                    is a int;
+        // $val                    is a int;
+        // $isLocked               is a bool;
+        $optstr = $options->imm_getParams();
+        $url = sprintf('rfid.json?a=chks&t=%s&b=%d&n=%d%s',$tagId,$firstBlock,$nBlocks,$optstr);
 
         $json = $this->_download($url);
         $this->_chkerror($tagId, $json, $status);
@@ -367,13 +418,13 @@ class YRfidReader extends YFunction
      * happens, you can get more information from the status object.
      * @throws YAPI_Exception on error
      */
-    public function readHex(string $tagId, int $firstBlock, int $nBytes, YRfidOptions $options, YRfidStatus &$status): string
+    public function tagReadHex(string $tagId, int $firstBlock, int $nBytes, YRfidOptions $options, YRfidStatus &$status): string
     {
         // $optstr                 is a str;
         // $url                    is a str;
         // $json                   is a bin;
         // $hexbuf                 is a str;
-        $optstr = $options->_getParams();
+        $optstr = $options->imm_getParams();
         $url = sprintf('rfid.json?a=read&t=%s&b=%d&n=%d%s',$tagId,$firstBlock,$nBytes,$optstr);
 
         $json = $this->_download($url);
@@ -409,9 +460,9 @@ class YRfidReader extends YFunction
      * happens, you can get more information from the status object.
      * @throws YAPI_Exception on error
      */
-    public function readBin(string $tagId, int $firstBlock, int $nBytes, YRfidOptions $options, YRfidStatus &$status): string
+    public function tagReadBin(string $tagId, int $firstBlock, int $nBytes, YRfidOptions $options, YRfidStatus &$status): string
     {
-        return YAPI::_hexStrToBin($this->readHex($tagId, $firstBlock, $nBytes, $options, $status));
+        return YAPI::_hexStrToBin($this->tagReadHex($tagId, $firstBlock, $nBytes, $options, $status));
     }
 
     /**
@@ -437,13 +488,13 @@ class YRfidReader extends YFunction
      * happens, you can get more information from the status object.
      * @throws YAPI_Exception on error
      */
-    public function readArray(string $tagId, int $firstBlock, int $nBytes, YRfidOptions $options, YRfidStatus &$status): array
+    public function tagReadArray(string $tagId, int $firstBlock, int $nBytes, YRfidOptions $options, YRfidStatus &$status): array
     {
         // $blk                    is a bin;
         // $idx                    is a int;
         // $endidx                 is a int;
         $res = [];              // intArr;
-        $blk = $this->readBin($tagId, $firstBlock, $nBytes, $options, $status);
+        $blk = $this->tagReadBin($tagId, $firstBlock, $nBytes, $options, $status);
         $endidx = strlen($blk);
         $idx = 0;
         while ($idx < $endidx) {
@@ -476,9 +527,9 @@ class YRfidReader extends YFunction
      * happens, you can get more information from the status object.
      * @throws YAPI_Exception on error
      */
-    public function readStr(string $tagId, int $firstBlock, int $nChars, YRfidOptions $options, YRfidStatus &$status): string
+    public function tagReadStr(string $tagId, int $firstBlock, int $nChars, YRfidOptions $options, YRfidStatus &$status): string
     {
-        return $this->readBin($tagId, $firstBlock, $nChars, $options, $status);
+        return $this->tagReadBin($tagId, $firstBlock, $nChars, $options, $status);
     }
 
     /**
@@ -505,18 +556,25 @@ class YRfidReader extends YFunction
      * happens, you can get more information from the status object.
      * @throws YAPI_Exception on error
      */
-    public function writeBin(string $tagId, int $firstBlock, string $buff, YRfidOptions $options, YRfidStatus &$status): int
+    public function tagWriteBin(string $tagId, int $firstBlock, string $buff, YRfidOptions $options, YRfidStatus &$status): int
     {
         // $optstr                 is a str;
+        // $hexstr                 is a str;
         // $buflen                 is a int;
         // $fname                  is a str;
         // $json                   is a bin;
-        $optstr = $options->_getParams();
         $buflen = strlen($buff);
-        $fname = sprintf('Rfid:t=%s&b=%d&n=%d%s',$tagId,$firstBlock,$buflen,$optstr);
-
-        $json = $this->_uploadEx($fname, $buff);
-        return $this->_chkerror($tagId, $json, $status);
+        if ($buflen <= 16) {
+            // short data, use an URL-based command
+            $hexstr = YAPI::_bytesToHexStr($buff);
+            return $this->tagWriteHex($tagId, $firstBlock, $hexstr, $options, $status);
+        } else {
+            // long data, use an upload command
+            $optstr = $options->imm_getParams();
+            $fname = sprintf('Rfid:t=%s&b=%d&n=%d%s',$tagId,$firstBlock,$buflen,$optstr);
+            $json = $this->_uploadEx($fname, $buff);
+            return $this->_chkerror($tagId, $json, $status);
+        }
     }
 
     /**
@@ -543,7 +601,7 @@ class YRfidReader extends YFunction
      * happens, you can get more information from the status object.
      * @throws YAPI_Exception on error
      */
-    public function writeArray(string $tagId, int $firstBlock, array $byteList, YRfidOptions $options, YRfidStatus &$status): int
+    public function tagWriteArray(string $tagId, int $firstBlock, array $byteList, YRfidOptions $options, YRfidStatus &$status): int
     {
         // $bufflen                is a int;
         // $buff                   is a bin;
@@ -558,7 +616,7 @@ class YRfidReader extends YFunction
             $idx = $idx + 1;
         }
 
-        return $this->writeBin($tagId, $firstBlock, $buff, $options, $status);
+        return $this->tagWriteBin($tagId, $firstBlock, $buff, $options, $status);
     }
 
     /**
@@ -585,23 +643,34 @@ class YRfidReader extends YFunction
      * happens, you can get more information from the status object.
      * @throws YAPI_Exception on error
      */
-    public function writeHex(string $tagId, int $firstBlock, string $hexString, YRfidOptions $options, YRfidStatus &$status): int
+    public function tagWriteHex(string $tagId, int $firstBlock, string $hexString, YRfidOptions $options, YRfidStatus &$status): int
     {
         // $bufflen                is a int;
+        // $optstr                 is a str;
+        // $url                    is a str;
+        // $json                   is a bin;
         // $buff                   is a bin;
         // $idx                    is a int;
         // $hexb                   is a int;
         $bufflen = strlen($hexString);
         $bufflen = (($bufflen) >> (1));
-        $buff = ($bufflen > 0 ? pack('C',array_fill(0, $bufflen, 0)) : '');
-        $idx = 0;
-        while ($idx < $bufflen) {
-            $hexb = hexdec(substr($hexString,  2 * $idx, 2));
-            $buff[$idx] = pack('C', $hexb);
-            $idx = $idx + 1;
+        if ($bufflen <= 16) {
+            // short data, use an URL-based command
+            $optstr = $options->imm_getParams();
+            $url = sprintf('rfid.json?a=writ&t=%s&b=%d&w=%s%s',$tagId,$firstBlock,$hexString,$optstr);
+            $json = $this->_download($url);
+            return $this->_chkerror($tagId, $json, $status);
+        } else {
+            // long data, use an upload command
+            $buff = ($bufflen > 0 ? pack('C',array_fill(0, $bufflen, 0)) : '');
+            $idx = 0;
+            while ($idx < $bufflen) {
+                $hexb = hexdec(substr($hexString,  2 * $idx, 2));
+                $buff[$idx] = pack('C', $hexb);
+                $idx = $idx + 1;
+            }
+            return $this->tagWriteBin($tagId, $firstBlock, $buff, $options, $status);
         }
-
-        return $this->writeBin($tagId, $firstBlock, $buff, $options, $status);
     }
 
     /**
@@ -628,12 +697,12 @@ class YRfidReader extends YFunction
      * happens, you can get more information from the status object.
      * @throws YAPI_Exception on error
      */
-    public function writeStr(string $tagId, int $firstBlock, string $text, YRfidOptions $options, YRfidStatus &$status): int
+    public function tagWriteStr(string $tagId, int $firstBlock, string $text, YRfidOptions $options, YRfidStatus &$status): int
     {
         // $buff                   is a bin;
         $buff = $text;
 
-        return $this->writeBin($tagId, $firstBlock, $buff, $options, $status);
+        return $this->tagWriteBin($tagId, $firstBlock, $buff, $options, $status);
     }
 
     /**
@@ -649,7 +718,7 @@ class YRfidReader extends YFunction
     {
         // $content                is a bin;
 
-        $content = $this->_download('events.txt');
+        $content = $this->_download('events.txt?pos=0');
         return $content;
     }
 
@@ -688,15 +757,11 @@ class YRfidReader extends YFunction
     {
         // $cbPos                  is a int;
         // $cbDPos                 is a int;
-        // $cbNtags                is a int;
-        // $searchTags             is a int;
         // $url                    is a str;
         // $content                is a bin;
         // $contentStr             is a str;
-        $currentTags = [];      // strArr;
         $eventArr = [];         // strArr;
         // $arrLen                 is a int;
-        $lastEvents = [];       // intArr;
         // $lenStr                 is a str;
         // $arrPos                 is a int;
         // $eventStr               is a str;
@@ -704,13 +769,14 @@ class YRfidReader extends YFunction
         // $hexStamp               is a str;
         // $typePos                is a int;
         // $dataPos                is a int;
-        // $evtStamp               is a int;
+        // $intStamp               is a int;
+        // $binMStamp              is a bin;
+        // $msStamp                is a int;
+        // $evtStamp               is a float;
         // $evtType                is a str;
         // $evtData                is a str;
-        // $tagIdx                 is a int;
         // detect possible power cycle of the reader to clear event pointer
         $cbPos = intVal($cbVal);
-        $cbNtags = (($cbPos) % (1000));
         $cbPos = intVal(($cbPos) / (1000));
         $cbDPos = (($cbPos - $this->_prevCbPos) & (0x7ffff));
         $this->_prevCbPos = $cbPos;
@@ -720,103 +786,63 @@ class YRfidReader extends YFunction
         if (!(!is_null($this->_eventCallback))) {
             return YAPI::SUCCESS;
         }
-        // load all events since previous call
-        $url = sprintf('events.txt?pos=%d', $this->_eventPos);
-
-        $content = $this->_download($url);
-        $contentStr = $content;
-        $eventArr = explode(''."\n".'', $contentStr);
-        $arrLen = sizeof($eventArr);
-        if (!($arrLen > 0)) return $this->_throw( YAPI::IO_ERROR, 'fail to download events',YAPI::IO_ERROR);
-        // last element of array is the new position preceeded by '@'
-        $arrLen = $arrLen - 1;
-        $lenStr = $eventArr[$arrLen];
-        $lenStr = substr($lenStr,  1, strlen($lenStr)-1);
-        // update processed event position pointer
-        $this->_eventPos = intVal($lenStr);
         if ($this->_isFirstCb) {
             // first emulated value callback caused by registerValueCallback:
-            // attempt to retrieve arrivals of all tags present to emulate arrival
+            // retrieve arrivals of all tags currently present to emulate arrival
             $this->_isFirstCb = false;
             $this->_eventStamp = 0;
-            if ($cbNtags == 0) {
-                return YAPI::SUCCESS;
-            }
-            $currentTags = $this->get_tagIdList();
-            $cbNtags = sizeof($currentTags);
-            $searchTags = $cbNtags;
-            while (sizeof($lastEvents) > 0) {
-                array_pop($lastEvents);
-            };
-            $arrPos = $arrLen - 1;
-            while (($arrPos >= 0) && ($searchTags > 0)) {
-                $eventStr = $eventArr[$arrPos];
-                $typePos = YAPI::Ystrpos($eventStr,':')+1;
-                if ($typePos > 8) {
-                    $dataPos = YAPI::Ystrpos($eventStr,'=')+1;
-                    $evtType = substr($eventStr,  $typePos, 1);
-                    if (($dataPos > 10) && $evtType == '+') {
-                        $evtData = substr($eventStr,  $dataPos, strlen($eventStr)-$dataPos);
-                        $tagIdx = $searchTags - 1;
-                        while ($tagIdx >= 0) {
-                            if ($evtData == $currentTags[$tagIdx]) {
-                                $lastEvents[] = 0+$arrPos;
-                                $currentTags[$tagIdx] = '';
-                                while (($searchTags > 0) && $currentTags[$searchTags-1] == '') {
-                                    $searchTags = $searchTags - 1;
-                                }
-                                $tagIdx = -1;
-                            }
-                            $tagIdx = $tagIdx - 1;
-                        }
-                    }
-                }
-                $arrPos = $arrPos - 1;
-            }
-            // If we have any remaining tags without a known arrival event,
-            // create a pseudo callback with timestamp zero
-            $tagIdx = 0;
-            while ($tagIdx < $searchTags) {
-                $evtData = $currentTags[$tagIdx];
-                if (!($evtData == '')) {
-                    call_user_func($this->_eventCallback, $this, 0, '+', $evtData);
-                }
-                $tagIdx = $tagIdx + 1;
-            }
+            $content = $this->_download('events.txt');
+            $contentStr = $content;
+            $eventArr = explode(''."\n".'', $contentStr);
+            $arrLen = sizeof($eventArr);
+            if (!($arrLen > 0)) return $this->_throw( YAPI::IO_ERROR, 'fail to download events',YAPI::IO_ERROR);
+            // first element of array is the new position preceeded by '@'
+            $arrPos = 1;
+            $lenStr = $eventArr[0];
+            $lenStr = substr($lenStr,  1, strlen($lenStr)-1);
+            // update processed event position pointer
+            $this->_eventPos = intVal($lenStr);
         } else {
-            // regular callback
-            while (sizeof($lastEvents) > 0) {
-                array_pop($lastEvents);
-            };
-            $arrPos = $arrLen - 1;
-            while ($arrPos >= 0) {
-                $lastEvents[] = 0+$arrPos;
-                $arrPos = $arrPos - 1;
-            }
+            // load all events since previous call
+            $url = sprintf('events.txt?pos=%d', $this->_eventPos);
+            $content = $this->_download($url);
+            $contentStr = $content;
+            $eventArr = explode(''."\n".'', $contentStr);
+            $arrLen = sizeof($eventArr);
+            if (!($arrLen > 0)) return $this->_throw( YAPI::IO_ERROR, 'fail to download events',YAPI::IO_ERROR);
+            // last element of array is the new position preceeded by '@'
+            $arrPos = 0;
+            $arrLen = $arrLen - 1;
+            $lenStr = $eventArr[$arrLen];
+            $lenStr = substr($lenStr,  1, strlen($lenStr)-1);
+            // update processed event position pointer
+            $this->_eventPos = intVal($lenStr);
         }
-        // now generate callbacks for each selected event
-        $arrLen = sizeof($lastEvents);
-        $arrPos = $arrLen - 1;
-        while ($arrPos >= 0) {
-            $tagIdx = $lastEvents[$arrPos];
-            $eventStr = $eventArr[$tagIdx];
+        // now generate callbacks for each real event
+        while ($arrPos < $arrLen) {
+            $eventStr = $eventArr[$arrPos];
             $eventLen = strlen($eventStr);
-            if ($eventLen >= 1) {
+            $typePos = YAPI::Ystrpos($eventStr,':')+1;
+            if (($eventLen >= 14) && ($typePos > 10)) {
                 $hexStamp = substr($eventStr,  0, 8);
-                $evtStamp = hexdec($hexStamp);
-                $typePos = YAPI::Ystrpos($eventStr,':')+1;
-                if (($evtStamp >= $this->_eventStamp) && ($typePos > 8)) {
-                    $this->_eventStamp = $evtStamp;
+                $intStamp = hexdec($hexStamp);
+                if ($intStamp >= $this->_eventStamp) {
+                    $this->_eventStamp = $intStamp;
+                    $binMStamp = substr($eventStr,  8, 2);
+                    $msStamp = (ord($binMStamp[0])-64) * 32 + ord($binMStamp[1]);
+                    $evtStamp = $intStamp + (0.001 * $msStamp);
                     $dataPos = YAPI::Ystrpos($eventStr,'=')+1;
                     $evtType = substr($eventStr,  $typePos, 1);
                     $evtData = '';
                     if ($dataPos > 10) {
                         $evtData = substr($eventStr,  $dataPos, $eventLen-$dataPos);
                     }
-                    call_user_func($this->_eventCallback, $this, $evtStamp, $evtType, $evtData);
+                    if (!is_null($this->_eventCallback)) {
+                        call_user_func($this->_eventCallback, $this, $evtStamp, $evtType, $evtData);
+                    }
                 }
             }
-            $arrPos = $arrPos - 1;
+            $arrPos = $arrPos + 1;
         }
         return YAPI::SUCCESS;
     }

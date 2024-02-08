@@ -18,6 +18,9 @@ class YPwmOutput extends YFunction
     const DUTYCYCLE_INVALID = YAPI::INVALID_DOUBLE;
     const PULSEDURATION_INVALID = YAPI::INVALID_DOUBLE;
     const PWMTRANSITION_INVALID = YAPI::INVALID_STRING;
+    const INVERTEDOUTPUT_FALSE = 0;
+    const INVERTEDOUTPUT_TRUE = 1;
+    const INVERTEDOUTPUT_INVALID = -1;
     const ENABLEDATPOWERON_FALSE = 0;
     const ENABLEDATPOWERON_TRUE = 1;
     const ENABLEDATPOWERON_INVALID = -1;
@@ -31,6 +34,7 @@ class YPwmOutput extends YFunction
     protected float $_dutyCycle = self::DUTYCYCLE_INVALID;      // MeasureVal
     protected float $_pulseDuration = self::PULSEDURATION_INVALID;  // MeasureVal
     protected string $_pwmTransition = self::PWMTRANSITION_INVALID;  // Text
+    protected int $_invertedOutput = self::INVERTEDOUTPUT_INVALID; // Bool
     protected int $_enabledAtPowerOn = self::ENABLEDATPOWERON_INVALID; // Bool
     protected float $_dutyCycleAtPowerOn = self::DUTYCYCLEATPOWERON_INVALID; // MeasureVal
 
@@ -67,6 +71,9 @@ class YPwmOutput extends YFunction
             return 1;
         case 'pwmTransition':
             $this->_pwmTransition = $val;
+            return 1;
+        case 'invertedOutput':
+            $this->_invertedOutput = intval($val);
             return 1;
         case 'enabledAtPowerOn':
             $this->_enabledAtPowerOn = intval($val);
@@ -293,6 +300,46 @@ class YPwmOutput extends YFunction
     {
         $rest_val = $newval;
         return $this->_setAttr("pwmTransition", $rest_val);
+    }
+
+    /**
+     * Returns true if the output signal is configured as inverted, and false otherwise.
+     *
+     * @return int  either YPwmOutput::INVERTEDOUTPUT_FALSE or YPwmOutput::INVERTEDOUTPUT_TRUE, according to
+     * true if the output signal is configured as inverted, and false otherwise
+     *
+     * On failure, throws an exception or returns YPwmOutput::INVERTEDOUTPUT_INVALID.
+     * @throws YAPI_Exception on error
+     */
+    public function get_invertedOutput(): int
+    {
+        // $res                    is a enumBOOL;
+        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
+            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
+                return self::INVERTEDOUTPUT_INVALID;
+            }
+        }
+        $res = $this->_invertedOutput;
+        return $res;
+    }
+
+    /**
+     * Changes the inversion mode of the output signal.
+     * Remember to call the matching module saveToFlash() method if you want
+     * the change to be kept after power cycle.
+     *
+     * @param int $newval : either YPwmOutput::INVERTEDOUTPUT_FALSE or YPwmOutput::INVERTEDOUTPUT_TRUE,
+     * according to the inversion mode of the output signal
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function set_invertedOutput(int $newval): int
+    {
+        $rest_val = strval($newval);
+        return $this->_setAttr("invertedOutput", $rest_val);
     }
 
     /**
@@ -685,6 +732,22 @@ class YPwmOutput extends YFunction
     public function setPwmTransition(string $newval): int
 {
     return $this->set_pwmTransition($newval);
+}
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function invertedOutput(): int
+{
+    return $this->get_invertedOutput();
+}
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setInvertedOutput(int $newval): int
+{
+    return $this->set_invertedOutput($newval);
 }
 
     /**

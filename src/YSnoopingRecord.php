@@ -12,6 +12,7 @@ class YSnoopingRecord
 
     //--- (generated code: YSnoopingRecord attributes)
     protected int $_tim = 0;                            // int
+    protected int $_pos = 0;                            // int
     protected int $_dir = 0;                            // int
     protected string $_msg = "";                           // str
 
@@ -21,11 +22,17 @@ class YSnoopingRecord
     {
         //--- (generated code: YSnoopingRecord constructor)
         //--- (end of generated code: YSnoopingRecord constructor)
-
         $loadval = json_decode($str_json, true);
-        $this->_tim = $loadval['t'];
-        $this->_dir = $loadval['m'][0] == '<' ? 1 : 0;
-        $this->_msg = substr($loadval['m'], 1);
+        if (array_key_exists('t', $loadval)) {
+            $this->_tim = $loadval['t'];
+        }
+        if (array_key_exists('p', $loadval)) {
+            $this->_pos = $loadval['p'];
+        }
+        if (array_key_exists('m', $loadval)) {
+            $this->_dir = $loadval['m'][0] == '<' ? 1 : 0;
+            $this->_msg = substr($loadval['m'], 1);
+        }
     }
 
     //--- (generated code: YSnoopingRecord implementation)
@@ -38,6 +45,16 @@ class YSnoopingRecord
     public function get_time(): int
     {
         return $this->_tim;
+    }
+
+    /**
+     * Returns the absolute position of the message end.
+     *
+     * @return int  the absolute position of the message end.
+     */
+    public function get_pos(): int
+    {
+        return $this->_pos;
     }
 
     /**

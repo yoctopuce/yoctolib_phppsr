@@ -29,11 +29,12 @@ class YRfidStatus
     const CRYPTOGRAPHIC_ERROR            = 64;
     const READER_BUSY                    = 1000;
     const TAG_NOTFOUND                   = 1001;
-    const TAG_JUSTLEFT                   = 1002;
-    const TAG_COMMUNICATION_ERROR        = 1003;
-    const TAG_NOT_RESPONDING             = 1004;
-    const TIMEOUT_ERROR                  = 1005;
-    const COLLISION_DETECTED             = 1006;
+    const TAG_LEFT                       = 1002;
+    const TAG_JUSTLEFT                   = 1003;
+    const TAG_COMMUNICATION_ERROR        = 1004;
+    const TAG_NOT_RESPONDING             = 1005;
+    const TIMEOUT_ERROR                  = 1006;
+    const COLLISION_DETECTED             = 1007;
     const INVALID_CMD_ARGUMENTS          = -66;
     const UNKNOWN_CAPABILITIES           = -67;
     const MEMORY_NOT_SUPPORTED           = -68;
@@ -118,6 +119,7 @@ class YRfidStatus
     const INVLD_BLOCK_MODE_COMBINATION   = -152;
     const INVLD_ACCESS_MODE_COMBINATION  = -153;
     const INVALID_SIZE                   = -154;
+    const BAD_PASSWORD_FORMAT            = -155;
     //--- (end of generated code: YRfidStatus declaration)
 
     //--- (generated code: YRfidStatus attributes)
@@ -217,7 +219,7 @@ class YRfidStatus
     /**
      * @throws YAPI_Exception on error
      */
-    public function _init(string $tagId, int $errCode, int $errBlk, int $fab, int $lab): void
+    public function imm_init(string $tagId, int $errCode, int $errBlk, int $fab, int $lab): void
     {
         // $errMsg                 is a str;
         if ($errCode == 0) {
@@ -245,7 +247,10 @@ class YRfidStatus
                 $errMsg = 'Tag not found';
             }
             if ($errCode == self::TAG_JUSTLEFT) {
-                $errMsg = 'Tag just left';
+                $errMsg = 'Tag left during operation';
+            }
+            if ($errCode == self::TAG_LEFT) {
+                $errMsg = 'Tag not here anymore';
             }
             if ($errCode == self::READER_BUSY) {
                 $errMsg = 'Reader is busy';
@@ -382,9 +387,6 @@ class YRfidStatus
             if ($errCode == self::UNKNOWN_DWARFxx_ERROR_CODE) {
                 $errMsg = 'Unknown DWARF15 error code';
             }
-            if ($errCode == self::RESPONSE_SHORT) {
-                $errMsg = 'Response too short';
-            }
             if ($errCode == self::UNEXPECTED_TAG_ID_IN_RESPONSE) {
                 $errMsg = 'Unexpected Tag id in response';
             }
@@ -416,7 +418,7 @@ class YRfidStatus
                 $errMsg = 'DSFID not available';
             }
             if ($errCode == self::TAG_RESPONSE_TOO_SHORT) {
-                $errMsg = 'VIIC\'s response too short';
+                $errMsg = 'Tag\'s response too short';
             }
             if ($errCode == self::DEC_EXPECTED) {
                 $errMsg = 'Error Decimal value Expected, or is missing';
@@ -543,6 +545,9 @@ class YRfidStatus
             }
             if ($errCode == self::INVALID_SIZE) {
                 $errMsg = 'Invalid data size parameter';
+            }
+            if ($errCode == self::BAD_PASSWORD_FORMAT) {
+                $errMsg = 'Bad password format or type';
             }
             if ($errBlk >= 0) {
                 $errMsg = sprintf('%s (block %d)', $errMsg, $errBlk);

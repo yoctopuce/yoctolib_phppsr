@@ -126,7 +126,7 @@ class YRfidTagInfo
     /**
      * @throws YAPI_Exception on error
      */
-    public function _init(string $tagId, int $tagType, int $size, int $usable, int $blksize, int $fblk, int $lblk): void
+    public function imm_init(string $tagId, int $tagType, int $size, int $usable, int $blksize, int $fblk, int $lblk): void
     {
         // $typeStr                is a str;
         $typeStr = 'unknown';
