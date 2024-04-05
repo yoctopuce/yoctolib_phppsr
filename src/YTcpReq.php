@@ -64,11 +64,11 @@ class YTcpReq
         if ($this->meta != '' && $this->errorType == YAPI::SUCCESS) {
             // connection was done and ended successfully
             // check we need to unchunk the response
-            $t_ofs = strpos($this->meta, "Transfer-Encoding");
+            $t_ofs = stripos($this->meta, "transfer-encoding");
             if ($t_ofs > 0) {
                 $t_ofs += 17;
                 $t_endl = strpos($this->meta, "\r\n", $t_ofs);
-                $t_chunk = strpos($this->meta, "chunked", $t_ofs);
+                $t_chunk = stripos($this->meta, "chunked", $t_ofs);
                 if ($t_chunk !== false && $t_endl !== false && $t_chunk < $t_endl) {
                     // chuck encoded
                     $new = $this->http_chunked_decode($this->reply);

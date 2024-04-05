@@ -757,9 +757,10 @@ class YModule extends YFunction
      * Registers a device log callback function. This callback will be called each time
      * that a module sends a new log message. Mostly useful to debug a Yoctopuce module.
      *
-     * @param callable $callback : the callback function to call, or a null pointer. The callback function
-     * should take two
-     *         arguments: the module object that emitted the log message, and the character string containing the log.
+     * @param callable $callback : the callback function to call, or a null pointer.
+     *         The callback function should take two
+     *         arguments: the module object that emitted the log message,
+     *         and the character string containing the log.
      *         On failure, throws an exception or returns a negative error code.
      * @throws YAPI_Exception on error
      */

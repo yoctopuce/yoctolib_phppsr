@@ -508,13 +508,13 @@ class YI2cPort extends YFunction
     /**
      * Retrieves an I2C port for a given identifier.
      * The identifier can be specified using several formats:
-     * <ul>
-     * <li>FunctionLogicalName</li>
-     * <li>ModuleSerialNumber.FunctionIdentifier</li>
-     * <li>ModuleSerialNumber.FunctionLogicalName</li>
-     * <li>ModuleLogicalName.FunctionIdentifier</li>
-     * <li>ModuleLogicalName.FunctionLogicalName</li>
-     * </ul>
+     *
+     * - FunctionLogicalName
+     * - ModuleSerialNumber.FunctionIdentifier
+     * - ModuleSerialNumber.FunctionLogicalName
+     * - ModuleLogicalName.FunctionIdentifier
+     * - ModuleLogicalName.FunctionLogicalName
+     *
      *
      * This function does not require that the I2C port is online at the time
      * it is invoked. The returned object is nevertheless valid.
@@ -1245,13 +1245,14 @@ class YI2cPort extends YFunction
      *
      * @param int $maxWait : the maximum number of milliseconds to wait for a message if none is found
      *         in the receive buffer.
+     * @param int $maxMsg : the maximum number of messages to be returned by the function; up to 254.
      *
      * @return YI2cSnoopingRecord[]  an array of YI2cSnoopingRecord objects containing the messages found, if any.
      *
      * On failure, throws an exception or returns an empty array.
      * @throws YAPI_Exception on error
      */
-    public function snoopMessages(int $maxWait): array
+    public function snoopMessagesEx(int $maxWait, int $maxMsg): array
     {
         // $url                    is a str;
         // $msgbin                 is a bin;
@@ -1260,7 +1261,7 @@ class YI2cPort extends YFunction
         $res = [];              // YI2cSnoopingRecordArr;
         // $idx                    is a int;
 
-        $url = sprintf('rxmsg.json?pos=%d&maxw=%d&t=0', $this->_rxptr, $maxWait);
+        $url = sprintf('rxmsg.json?pos=%d&maxw=%d&t=0&len=%d', $this->_rxptr, $maxWait, $maxMsg);
         $msgbin = $this->_download($url);
         $msgarr = $this->_json_get_array($msgbin);
         $msglen = sizeof($msgarr);
@@ -1276,6 +1277,25 @@ class YI2cPort extends YFunction
             $idx = $idx + 1;
         }
         return $res;
+    }
+
+    /**
+     * Retrieves messages (both direction) in the I2C port buffer, starting at current position.
+     *
+     * If no message is found, the search waits for one up to the specified maximum timeout
+     * (in milliseconds).
+     *
+     * @param int $maxWait : the maximum number of milliseconds to wait for a message if none is found
+     *         in the receive buffer.
+     *
+     * @return YI2cSnoopingRecord[]  an array of YI2cSnoopingRecord objects containing the messages found, if any.
+     *
+     * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
+     */
+    public function snoopMessages(int $maxWait): array
+    {
+        return $this->snoopMessagesEx($maxWait, 255);
     }
 
     /**

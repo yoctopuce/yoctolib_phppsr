@@ -1565,9 +1565,9 @@ class YAPI
      * to the list of trusted certificates using the AddTrustedCertificates method.
      *
      * @param string $url : the root URL of the VirtualHub V2 or HTTP server.
-     * @param int $mstimeout : the number of milliseconds available to download the certificate.
+     * @param float $mstimeout : the number of milliseconds available to download the certificate.
      *
-     * @return  string containing the certificate. In case of error, returns a string starting with "error:".
+     * @return string  a string containing the certificate. In case of error, returns a string starting with "error:".
      */
     public static function DownloadHostCertificate(string $url,int $mstimeout):string
     {
@@ -1617,11 +1617,13 @@ class YAPI
     }
 
     /**
-     * Enables or disables certain TLS/SSSL certificate checks.
+     * Enables or disables certain TLS/SSL certificate checks.
      *
-     * @param int $options: The options: YAPI::ALL_CHECK, YAPI::NO_TRUSTED_CA_CHECK,
-     *         YAPI::NO_HOSTNAME_CHECK.
-     * @noreturn
+     * @param options: The options: YAPI::NO_TRUSTED_CA_CHECK,
+     *         YAPI::NO_EXPIRATION_CHECK, YAPI::NO_HOSTNAME_CHECK.
+     *
+     * @return string  an empty string if the options are taken into account.
+     *         On error, returns a string beginning with "error:".
      */
     public static function SetNetworkSecurityOptions(int $options):void
     {
@@ -1795,7 +1797,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "1.10.59271";
+        return "1.10.60394";
     }
 
     /**
@@ -2398,7 +2400,7 @@ class YAPI
                             $match[1] = preg_replace_callback('/(?<=^|[\x09\x20\x2D])./', function ($matches) {
                                 return strtoupper($matches[0]);
                             }, strtolower(trim($match[1])));
-                            $meta[$match[1]] = trim($match[2]);
+                            $meta[strtolower($match[1])] = trim($match[2]);
                         }
                     }
                     $firstline = $lines[0];
@@ -2412,15 +2414,15 @@ class YAPI
                         fclose($skt);
                         $errmsg = "Websocket not supported";
                         return YAPI::NOT_SUPPORTED;
-                    } elseif ($code >= '300' && $code <= '302' && isset($meta['Location'])) {
+                    } elseif ($code >= '300' && $code <= '302' && isset($meta['location'])) {
                         fclose($skt);
-                        return self::_forwardHTTPreq($proto, $host, $meta['Location'], $cbdata, $errmsg);
+                        return self::_forwardHTTPreq($proto, $host, $meta['location'], $cbdata, $errmsg);
                     } elseif (substr($code, 0, 2) != '20' || $code[2] == '3') {
                         fclose($skt);
                         $errmsg = "HTTP error" . substr($firstline, strlen($words[0]));
                         return YAPI::NOT_SUPPORTED;
                     }
-                    $chunked = isset($meta['Transfer-Encoding']) && strtolower($meta['Transfer-Encoding']) == 'chunked';
+                    $chunked = isset($meta['transfer-encoding']) && strtolower($meta['transfer-encoding']) == 'chunked';
                 }
             }
             // process body according to encoding

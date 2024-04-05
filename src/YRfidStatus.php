@@ -2,7 +2,8 @@
 namespace Yoctopuce\YoctoAPI;
 
 /**
- * YRfidStatus Class: Detailled information about the result of RFID tag operations
+ * YRfidStatus Class: Detailled information about the result of RFID tag operations, allowing to find
+ * out what happened exactly after a tag operation failure.
  *
  * YRfidStatus objects provide additional information about
  * operations on RFID tags, including the range of blocks affected
@@ -11,6 +12,9 @@ namespace Yoctopuce\YoctoAPI;
  * This makes it possible, for example, to distinguish communication
  * errors that can be recovered by an additional attempt, from
  * security or other errors on the tag.
+ * Combined with the EnableDryRun option in RfidOptions,
+ * this structure can be used to predict which blocks will be affected
+ * by a write operation.
  */
 class YRfidStatus
 {
@@ -120,6 +124,7 @@ class YRfidStatus
     const INVLD_ACCESS_MODE_COMBINATION  = -153;
     const INVALID_SIZE                   = -154;
     const BAD_PASSWORD_FORMAT            = -155;
+    const RADIO_IS_OFF                   = -156;
     //--- (end of generated code: YRfidStatus declaration)
 
     //--- (generated code: YRfidStatus attributes)
@@ -289,10 +294,10 @@ class YRfidStatus
                 $errMsg = 'Block is not available';
             }
             if ($errCode == self::BLOCK_ALREADY_LOCKED) {
-                $errMsg = 'Block is already locked and thus cannot be locked again.';
+                $errMsg = 'Block / byte is already locked and thus cannot be locked again.';
             }
             if ($errCode == self::BLOCK_LOCKED) {
-                $errMsg = 'Block is locked and its content cannot be changed';
+                $errMsg = 'Block / byte is locked and its content cannot be changed';
             }
             if ($errCode == self::BLOCK_NOT_SUCESSFULLY_PROGRAMMED) {
                 $errMsg = 'Block was not successfully programmed';
@@ -548,6 +553,9 @@ class YRfidStatus
             }
             if ($errCode == self::BAD_PASSWORD_FORMAT) {
                 $errMsg = 'Bad password format or type';
+            }
+            if ($errCode == self::RADIO_IS_OFF) {
+                $errMsg = 'Radio is OFF (refreshRate=0).';
             }
             if ($errBlk >= 0) {
                 $errMsg = sprintf('%s (block %d)', $errMsg, $errBlk);

@@ -29,6 +29,7 @@ class YDevice
     protected int $_beacon;
     protected int $_devYdx;
     protected array $_cache;
+    protected float $_cacheExpiration;
     protected array $_functions;
     protected ?YTcpReq $_ongoingReq;
     public int $_lastErrorType;

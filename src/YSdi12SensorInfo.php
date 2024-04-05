@@ -2,17 +2,18 @@
 namespace Yoctopuce\YoctoAPI;
 
 /**
- * YSdi12Sensor Class: Description of a discovered SDI12 sensor, returned by
+ * YSdi12SensorInfo Class: Description of a discovered SDI12 sensor, returned by
  * sdi12Port.discoverSingleSensor and sdi12Port.discoverAllSensors methods
  *
  *
  */
-class YSdi12Sensor
+class YSdi12SensorInfo
 {
-    //--- (end of generated code: YSdi12Sensor declaration)
+    //--- (end of generated code: YSdi12SensorInfo declaration)
 
-    //--- (generated code: YSdi12Sensor attributes)
+    //--- (generated code: YSdi12SensorInfo attributes)
     protected ?YSdi12Port $_sdi12Port = null;                         // YSdi12Port
+    protected bool $_isValid = false;                        // bool
     protected string $_addr = "";                           // str
     protected string $_proto = "";                           // str
     protected string $_mfg = "";                           // str
@@ -21,15 +22,33 @@ class YSdi12Sensor
     protected string $_sn = "";                           // str
     protected array $_valuesDesc = [];                           // strArrArr
 
-    //--- (end of generated code: YSdi12Sensor attributes)
+    //--- (end of generated code: YSdi12SensorInfo attributes)
 
     function __construct(string $str_func)
     {
-        //--- (generated code: YSdi12Sensor constructor)
-        //--- (end of generated code: YSdi12Sensor constructor)
+        //--- (generated code: YSdi12SensorInfo constructor)
+        //--- (end of generated code: YSdi12SensorInfo constructor)
     }
 
-    //--- (generated code: YSdi12Sensor implementation)
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function _throw(YRETCODE $errcode, string $msg, mixed $retVal): mixed
+    {
+        return $this->_sdi12Port->_throw($errcode,$msg,$retVal);
+    }
+
+    //--- (generated code: YSdi12SensorInfo implementation)
+
+    /**
+     * Returns the sensor state.
+     *
+     * @return boolean  the sensor state.
+     */
+    public function isValid(): bool
+    {
+        return $this->_isValid;
+    }
 
     /**
      * Returns the sensor address.
@@ -93,6 +112,8 @@ class YSdi12Sensor
 
     /**
      * Returns the number of sensor measurements.
+     * This function only works if the sensor is in version 1.4 SDI-12
+     * and supports metadata commands.
      *
      * @return int  the number of sensor measurements.
      */
@@ -103,61 +124,86 @@ class YSdi12Sensor
 
     /**
      * Returns the sensor measurement command.
+     * This function only works if the sensor is in version 1.4 SDI-12
+     * and supports metadata commands.
      *
      * @param int $measureIndex : measurement index
      *
      * @return string  the sensor measurement command.
+     *         On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
     public function get_measureCommand(int $measureIndex): string
     {
+        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid measure index','');
         return $this->_valuesDesc[$measureIndex][0];
     }
 
     /**
      * Returns sensor measurement position.
+     * This function only works if the sensor is in version 1.4 SDI-12
+     * and supports metadata commands.
      *
      * @param int $measureIndex : measurement index
      *
      * @return int  the sensor measurement command.
+     *         On failure, throws an exception or returns 0.
+     * @throws YAPI_Exception on error
      */
     public function get_measurePosition(int $measureIndex): int
     {
+        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid measure index',0);
         return intVal($this->_valuesDesc[$measureIndex][2]);
     }
 
     /**
      * Returns the measured value symbol.
+     * This function only works if the sensor is in version 1.4 SDI-12
+     * and supports metadata commands.
      *
      * @param int $measureIndex : measurement index
      *
      * @return string  the sensor measurement command.
+     *         On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
     public function get_measureSymbol(int $measureIndex): string
     {
+        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid measure index','');
         return $this->_valuesDesc[$measureIndex][3];
     }
 
     /**
      * Returns the unit of the measured value.
+     * This function only works if the sensor is in version 1.4 SDI-12
+     * and supports metadata commands.
      *
      * @param int $measureIndex : measurement index
      *
      * @return string  the sensor measurement command.
+     *         On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
     public function get_measureUnit(int $measureIndex): string
     {
+        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid measure index','');
         return $this->_valuesDesc[$measureIndex][4];
     }
 
     /**
      * Returns the description of the measured value.
+     * This function only works if the sensor is in version 1.4 SDI-12
+     * and supports metadata commands.
      *
      * @param int $measureIndex : measurement index
      *
      * @return string  the sensor measurement command.
+     *         On failure, throws an exception or returns an empty string.
+     * @throws YAPI_Exception on error
      */
     public function get_measureDescription(int $measureIndex): string
     {
+        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid measure index','');
         return $this->_valuesDesc[$measureIndex][5];
     }
 
@@ -185,6 +231,7 @@ class YSdi12Sensor
                 $this->_model = $errmsg;
                 $this->_ver = $errmsg;
                 $this->_sn = $errmsg;
+                $this->_isValid = false;
             } else {
                 $this->_addr = substr($infoStr,  0, 1);
                 $this->_proto = substr($infoStr,  1, 2);
@@ -192,6 +239,7 @@ class YSdi12Sensor
                 $this->_model = substr($infoStr,  11, 6);
                 $this->_ver = substr($infoStr,  17, 3);
                 $this->_sn = substr($infoStr,  20, strlen($infoStr)-20);
+                $this->_isValid = true;
             }
         }
     }
@@ -254,7 +302,7 @@ class YSdi12Sensor
         $this->_valuesDesc = $val;
     }
 
-    //--- (end of generated code: YSdi12Sensor implementation)
+    //--- (end of generated code: YSdi12SensorInfo implementation)
 
 //--- (generated code: YSdi12Port return codes)
 //--- (end of generated code: YSdi12Port return codes)

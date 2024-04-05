@@ -541,13 +541,13 @@ class YSerialPort extends YFunction
     /**
      * Retrieves a serial port for a given identifier.
      * The identifier can be specified using several formats:
-     * <ul>
-     * <li>FunctionLogicalName</li>
-     * <li>ModuleSerialNumber.FunctionIdentifier</li>
-     * <li>ModuleSerialNumber.FunctionLogicalName</li>
-     * <li>ModuleLogicalName.FunctionIdentifier</li>
-     * <li>ModuleLogicalName.FunctionLogicalName</li>
-     * </ul>
+     *
+     * - FunctionLogicalName
+     * - ModuleSerialNumber.FunctionIdentifier
+     * - ModuleSerialNumber.FunctionLogicalName
+     * - ModuleLogicalName.FunctionIdentifier
+     * - ModuleLogicalName.FunctionLogicalName
+     *
      *
      * This function does not require that the serial port is online at the time
      * it is invoked. The returned object is nevertheless valid.
@@ -1361,6 +1361,7 @@ class YSerialPort extends YFunction
      *
      * @param int $maxWait : the maximum number of milliseconds to wait for a message if none is found
      *         in the receive buffer.
+     * @param int $maxMsg : the maximum number of messages to be returned by the function; up to 254.
      *
      * @return YSnoopingRecord[]  an array of YSnoopingRecord objects containing the messages found, if any.
      *         Binary messages are converted to hexadecimal representation.
@@ -1368,7 +1369,7 @@ class YSerialPort extends YFunction
      * On failure, throws an exception or returns an empty array.
      * @throws YAPI_Exception on error
      */
-    public function snoopMessages(int $maxWait): array
+    public function snoopMessagesEx(int $maxWait, int $maxMsg): array
     {
         // $url                    is a str;
         // $msgbin                 is a bin;
@@ -1377,7 +1378,7 @@ class YSerialPort extends YFunction
         $res = [];              // YSnoopingRecordArr;
         // $idx                    is a int;
 
-        $url = sprintf('rxmsg.json?pos=%d&maxw=%d&t=0', $this->_rxptr, $maxWait);
+        $url = sprintf('rxmsg.json?pos=%d&maxw=%d&t=0&len=%d', $this->_rxptr, $maxWait, $maxMsg);
         $msgbin = $this->_download($url);
         $msgarr = $this->_json_get_array($msgbin);
         $msglen = sizeof($msgarr);
@@ -1393,6 +1394,28 @@ class YSerialPort extends YFunction
             $idx = $idx + 1;
         }
         return $res;
+    }
+
+    /**
+     * Retrieves messages (both direction) in the serial port buffer, starting at current position.
+     * This function will only compare and return printable characters in the message strings.
+     * Binary protocols are handled as hexadecimal strings.
+     *
+     * If no message is found, the search waits for one up to the specified maximum timeout
+     * (in milliseconds).
+     *
+     * @param int $maxWait : the maximum number of milliseconds to wait for a message if none is found
+     *         in the receive buffer.
+     *
+     * @return YSnoopingRecord[]  an array of YSnoopingRecord objects containing the messages found, if any.
+     *         Binary messages are converted to hexadecimal representation.
+     *
+     * On failure, throws an exception or returns an empty array.
+     * @throws YAPI_Exception on error
+     */
+    public function snoopMessages(int $maxWait): array
+    {
+        return $this->snoopMessagesEx($maxWait, 255);
     }
 
     /**

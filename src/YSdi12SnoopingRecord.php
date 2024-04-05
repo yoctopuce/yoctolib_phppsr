@@ -80,10 +80,10 @@ class YSdi12SnoopingRecord
 
     //--- (end of generated code: YSdi12SnoopingRecord implementation)
 
-//--- (generated code: YSdi12Sensor definitions)
-//--- (end of generated code: YSdi12Sensor definitions)
-    #--- (generated code: YSdi12Sensor yapiwrapper)
+//--- (generated code: YSdi12SensorInfo definitions)
+//--- (end of generated code: YSdi12SensorInfo definitions)
+    #--- (generated code: YSdi12SensorInfo yapiwrapper)
 
-   #--- (end of generated code: YSdi12Sensor yapiwrapper)
+   #--- (end of generated code: YSdi12SensorInfo yapiwrapper)
 
-//--- (generated code: YSdi12Sensor declaration)
+//--- (generated code: YSdi12SensorInfo declaration)

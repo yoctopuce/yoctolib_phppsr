@@ -4,8 +4,21 @@ namespace Yoctopuce\YoctoAPI;
 /**
  * YRfidReader Class: RfidReader function interface
  *
- * The RfidReader class provides access detect,
- * read and write RFID tags.
+ * The YRfidReader class allows you to detect RFID tags, as well as
+ * read and write on these tags if the security settings allow it.
+ *
+ * Short reminder:
+ *
+ * - A tag's memory is generally organized in fixed-size blocks.
+ * - At tag level, each block must be read and written in its entirety.
+ * - Some blocks are special configuration blocks, and may alter the tag's behaviour
+ * tag behavior if they are rewritten with arbitrary data.
+ * - Data blocks can be set to read-only mode, but on many tags, this operation is irreversible.
+ *
+ *
+ * By default, the RfidReader class automatically manages these blocks so that
+ * arbitrary size data  can be manipulated of  without risk and without knowledge of
+ * tag architecture .
  */
 class YRfidReader extends YFunction
 {
@@ -92,7 +105,8 @@ class YRfidReader extends YFunction
      * Changes the present tag list refresh rate, measured in Hz. The reader will do
      * its best to respect it. Note that the reader cannot detect tag arrival or removal
      * while it is  communicating with a tag.  Maximum frequency is limited to 100Hz,
-     * but in real life it will be difficult to do better than 50Hz.
+     * but in real life it will be difficult to do better than 50Hz.  A zero value
+     * will power off the device radio.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
@@ -112,13 +126,13 @@ class YRfidReader extends YFunction
     /**
      * Retrieves a RFID reader for a given identifier.
      * The identifier can be specified using several formats:
-     * <ul>
-     * <li>FunctionLogicalName</li>
-     * <li>ModuleSerialNumber.FunctionIdentifier</li>
-     * <li>ModuleSerialNumber.FunctionLogicalName</li>
-     * <li>ModuleLogicalName.FunctionIdentifier</li>
-     * <li>ModuleLogicalName.FunctionLogicalName</li>
-     * </ul>
+     *
+     * - FunctionLogicalName
+     * - ModuleSerialNumber.FunctionIdentifier
+     * - ModuleSerialNumber.FunctionLogicalName
+     * - ModuleLogicalName.FunctionIdentifier
+     * - ModuleLogicalName.FunctionLogicalName
+     *
      *
      * This function does not require that the RFID reader is online at the time
      * it is invoked. The returned object is nevertheless valid.
@@ -199,7 +213,7 @@ class YRfidReader extends YFunction
     /**
      * Returns the list of RFID tags currently detected by the reader.
      *
-     * @return string[]  a list of strings, corresponding to each tag identifier.
+     * @return string[]  a list of strings, corresponding to each tag identifier (UID).
      *
      * On failure, throws an exception or returns an empty list.
      * @throws YAPI_Exception on error
@@ -401,7 +415,8 @@ class YRfidReader extends YFunction
      * number of bytes is larger than the RFID tag block size. By default
      * firstBlock cannot be a special block, and any special block encountered
      * in the middle of the read operation will be skipped automatically.
-     * If you rather want to read special blocks, use EnableRawAccess option.
+     * If you rather want to read special blocks, use the EnableRawAccess
+     * field from the options parameter.
      *
      * @param string $tagId : identifier of the tag to use
      * @param int $firstBlock : block number where read should start
@@ -443,7 +458,8 @@ class YRfidReader extends YFunction
      * is larger than the RFID tag block size.  By default
      * firstBlock cannot be a special block, and any special block encountered
      * in the middle of the read operation will be skipped automatically.
-     * If you rather want to read special blocks, use EnableRawAccess option.
+     * If you rather want to read special blocks, use the EnableRawAccess
+     * field frrm the options parameter.
      *
      * @param string $tagId : identifier of the tag to use
      * @param int $firstBlock : block number where read should start
@@ -471,7 +487,8 @@ class YRfidReader extends YFunction
      * is larger than the RFID tag block size.  By default
      * firstBlock cannot be a special block, and any special block encountered
      * in the middle of the read operation will be skipped automatically.
-     * If you rather want to read special blocks, use EnableRawAccess option.
+     * If you rather want to read special blocks, use the EnableRawAccess
+     * field from the options parameter.
      *
      * @param string $tagId : identifier of the tag to use
      * @param int $firstBlock : block number where read should start
@@ -510,7 +527,8 @@ class YRfidReader extends YFunction
      * is larger than the RFID tag block size.  By default
      * firstBlock cannot be a special block, and any special block encountered
      * in the middle of the read operation will be skipped automatically.
-     * If you rather want to read special blocks, use EnableRawAccess option.
+     * If you rather want to read special blocks, use the EnableRawAccess
+     * field from the options parameter.
      *
      * @param string $tagId : identifier of the tag to use
      * @param int $firstBlock : block number where read should start
@@ -538,8 +556,10 @@ class YRfidReader extends YFunction
      * number of bytes to write is larger than the RFID tag block size.
      * By default firstBlock cannot be a special block, and any special block
      * encountered in the middle of the write operation will be skipped
-     * automatically. If you rather want to rewrite special blocks as well,
-     * use EnableRawAccess option.
+     * automatically. The last data block affected by the operation will
+     * be automatically padded with zeros if neccessary.  If you rather want
+     * to rewrite special blocks as well,
+     * use the EnableRawAccess field from the options parameter.
      *
      * @param string $tagId : identifier of the tag to use
      * @param int $firstBlock : block number where write should start
@@ -583,8 +603,10 @@ class YRfidReader extends YFunction
      * number of bytes to write is larger than the RFID tag block size.
      * By default firstBlock cannot be a special block, and any special block
      * encountered in the middle of the write operation will be skipped
-     * automatically. If you rather want to rewrite special blocks as well,
-     * use EnableRawAccess option.
+     * automatically. The last data block affected by the operation will
+     * be automatically padded with zeros if neccessary.
+     * If you rather want to rewrite special blocks as well,
+     * use the EnableRawAccess field from the options parameter.
      *
      * @param string $tagId : identifier of the tag to use
      * @param int $firstBlock : block number where write should start
@@ -625,8 +647,10 @@ class YRfidReader extends YFunction
      * number of bytes to write is larger than the RFID tag block size.
      * By default firstBlock cannot be a special block, and any special block
      * encountered in the middle of the write operation will be skipped
-     * automatically. If you rather want to rewrite special blocks as well,
-     * use EnableRawAccess option.
+     * automatically. The last data block affected by the operation will
+     * be automatically padded with zeros if neccessary.
+     * If you rather want to rewrite special blocks as well,
+     * use the EnableRawAccess field from the options parameter.
      *
      * @param string $tagId : identifier of the tag to use
      * @param int $firstBlock : block number where write should start
@@ -677,10 +701,16 @@ class YRfidReader extends YFunction
      * Writes data provided as an ASCII string to an RFID tag memory.
      * The write operation may span accross multiple blocks if the
      * number of bytes to write is larger than the RFID tag block size.
+     * Note that only the characters présent  in  the provided string
+     * will be written, there is no notion of string length. If your
+     * string data have variable length, you'll have to encode the
+     * string length yourself.
      * By default firstBlock cannot be a special block, and any special block
      * encountered in the middle of the write operation will be skipped
-     * automatically. If you rather want to rewrite special blocks as well,
-     * use EnableRawAccess option.
+     * automatically. The last data block affected by the operation will
+     * be automatically padded with zeros if neccessary.
+     * If you rather want to rewrite special blocks as well,
+     * use the EnableRawAccess field from the options parameter.
      *
      * @param string $tagId : identifier of the tag to use
      * @param int $firstBlock : block number where write should start
@@ -703,6 +733,192 @@ class YRfidReader extends YFunction
         $buff = $text;
 
         return $this->tagWriteBin($tagId, $firstBlock, $buff, $options, $status);
+    }
+
+    /**
+     * Reads an RFID tag AFI byte (ISO 15693 only).
+     *
+     * @param string $tagId : identifier of the tag to use
+     * @param YRfidOptions $options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param YRfidStatus $status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return int  the AFI value (0...255)
+     *
+     * On failure, throws an exception or returns a negative error code. When it
+     * happens, you can get more information from the status object.
+     * @throws YAPI_Exception on error
+     */
+    public function tagGetAFI(string $tagId, YRfidOptions $options, YRfidStatus &$status): int
+    {
+        // $optstr                 is a str;
+        // $url                    is a str;
+        // $json                   is a bin;
+        // $res                    is a int;
+        $optstr = $options->imm_getParams();
+        $url = sprintf('rfid.json?a=rdsf&t=%s&b=0%s',$tagId,$optstr);
+
+        $json = $this->_download($url);
+        $this->_chkerror($tagId, $json, $status);
+        if ($status->get_yapiError() == YAPI::SUCCESS) {
+            $res = intVal($this->_json_get_key($json, 'res'));
+        } else {
+            $res = $status->get_yapiError();
+        }
+        return $res;
+    }
+
+    /**
+     * Change an RFID tag AFI byte (ISO 15693 only).
+     *
+     * @param string $tagId : identifier of the tag to use
+     * @param int $afi : the AFI value to write (0...255)
+     * @param YRfidOptions $options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param YRfidStatus $status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code. When it
+     * happens, you can get more information from the status object.
+     * @throws YAPI_Exception on error
+     */
+    public function tagSetAFI(string $tagId, int $afi, YRfidOptions $options, YRfidStatus &$status): int
+    {
+        // $optstr                 is a str;
+        // $url                    is a str;
+        // $json                   is a bin;
+        $optstr = $options->imm_getParams();
+        $url = sprintf('rfid.json?a=wrsf&t=%s&b=0&v=%d%s',$tagId,$afi,$optstr);
+
+        $json = $this->_download($url);
+        return $this->_chkerror($tagId, $json, $status);
+    }
+
+    /**
+     * Locks the RFID tag AFI byte (ISO 15693 only).
+     * This operation is definitive and irreversible.
+     *
+     * @param string $tagId : identifier of the tag to use
+     * @param YRfidOptions $options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param YRfidStatus $status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code. When it
+     * happens, you can get more information from the status object.
+     * @throws YAPI_Exception on error
+     */
+    public function tagLockAFI(string $tagId, YRfidOptions $options, YRfidStatus &$status): int
+    {
+        // $optstr                 is a str;
+        // $url                    is a str;
+        // $json                   is a bin;
+        $optstr = $options->imm_getParams();
+        $url = sprintf('rfid.json?a=lksf&t=%s&b=0%s',$tagId,$optstr);
+
+        $json = $this->_download($url);
+        return $this->_chkerror($tagId, $json, $status);
+    }
+
+    /**
+     * Reads an RFID tag DSFID byte (ISO 15693 only).
+     *
+     * @param string $tagId : identifier of the tag to use
+     * @param YRfidOptions $options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param YRfidStatus $status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return int  the DSFID value (0...255)
+     *
+     * On failure, throws an exception or returns a negative error code. When it
+     * happens, you can get more information from the status object.
+     * @throws YAPI_Exception on error
+     */
+    public function tagGetDSFID(string $tagId, YRfidOptions $options, YRfidStatus &$status): int
+    {
+        // $optstr                 is a str;
+        // $url                    is a str;
+        // $json                   is a bin;
+        // $res                    is a int;
+        $optstr = $options->imm_getParams();
+        $url = sprintf('rfid.json?a=rdsf&t=%s&b=1%s',$tagId,$optstr);
+
+        $json = $this->_download($url);
+        $this->_chkerror($tagId, $json, $status);
+        if ($status->get_yapiError() == YAPI::SUCCESS) {
+            $res = intVal($this->_json_get_key($json, 'res'));
+        } else {
+            $res = $status->get_yapiError();
+        }
+        return $res;
+    }
+
+    /**
+     * Change an RFID tag DSFID byte (ISO 15693 only).
+     *
+     * @param string $tagId : identifier of the tag to use
+     * @param int $dsfid : the DSFID value to write (0...255)
+     * @param YRfidOptions $options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param YRfidStatus $status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code. When it
+     * happens, you can get more information from the status object.
+     * @throws YAPI_Exception on error
+     */
+    public function tagSetDSFID(string $tagId, int $dsfid, YRfidOptions $options, YRfidStatus &$status): int
+    {
+        // $optstr                 is a str;
+        // $url                    is a str;
+        // $json                   is a bin;
+        $optstr = $options->imm_getParams();
+        $url = sprintf('rfid.json?a=wrsf&t=%s&b=1&v=%d%s',$tagId,$dsfid,$optstr);
+
+        $json = $this->_download($url);
+        return $this->_chkerror($tagId, $json, $status);
+    }
+
+    /**
+     * Locks the RFID tag DSFID byte (ISO 15693 only).
+     * This operation is definitive and irreversible.
+     *
+     * @param string $tagId : identifier of the tag to use
+     * @param YRfidOptions $options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param YRfidStatus $status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code. When it
+     * happens, you can get more information from the status object.
+     * @throws YAPI_Exception on error
+     */
+    public function tagLockDSFID(string $tagId, YRfidOptions $options, YRfidStatus &$status): int
+    {
+        // $optstr                 is a str;
+        // $url                    is a str;
+        // $json                   is a bin;
+        $optstr = $options->imm_getParams();
+        $url = sprintf('rfid.json?a=lksf&t=%s&b=1%s',$tagId,$optstr);
+
+        $json = $this->_download($url);
+        return $this->_chkerror($tagId, $json, $status);
     }
 
     /**

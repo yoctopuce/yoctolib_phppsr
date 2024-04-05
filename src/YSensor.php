@@ -468,11 +468,11 @@ class YSensor extends YFunction
     }
 
     /**
-     * Returns the sensor health state code, which is zero when there is an up-to-date measure
+     * Returns the sensor state code, which is zero when there is an up-to-date measure
      * available or a positive code if the sensor is not able to provide a measure right now.
      *
-     * @return int  an integer corresponding to the sensor health state code, which is zero when there is
-     * an up-to-date measure
+     * @return int  an integer corresponding to the sensor state code, which is zero when there is an
+     * up-to-date measure
      *         available or a positive code if the sensor is not able to provide a measure right now
      *
      * On failure, throws an exception or returns YSensor.SENSORSTATE_INVALID.
@@ -493,13 +493,13 @@ class YSensor extends YFunction
     /**
      * Retrieves a sensor for a given identifier.
      * The identifier can be specified using several formats:
-     * <ul>
-     * <li>FunctionLogicalName</li>
-     * <li>ModuleSerialNumber.FunctionIdentifier</li>
-     * <li>ModuleSerialNumber.FunctionLogicalName</li>
-     * <li>ModuleLogicalName.FunctionIdentifier</li>
-     * <li>ModuleLogicalName.FunctionLogicalName</li>
-     * </ul>
+     *
+     * - FunctionLogicalName
+     * - ModuleSerialNumber.FunctionIdentifier
+     * - ModuleSerialNumber.FunctionLogicalName
+     * - ModuleLogicalName.FunctionIdentifier
+     * - ModuleLogicalName.FunctionLogicalName
+     *
      *
      * This function does not require that the sensor is online at the time
      * it is invoked. The returned object is nevertheless valid.

@@ -8,7 +8,7 @@ namespace Yoctopuce\YoctoAPI;
  * sensors. Recording can happen automatically, without requiring a permanent
  * connection to a computer.
  * The YDataLogger class controls the global parameters of the internal data
- * logger. Recording control (start/stop) as well as data retreival is done at
+ * logger. Recording control (start/stop) as well as data retrieval is done at
  * sensor objects level.
  */
 class YDataLogger extends YFunction
@@ -339,13 +339,13 @@ class YDataLogger extends YFunction
     /**
      * Retrieves a data logger for a given identifier.
      * The identifier can be specified using several formats:
-     * <ul>
-     * <li>FunctionLogicalName</li>
-     * <li>ModuleSerialNumber.FunctionIdentifier</li>
-     * <li>ModuleSerialNumber.FunctionLogicalName</li>
-     * <li>ModuleLogicalName.FunctionIdentifier</li>
-     * <li>ModuleLogicalName.FunctionLogicalName</li>
-     * </ul>
+     *
+     * - FunctionLogicalName
+     * - ModuleSerialNumber.FunctionIdentifier
+     * - ModuleSerialNumber.FunctionLogicalName
+     * - ModuleLogicalName.FunctionIdentifier
+     * - ModuleLogicalName.FunctionLogicalName
+     *
      *
      * This function does not require that the data logger is online at the time
      * it is invoked. The returned object is nevertheless valid.
