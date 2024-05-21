@@ -360,7 +360,7 @@ class YDataStream
      */
     public function get_startTimeUTC(): float
     {
-        return round($this->_startTime);
+        return intval(round($this->_startTime));
     }
 
     /**
@@ -387,7 +387,7 @@ class YDataStream
      */
     public function get_dataSamplesIntervalMs(): int
     {
-        return round($this->_dataSamplesInterval*1000);
+        return intval(round($this->_dataSamplesInterval*1000));
     }
 
     /**

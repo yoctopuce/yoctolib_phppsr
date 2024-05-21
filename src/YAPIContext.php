@@ -30,6 +30,53 @@ class YAPIContext
     {
         return "error: Not supported in PHP";
     }
+
+
+    /**
+     * Download the TLS/SSL certificate from the hub. This function allows to download a TLS/SSL certificate to add it
+     * to the list of trusted certificates using the AddTrustedCertificates method.
+     *
+     * @param string $url : the root URL of the VirtualHub V2 or HTTP server.
+     * @param float $mstimeout : the number of milliseconds available to download the certificate.
+     *
+     * @return string  a string containing the certificate. In case of error, returns a string starting with "error:".
+     */
+    private function DownloadHostCertificate_internal(string $url, float $mstimeout): string
+    {
+        $contextOptions = array(
+            'ssl' => array(
+                'verify_peer' => false,
+                'allow_self_signed' => true,
+                'verify_peer_name' => false,
+                'capture_peer_cert_chain' => true
+            )
+        );
+        $url = str_replace('http://', 'tls://', $url);
+        $url = str_replace('https://', 'tls://', $url);
+        if (strpos($url, 'tls://') !== 0) {
+            $url = 'tls://' . $url;
+        }
+
+        $sslContext = @stream_context_create($contextOptions);
+        $resource = @stream_socket_client($url, $errno, $errstr, 10, STREAM_CLIENT_CONNECT, $sslContext);
+        if ($resource) {
+            $params = stream_context_get_params($resource);
+            $ca = "";
+            foreach ($params["options"]["ssl"]["peer_certificate_chain"] as $cert) {
+                openssl_x509_export($cert, $output);
+                $ca .= $output;
+            }
+            return $ca;
+        }
+        return "";
+    }
+
+    private function AddTrustedCertificates_internal(string $certificate): string
+    {
+        return "error:AddTrustedCertificates is not supported in PHP";
+    }
+
+
     //--- (generated code: YAPIContext implementation)
 
     /**
@@ -84,6 +131,80 @@ class YAPIContext
 
     //cannot be generated for PHP:
     //private function AddUdevRule_internal(bool $force)
+
+    /**
+     * Download the TLS/SSL certificate from the hub. This function allows to download a TLS/SSL certificate to add it
+     * to the list of trusted certificates using the AddTrustedCertificates method.
+     *
+     * @param string $url : the root URL of the VirtualHub V2 or HTTP server.
+     * @param float $mstimeout : the number of milliseconds available to download the certificate.
+     *
+     * @return string  a string containing the certificate. In case of error, returns a string starting with "error:".
+     */
+    public function DownloadHostCertificate(string $url, float $mstimeout): string
+    {
+        return $this->DownloadHostCertificate_internal($url, $mstimeout);
+    }
+
+    //cannot be generated for PHP:
+    //private function DownloadHostCertificate_internal(string $url, float $mstimeout)
+
+    /**
+     * Adds a TLS/SSL certificate to the list of trusted certificates. By default, the library
+     * library will reject TLS/SSL connections to servers whose certificate is not known. This function
+     * function allows to add a list of known certificates. It is also possible to disable the verification
+     * using the SetNetworkSecurityOptions method.
+     *
+     * @param string $certificate : a string containing one or more certificates.
+     *
+     * @return string  an empty string if the certificate has been added correctly.
+     *         In case of error, returns a string starting with "error:".
+     */
+    public function AddTrustedCertificates(string $certificate): string
+    {
+        return $this->AddTrustedCertificates_internal($certificate);
+    }
+
+    //cannot be generated for PHP:
+    //private function AddTrustedCertificates_internal(string $certificate)
+
+    /**
+     * Set the path of Certificate Authority file on local filesystem. This method takes as a parameter
+     * the path of a file containing all certificates in PEM format.
+     * For technical reasons, only one file can be specified. So if you need to connect to several Hubs
+     * instances with self-signed certificates, you'll need to use
+     * a single file containing all the certificates end-to-end. Passing a empty string will restore the
+     * default settings. This option is only supported by PHP library.
+     *
+     * @param string $certificatePath : the path of the file containing all certificates in PEM format.
+     *
+     * @return string  an empty string if the certificate has been added correctly.
+     *         In case of error, returns a string starting with "error:".
+     */
+    public function SetTrustedCertificatesList(string $certificatePath): string
+    {
+        return $this->SetTrustedCertificatesList_internal($certificatePath);
+    }
+
+    //cannot be generated for PHP:
+    //private function SetTrustedCertificatesList_internal(string $certificatePath)
+
+    /**
+     * Enables or disables certain TLS/SSL certificate checks.
+     *
+     * @param int $opts : The options are YAPI::NO_TRUSTED_CA_CHECK,
+     *         YAPI::NO_EXPIRATION_CHECK, YAPI::NO_HOSTNAME_CHECK.
+     *
+     * @return string  an empty string if the options are taken into account.
+     *         On error, returns a string beginning with "error:".
+     */
+    public function SetNetworkSecurityOptions(int $opts): string
+    {
+        return $this->SetNetworkSecurityOptions_internal($opts);
+    }
+
+    //cannot be generated for PHP:
+    //private function SetNetworkSecurityOptions_internal(int $opts)
 
     /**
      * Modifies the network connection delay for yRegisterHub() and yUpdateDeviceList().
@@ -208,7 +329,7 @@ class YAPIContext
         $this->_deviceListValidityMs = $deviceListValidity * 1000;
     }
 
-    public function GetDeviceListValidity_internal(): float
+    public function GetDeviceListValidity_internal(): int
     {
         return intval($this->_deviceListValidityMs / 1000);
     }
@@ -216,15 +337,23 @@ class YAPIContext
 
     public function SetNetworkTimeout_internal(float $networkMsTimeout): void
     {
-        $this->_networkTimeoutMs = $networkMsTimeout;
+        $this->_networkTimeoutMs = (int)$networkMsTimeout;
     }
-    public function SetTrustedCertificatesList(string $certificatePath):void
+
+    public function SetTrustedCertificatesList_internal(string $certificatePath): string
     {
-        $this->_sslCertPath = $certificatePath;
+        if ($certificatePath == '' || file_exists($certificatePath)) {
+            $this->_sslCertPath = $certificatePath;
+            return "";
+        } else {
+            return "error: Invalid path";
+        }
     }
-    public function SetNetworkSecurityOptions(int $options):void
+
+    private function SetNetworkSecurityOptions_internal(int $options): string
     {
         $this->_sslCertOptions = $options;
+        return "";
     }
 
     public function GetNetworkTimeout_internal(): int

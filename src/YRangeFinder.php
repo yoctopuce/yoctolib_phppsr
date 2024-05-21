@@ -373,9 +373,9 @@ class YRangeFinder extends YSensor
     {
         // $distmm                 is a int;
         if ($this->get_unit() == '"') {
-            $distmm = round($targetDist * 25.4);
+            $distmm = intval(round($targetDist * 25.4));
         } else {
-            $distmm = round($targetDist);
+            $distmm = intval(round($targetDist));
         }
         return $this->set_command(sprintf('O%d',$distmm));
     }
@@ -397,9 +397,9 @@ class YRangeFinder extends YSensor
     {
         // $distmm                 is a int;
         if ($this->get_unit() == '"') {
-            $distmm = round($targetDist * 25.4);
+            $distmm = intval(round($targetDist * 25.4));
         } else {
-            $distmm = round($targetDist);
+            $distmm = intval(round($targetDist));
         }
         return $this->set_command(sprintf('X%d',$distmm));
     }

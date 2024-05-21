@@ -43,7 +43,7 @@ class YFirmwareUpdate
         return $this->_progress;
     }
 
-    private static function CheckFirmware_internal(string $serial, string $path, string $minrelease): string
+    private static function CheckFirmware_internal(string $serial, string $path, int $minrelease): string
     {
         if ($path == "http://www.yoctopuce.com" || $path == "http://www.yoctopuce.com" || $path == "www.yoctopuce.com") {
             $yoctopuce_infos = file_get_contents('https://www.yoctopuce.com/FR/common/getLastFirmwareLink.php?serial=' . $serial);
@@ -55,8 +55,8 @@ class YFirmwareUpdate
                 return 'error: Invalid JSON response from www.yoctopuce.com';
             }
             $link = $jsonData['link'];
-            $version = $jsonData['version'];
-            if ($minrelease != "") {
+            $version = intVal($jsonData['version']);
+            if ($minrelease > 0) {
                 if ($version > $minrelease) {
                     return $link;
                 }

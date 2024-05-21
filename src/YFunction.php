@@ -616,13 +616,13 @@ class YFunction
      */
     public function _escapeAttr(string $str_val): string
     {
-        $safecodes = [ '%21', '%23', '%24', '%27', '%28', '%29', '%2A', '%2C', '%2F', '%3A', '%3B', '%40', '%3F', '%5B', '%5D' ];
-        $safechars = [ '!', "#", "$", "'", "(", ")", '*', ",", "/", ":", ";", "@", "?", "[", "]" ];
+        $safecodes = ['%21', '%23', '%24', '%27', '%28', '%29', '%2A', '%2C', '%2F', '%3A', '%3B', '%40', '%3F', '%5B', '%5D'];
+        $safechars = ['!', "#", "$", "'", "(", ")", '*', ",", "/", ":", ";", "@", "?", "[", "]"];
         $isAscii = !preg_match('~[\x7f-\xff]~', $str_val);
-        if(!$isAscii) {
+        if (!$isAscii) {
             // check if string is made of utf-8 characters that can be converted to iso-8859-1
             $isUtf8 = preg_match('~^([\x00-\x7f]|[\xC2-\xC3][\x80-\xBF])+$~', $str_val);
-            if($isUtf8) {
+            if ($isUtf8) {
                 $str_val = iconv("UTF-8", "ISO-8859-1", $str_val);
             }
         }

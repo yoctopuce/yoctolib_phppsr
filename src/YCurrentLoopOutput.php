@@ -238,7 +238,7 @@ class YCurrentLoopOutput extends YFunction
         if ($mA_target > 21.0) {
             $mA_target = 21.0;
         }
-        $newval = sprintf('%d:%d', round($mA_target*65536), $ms_duration);
+        $newval = sprintf('%d:%d', intval(round($mA_target*65536)), $ms_duration);
 
         return $this->set_currentTransition($newval);
     }

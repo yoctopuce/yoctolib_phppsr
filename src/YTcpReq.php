@@ -115,6 +115,7 @@ class YTcpReq
         return $dechunk;
     }
 
+
     function newsocket(int &$errno, string &$errstr, int $mstimeout): mixed
     {
         // for now, use client socket only since server sockets
@@ -124,20 +125,12 @@ class YTcpReq
         if ($pos !== false) {
             $addr = substr($addr, 0, $pos);
         }
-        if (substr($addr,0,6) == 'tls://') {
-            $ssl_options = [];
-            if (YAPI::$_yapiContext->_sslCertOptions & YAPI::NO_TRUSTED_CA_CHECK) {
-                $ssl_options['verify_peer'] = false;
-            }
-            if (YAPI::$_yapiContext->_sslCertOptions & YAPI::NO_HOSTNAME_CHECK) {
-                $ssl_options['verify_peer_name'] = false;
-            }
-            if (YAPI::$_yapiContext->_sslCertPath  !='') {
-                $ssl_options['cafile'] = YAPI::$_yapiContext->_sslCertPath;
-            }
-            $sslContext = stream_context_create(['ssl' => $ssl_options]);
-            $resource = @stream_socket_client($addr, $errno, $errstr, $mstimeout / 1000,STREAM_CLIENT_CONNECT,$sslContext);
-        } else{
+        if (substr($addr, 0, 6) == 'tls://') {
+            $sslContext = $this->hub->get_stream_context();
+            stream_context_set_params($sslContext, array("notification" => "stream_notification_callback"));
+
+            $resource = @stream_socket_client($addr, $errno, $errstr, $mstimeout / 1000, STREAM_CLIENT_CONNECT, $sslContext);
+        } else {
             $resource = @stream_socket_client($addr, $errno, $errstr, $mstimeout / 1000);
 
         }
@@ -231,21 +224,29 @@ class YTcpReq
                         $this->reply = substr($this->meta, $eoh + 4);
                         $this->meta = substr($this->meta, 0, $eoh + 4);
                         $firstline = substr($this->meta, 0, strpos($this->meta, "\r"));
-                        if (substr($firstline, 0, 12) == 'HTTP/1.1 401') {
-                            // authentication required
-                            $this->errorType = YAPI::UNAUTHORIZED;
-                            $this->errorMsg = "Authentication required";
-                            fclose($this->skt);
-                            $this->skt = null;
-                            $this->hub->parseWWWAuthenticate($this->meta);
-                            if ($this->hub->user != '') {
-                                $this->meta = '';
-                                $this->reply = '';
-                                $this->retryCount++;
-                            } else {
+                        $parts = explode(" ", $firstline);
+                        if (count($parts) >= 2 && $parts[0] == 'HTTP/1.1') {
+                            if ($parts[1] == '401') {
+                                // authentication required
+                                $this->errorType = YAPI::UNAUTHORIZED;
+                                $this->errorMsg = "Authentication required";
+                                fclose($this->skt);
+                                $this->skt = null;
+                                $this->hub->parseWWWAuthenticate($this->meta);
+                                if ($this->hub->user != '') {
+                                    $this->meta = '';
+                                    $this->reply = '';
+                                    $this->retryCount++;
+                                } else {
+                                    $this->retryCount = 99;
+                                }
+                                return YAPI::SUCCESS; // will propagate error later if needed
+                            } elseif ($parts[1] != '200' && $parts[1] != '304') {
+                                $this->errorType = YAPI::IO_ERROR;
+                                $this->errorMsg = "Unexpected HTTP return code ({$parts[1]})";
                                 $this->retryCount = 99;
+                                return YAPI::SUCCESS; // will retry later
                             }
-                            return YAPI::SUCCESS; // will propagate error later if needed
                         }
                     }
                 } else {

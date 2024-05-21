@@ -683,7 +683,7 @@ class YStepperMotor extends YFunction
      */
     public function findHomePosition(float $speed): int
     {
-        return $this->sendCommand(sprintf('H%d',round(1000*$speed)));
+        return $this->sendCommand(sprintf('H%d',intval(round(1000*$speed))));
     }
 
     /**
@@ -699,7 +699,7 @@ class YStepperMotor extends YFunction
      */
     public function changeSpeed(float $speed): int
     {
-        return $this->sendCommand(sprintf('R%d',round(1000*$speed)));
+        return $this->sendCommand(sprintf('R%d',intval(round(1000*$speed))));
     }
 
     /**
@@ -715,7 +715,7 @@ class YStepperMotor extends YFunction
      */
     public function moveTo(float $absPos): int
     {
-        return $this->sendCommand(sprintf('M%d',round(16*$absPos)));
+        return $this->sendCommand(sprintf('M%d',intval(round(16*$absPos))));
     }
 
     /**
@@ -731,7 +731,7 @@ class YStepperMotor extends YFunction
      */
     public function moveRel(float $relPos): int
     {
-        return $this->sendCommand(sprintf('m%d',round(16*$relPos)));
+        return $this->sendCommand(sprintf('m%d',intval(round(16*$relPos))));
     }
 
     /**
@@ -748,7 +748,7 @@ class YStepperMotor extends YFunction
      */
     public function moveRelSlow(float $relPos, float $maxSpeed): int
     {
-        return $this->sendCommand(sprintf('m%d@%d',round(16*$relPos),round(1000*$maxSpeed)));
+        return $this->sendCommand(sprintf('m%d@%d',intval(round(16*$relPos)),intval(round(1000*$maxSpeed))));
     }
 
     /**

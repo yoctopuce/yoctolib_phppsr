@@ -519,7 +519,7 @@ class YMultiCellWeighScale extends YSensor
      */
     public function setupSpan(float $currWeight, float $maxWeight): int
     {
-        return $this->set_command(sprintf('S%d:%d', round(1000*$currWeight), round(1000*$maxWeight)));
+        return $this->set_command(sprintf('S%d:%d', intval(round(1000*$currWeight)), intval(round(1000*$maxWeight))));
     }
 
     /**

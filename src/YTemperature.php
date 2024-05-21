@@ -347,7 +347,7 @@ class YTemperature extends YSensor
                 $idx = $idx + 1;
             }
             if ($found > 0) {
-                $res = $this->set_command(sprintf('m%d:%d', round(1000*$curr), round(1000*$currTemp)));
+                $res = $this->set_command(sprintf('m%d:%d', intval(round(1000*$curr)), intval(round(1000*$currTemp))));
                 if (!($res==YAPI::SUCCESS)) return $this->_throw( YAPI::IO_ERROR, 'unable to reset thermistor parameters',YAPI::IO_ERROR);
                 $prev = $curr;
             }

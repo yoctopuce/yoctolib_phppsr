@@ -1352,14 +1352,14 @@ class YModule extends YFunction
                     $calibData[$i] = ($calibData[$i] - $paramOffset) / $paramScale;
                 } else {
                     // floating-point decoding
-                    $calibData[$i] = YAPI::_decimalToDouble(round($calibData[$i]));
+                    $calibData[$i] = YAPI::_decimalToDouble(intval(round($calibData[$i])));
                 }
                 $i = $i + 1;
             }
         } else {
             // Handle latest 32bit parameter format
             $iCalib = YAPI::_decodeFloats($param);
-            $calibType = round($iCalib[0] / 1000.0);
+            $calibType = intval(round($iCalib[0] / 1000.0));
             if ($calibType >= 30) {
                 $calibType = $calibType - 30;
             }
@@ -1382,7 +1382,7 @@ class YModule extends YFunction
                     } else {
                         $param = $param . ' ';
                     }
-                    $param = $param . round($calibData[$i] * 1000.0 / 1000.0);
+                    $param = $param . intval(round($calibData[$i] * 1000.0 / 1000.0));
                     $i = $i + 1;
                 }
                 $param = $param . ',';
@@ -1395,7 +1395,7 @@ class YModule extends YFunction
                 $i = 0;
                 while ($i < 2 * $nPoints) {
                     if ($funScale == 0) {
-                        $wordVal = YAPI::_doubleToDecimal(round($calibData[$i]));
+                        $wordVal = YAPI::_doubleToDecimal(intval(round($calibData[$i])));
                     } else {
                         $wordVal = $calibData[$i] * $funScale + $funOffset;
                     }

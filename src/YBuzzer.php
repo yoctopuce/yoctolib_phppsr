@@ -446,7 +446,7 @@ class YBuzzer extends YFunction
                 } else {
                     $prevDuration = $num;
                 }
-                $ms = round(320000.0 / ($tempo * $num));
+                $ms = intval(round(320000.0 / ($tempo * $num)));
                 if ($typ == 0) {
                     $this->addPulseToPlaySeq(0, $ms);
                 } else {
@@ -458,7 +458,7 @@ class YBuzzer extends YFunction
                         $dNote = $dNote + 12;
                     }
                     $pitch = $prevPitch + $dNote;
-                    $freq = round(440 * exp($pitch * 0.05776226504666));
+                    $freq = intval(round(440 * exp($pitch * 0.05776226504666)));
                     $ms16 = (($ms) >> (4));
                     $rest = 0;
                     if ($typ == 3) {

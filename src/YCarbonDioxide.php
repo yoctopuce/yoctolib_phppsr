@@ -165,7 +165,7 @@ class YCarbonDioxide extends YSensor
      */
     public function triggerForcedCalibration(float $refVal): int
     {
-        return $this->set_command(sprintf('F%dC', round(1000*$refVal)));
+        return $this->set_command(sprintf('F%dC', intval(round(1000*$refVal))));
     }
 
     /**

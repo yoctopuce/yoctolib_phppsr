@@ -479,7 +479,7 @@ class YPowerSupply extends YFunction
         if ($V_target < 0.0) {
             $V_target  = 0.0;
         }
-        $newval = sprintf('%d:%d', round($V_target*65536), $ms_duration);
+        $newval = sprintf('%d:%d', intval(round($V_target*65536)), $ms_duration);
 
         return $this->set_voltageTransition($newval);
     }

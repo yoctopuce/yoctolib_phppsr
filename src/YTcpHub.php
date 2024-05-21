@@ -11,11 +11,12 @@ namespace Yoctopuce\YoctoAPI;
 class YTcpHub
 {
     // attributes
-    public string $rooturl;                    // root url of the hub (without auth parameters)
+    private string $rooturl;                    // root url of the hub (without auth parameters)
     public string $streamaddr;                 // stream address of the hub ("tcp://addr:port")
     public array $url_info;                   // $url parsed
     public string $notifurl;                   // notification file used by this hub
     public bool $use_pure_http;              // boolean that is true if the hub is VirtualHub-4web
+    public bool $has_unsecure_open_port;     // boolean that is true if the hub has non https port open (mixed mode)
     public ?YTcpReq $notifReq;                   // notification request, or null if not open
     public int $notifPos;                   // absolute position in notification stream
     public bool $isNotifWorking;            // boolean that is true when we receive ping notification
@@ -35,7 +36,7 @@ class YTcpHub
     protected string $nonce;                   // lasPrint(t received nonce
     protected string $opaque;                  // last received opaque
     protected string $ha1;                     // our authentication ha1 string
-    protected string $nc;                      // nounce usage count
+    protected int $nc;                         // nounce usage count
     protected string $serial;                  // the serial number of the hub
     private int $networkTimeout;
     private array $knownUrls = [];
@@ -69,6 +70,7 @@ class YTcpHub
         $this->retryExpires = 0;
         $this->writeProtected = false;
         $this->use_pure_http = false;
+        $this->has_unsecure_open_port = false;
         $this->reuseskt = null;
         $this->notifReq = null;
         $this->realm = '';
@@ -119,8 +121,6 @@ class YTcpHub
         }
         return ['whitePages' => $wp, 'yellowPages' => $yp];
     }
-
-
     static function decodeJZON(array $jzon, array $ref): mixed
     {
         $decoded = self::decodeJZONReq($jzon, $ref);
@@ -151,6 +151,23 @@ class YTcpHub
         return $res;
     }
 
+
+    function get_stream_context()
+    {
+        $ssl_options = [];
+        if (YAPI::$_yapiContext->_sslCertOptions & YAPI::NO_TRUSTED_CA_CHECK || $this->has_unsecure_open_port) {
+            $ssl_options['verify_peer'] = false;
+        }
+        if (YAPI::$_yapiContext->_sslCertOptions & YAPI::NO_HOSTNAME_CHECK || $this->has_unsecure_open_port) {
+            $ssl_options['verify_peer_name'] = false;
+        }
+        if (YAPI::$_yapiContext->_sslCertPath != '') {
+            $ssl_options['cafile'] = YAPI::$_yapiContext->_sslCertPath;
+        }
+        return stream_context_create([
+            'ssl' => $ssl_options
+        ]);
+    }
 
     function verfiyStreamAddr(bool $fullTest = true, string &$errmsg = ''): int
     {
@@ -308,12 +325,45 @@ class YTcpHub
             }
         } else {
             $info_json_url = $this->rooturl . $this->url_info['subdomain'] . '/info.json';
-            $info_json = @file_get_contents($info_json_url);
+            $ssl_options = $this->get_stream_context();
+            $info_json = file_get_contents($info_json_url, false, $ssl_options);
             if ($info_json !== false) {
                 $jsonData = json_decode($info_json, true);
                 if ($jsonData != null) {
                     if (array_key_exists('protocol', $jsonData) && $jsonData['protocol'] == 'HTTP/1.1') {
                         $this->use_pure_http = true;
+                    }
+                    if (array_key_exists('port', $jsonData)) {
+                        $best_proto = "";
+                        $best_port = 0;
+                        foreach ($jsonData['port'] as $portinfo) {
+                            $parts = explode(':', $portinfo);
+                            if ($parts[0] != 'http' && $parts[0] != 'https') {
+                                continue;
+                            }
+                            if ($parts[0] == 'http') {
+                                $this->has_unsecure_open_port = true;
+                            }
+                            if ($this->url_info['proto'] == 'secure' && $parts[0] == 'https') {
+                                if ($best_port == 0) {
+                                    $best_proto = $parts[0];
+                                    $best_port = $parts[1];
+                                }
+                            }
+                            if ($this->url_info['proto'] == 'auto') {
+                                if ($best_port == 0) {
+                                    $best_proto = $parts[0];
+                                    $best_port = $parts[1];
+                                }
+                            }
+                        }
+                        if ($best_port > 0) {
+                            $this->url_info['proto'] = $best_proto;
+                            $this->url_info['rooturl'] = "{$best_proto}://{$this->url_info['host']}:{$best_port}";
+                            $this->rooturl = $this->url_info['rooturl'];
+                            $this->streamaddr = str_replace('http://', 'tcp://', $this->rooturl);
+                            $this->streamaddr = str_replace('https://', 'tls://', $this->streamaddr);
+                        }
                     }
                     if (array_key_exists('serialNumber', $jsonData)) {
                         $this->updateSerial($jsonData['serialNumber']);
@@ -550,6 +600,11 @@ class YTcpHub
         if (!in_array($url, $this->knownUrls)) {
             $this->knownUrls[] = $url;
         }
+    }
+
+    public function getRooturl(): string
+    {
+        return $this->rooturl;
     }
 
 }

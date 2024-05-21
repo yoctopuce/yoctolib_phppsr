@@ -531,7 +531,7 @@ class YMotor extends YFunction
      */
     public function drivingForceMove(float $targetPower, int $delay): int
     {
-        return $this->set_command(sprintf('P%d,%d',round($targetPower*10),$delay));
+        return $this->set_command(sprintf('P%d,%d',intval(round($targetPower*10)),$delay));
     }
 
     /**
@@ -547,7 +547,7 @@ class YMotor extends YFunction
      */
     public function brakingForceMove(float $targetPower, int $delay): int
     {
-        return $this->set_command(sprintf('B%d,%d',round($targetPower*10),$delay));
+        return $this->set_command(sprintf('B%d,%d',intval(round($targetPower*10)),$delay));
     }
 
     /**
