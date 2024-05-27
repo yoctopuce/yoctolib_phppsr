@@ -1795,7 +1795,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "2.0.61039";
+        return "2.0.61148";
     }
 
     /**
@@ -2041,7 +2041,7 @@ class YAPI
         $url_detail = self::_parseRegisteredURL($url);
         /** @var YTcpHub $hub */
         foreach (self::$_hubs as $hub_url => $hub) {
-            if ($url == $url_detail['org_url']) {
+            if ($url == $hub->url_info['org_url']) {
                 $res[] = $hub;
             }else if ($hub_url == $url_detail['rooturl']) {
                 $res[] = $hub;

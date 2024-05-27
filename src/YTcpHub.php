@@ -326,7 +326,7 @@ class YTcpHub
         } else {
             $info_json_url = $this->rooturl . $this->url_info['subdomain'] . '/info.json';
             $ssl_options = $this->get_stream_context();
-            $info_json = file_get_contents($info_json_url, false, $ssl_options);
+            $info_json = @file_get_contents($info_json_url, false, $ssl_options);
             if ($info_json !== false) {
                 $jsonData = json_decode($info_json, true);
                 if ($jsonData != null) {
