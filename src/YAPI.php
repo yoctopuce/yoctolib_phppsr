@@ -1795,7 +1795,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "2.0.61148";
+        return "2.0.61813";
     }
 
     /**
@@ -2010,7 +2010,12 @@ class YAPI
             $res['auth'] = substr($str_url, 0, $authpos);
             $str_url = substr($str_url, $authpos + 1);
         }
+        $endv6 =  strpos($str_url, ']');
         $p_ofs = strpos($str_url, ':');
+        if ($p_ofs > 0 && $endv6 > 0 && $p_ofs < $endv6) {
+            // ipv6 URL
+            $p_ofs = strpos($str_url, ':',$endv6);
+        }
         if ($p_ofs !== false) {
             $res['host'] = substr($str_url, 0, $p_ofs);
             $res['port'] = (int)substr($str_url, $p_ofs + 1);

@@ -278,7 +278,7 @@ class YRfidReader extends YFunction
     }
 
     /**
-     * Change an RFID tag configuration to prevents any further write to
+     * Changes an RFID tag configuration to prevents any further write to
      * the selected blocks. This operation is definitive and irreversible.
      * Depending on the tag type and block index, adjascent blocks may become
      * read-only as well, based on the locking granularity.
@@ -777,7 +777,7 @@ class YRfidReader extends YFunction
     }
 
     /**
-     * Change an RFID tag AFI byte (ISO 15693 only).
+     * Changes an RFID tag AFI byte (ISO 15693 only).
      *
      * @param string $tagId : identifier of the tag to use
      * @param int $afi : the AFI value to write (0...255)
@@ -870,7 +870,7 @@ class YRfidReader extends YFunction
     }
 
     /**
-     * Change an RFID tag DSFID byte (ISO 15693 only).
+     * Changes an RFID tag DSFID byte (ISO 15693 only).
      *
      * @param string $tagId : identifier of the tag to use
      * @param int $dsfid : the DSFID value to write (0...255)

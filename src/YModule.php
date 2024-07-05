@@ -111,6 +111,12 @@ class YModule extends YFunction
         return $dev->functionId($functionIndex);
     }
 
+    public function functionIdByFunYdx(int $functionIndex): string
+    {
+        $dev = $this->_getDev();
+        return $dev->functionIdByFunYdx($functionIndex);
+    }
+
     /**
      * Retrieves the type of the <i>n</i>th function on the module. Yoctopuce functions type names match
      * their class names without the <i>Y</i> prefix, for instance <i>Relay</i>, <i>Temperature</i> etc..
