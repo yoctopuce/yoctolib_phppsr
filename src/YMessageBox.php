@@ -343,9 +343,9 @@ class YMessageBox extends YFunction
             $this->clearCache();
             $bitmapStr = $this->get_slotsBitmap();
             $newBitmap = YAPI::_hexStrToBin($bitmapStr);
-            $idx = (($slot) >> (3));
+            $idx = (($slot) >> 3);
             if ($idx < strlen($newBitmap)) {
-                $bitVal = ((1) << (((($slot) & (7)))));
+                $bitVal = (1 << ((($slot) & 7)));
                 if ((((ord($newBitmap[$idx])) & ($bitVal))) != 0) {
                     $this->_prevBitmapStr = '';
                     $int_res = $this->set_command(sprintf('DS%d',$slot));
@@ -381,25 +381,25 @@ class YMessageBox extends YFunction
         // $suffixlen              is a int;
         // copied form the YCellular class
         // quote dangerous characters used in AT commands
-        $cmdLen = strlen($cmd);
+        $cmdLen = mb_strlen($cmd);
         $chrPos = YAPI::Ystrpos($cmd,'#');
         while ($chrPos >= 0) {
-            $cmd = sprintf('%s%c23%s', substr($cmd,  0, $chrPos), 37,
-            substr($cmd,  $chrPos+1, $cmdLen-$chrPos-1));
+            $cmd = sprintf('%s%c23%s', substr($cmd, 0, $chrPos), 37,
+            substr($cmd, $chrPos+1, $cmdLen-$chrPos-1));
             $cmdLen = $cmdLen + 2;
             $chrPos = YAPI::Ystrpos($cmd,'#');
         }
         $chrPos = YAPI::Ystrpos($cmd,'+');
         while ($chrPos >= 0) {
-            $cmd = sprintf('%s%c2B%s', substr($cmd,  0, $chrPos), 37,
-            substr($cmd,  $chrPos+1, $cmdLen-$chrPos-1));
+            $cmd = sprintf('%s%c2B%s', substr($cmd, 0, $chrPos), 37,
+            substr($cmd, $chrPos+1, $cmdLen-$chrPos-1));
             $cmdLen = $cmdLen + 2;
             $chrPos = YAPI::Ystrpos($cmd,'+');
         }
         $chrPos = YAPI::Ystrpos($cmd,'=');
         while ($chrPos >= 0) {
-            $cmd = sprintf('%s%c3D%s', substr($cmd,  0, $chrPos), 37,
-            substr($cmd,  $chrPos+1, $cmdLen-$chrPos-1));
+            $cmd = sprintf('%s%c3D%s', substr($cmd, 0, $chrPos), 37,
+            substr($cmd, $chrPos+1, $cmdLen-$chrPos-1));
             $cmdLen = $cmdLen + 2;
             $chrPos = YAPI::Ystrpos($cmd,'=');
         }
@@ -410,8 +410,8 @@ class YMessageBox extends YFunction
         while ($waitMore > 0) {
             $buff = $this->_download($cmd);
             $bufflen = strlen($buff);
-            $buffstr = $buff;
-            $buffstrlen = strlen($buffstr);
+            $buffstr = YAPI::Ybin2str($buff);
+            $buffstrlen = mb_strlen($buffstr);
             $idx = $bufflen - 1;
             while (($idx > 0) && (ord($buff[$idx]) != 64) && (ord($buff[$idx]) != 10) && (ord($buff[$idx]) != 13)) {
                 $idx = $idx - 1;
@@ -419,8 +419,8 @@ class YMessageBox extends YFunction
             if (ord($buff[$idx]) == 64) {
                 // continuation detected
                 $suffixlen = $bufflen - $idx;
-                $cmd = sprintf('at.txt?cmd=%s', substr($buffstr,  $buffstrlen - $suffixlen, $suffixlen));
-                $buffstr = substr($buffstr,  0, $buffstrlen - $suffixlen);
+                $cmd = sprintf('at.txt?cmd=%s', substr($buffstr, $buffstrlen - $suffixlen, $suffixlen));
+                $buffstr = substr($buffstr, 0, $buffstrlen - $suffixlen);
                 $waitMore = $waitMore - 1;
             } else {
                 // request complete
@@ -437,7 +437,7 @@ class YMessageBox extends YFunction
     public function fetchPdu(int $slot): ?YSms
     {
         // $binPdu                 is a bin;
-        $arrPdu = [];           // strArr;
+        $arrPdu = [];           // binArr;
         // $hexPdu                 is a str;
         // $sms                    is a YSms;
 
@@ -715,8 +715,8 @@ class YMessageBox extends YFunction
             }
             $i = $i + 1;
         }
-        $resstr = $resbin;
-        if (strlen($resstr) > $reslen) {
+        $resstr = YAPI::Ybin2str($resbin);
+        if (mb_strlen($resstr) > $reslen) {
             $resstr = substr($resstr, 0, $reslen);
         }
         return $resstr;
@@ -738,7 +738,7 @@ class YMessageBox extends YFunction
         if (!($this->_gsm2unicodeReady)) {
             $this->initGsm2Unicode();
         }
-        $asc = $msg;
+        $asc = YAPI::Ystr2bin($msg);
         $asclen = strlen($asc);
         $extra = 0;
         $i = 0;
@@ -848,9 +848,9 @@ class YMessageBox extends YFunction
         while ($pduIdx < sizeof($this->_pdus)) {
             $sms = $this->_pdus[$pduIdx];
             $slot = $sms->get_slot();
-            $idx = (($slot) >> (3));
+            $idx = (($slot) >> 3);
             if ($idx < strlen($newBitmap)) {
-                $bitVal = ((1) << (((($slot) & (7)))));
+                $bitVal = (1 << ((($slot) & 7)));
                 if ((((ord($newBitmap[$idx])) & ($bitVal))) != 0) {
                     $newArr[] = $sms;
                     if ($sms->get_concatCount() == 0) {
@@ -858,13 +858,13 @@ class YMessageBox extends YFunction
                     } else {
                         $sig = $sms->get_concatSignature();
                         $i = 0;
-                        while (($i < $nsig) && (strlen($sig) > 0)) {
+                        while (($i < $nsig) && (mb_strlen($sig) > 0)) {
                             if ($signatures[$i] == $sig) {
                                 $sig = '';
                             }
                             $i = $i + 1;
                         }
-                        if (strlen($sig) > 0) {
+                        if (mb_strlen($sig) > 0) {
                             $signatures[] = $sig;
                             $nsig = $nsig + 1;
                         }
@@ -876,8 +876,8 @@ class YMessageBox extends YFunction
         // receive new messages
         $slot = 0;
         while ($slot < $nslots) {
-            $idx = (($slot) >> (3));
-            $bitVal = ((1) << (((($slot) & (7)))));
+            $idx = (($slot) >> 3);
+            $bitVal = (1 << ((($slot) & 7)));
             $prevBit = 0;
             if ($idx < strlen($prevBitmap)) {
                 $prevBit = ((ord($prevBitmap[$idx])) & ($bitVal));
@@ -891,13 +891,13 @@ class YMessageBox extends YFunction
                     } else {
                         $sig = $sms->get_concatSignature();
                         $i = 0;
-                        while (($i < $nsig) && (strlen($sig) > 0)) {
+                        while (($i < $nsig) && (mb_strlen($sig) > 0)) {
                             if ($signatures[$i] == $sig) {
                                 $sig = '';
                             }
                             $i = $i + 1;
                         }
-                        if (strlen($sig) > 0) {
+                        if (mb_strlen($sig) > 0) {
                             $signatures[] = $sig;
                             $nsig = $nsig + 1;
                         }

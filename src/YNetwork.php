@@ -343,7 +343,7 @@ class YNetwork extends YFunction
     /**
      * Returns the IP configuration of the network interface.
      *
-     * If the network interface is setup to use a static IP address, the string starts with "STATIC:" and
+     * If the network interface is set up to use a static IP address, the string starts with "STATIC:" and
      * is followed by three
      * parameters, separated by "/". The first is the device IP address, followed by the subnet mask
      * length, and finally the
@@ -1375,7 +1375,7 @@ class YNetwork extends YFunction
         // $content                is a bin;
 
         $content = $this->_download(sprintf('ping.txt?host=%s',$host));
-        return $content;
+        return YAPI::Ybin2str($content);
     }
 
     /**
@@ -1395,7 +1395,7 @@ class YNetwork extends YFunction
     }
 
     /**
-     * Setup periodic HTTP callbacks (simplified function).
+     * Set up periodic HTTP callbacks (simplified function).
      *
      * @param string $interval : a string representing the callback periodicity, expressed in
      *         seconds, minutes or hours, eg. "60s", "5m", "1h", "48h".

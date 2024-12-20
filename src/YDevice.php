@@ -186,7 +186,7 @@ class YDevice
             $this->_logIsPulling = false;
             return;
         }
-        $resultStr = iconv("ISO-8859-1", "UTF-8", $yreq->result);
+        $resultStr = YAPI::Ybin2str($yreq->result);
         $pos = strrpos($resultStr, "\n@");
         if ($pos < 0) {
             $this->_logIsPulling = false;
@@ -272,7 +272,7 @@ class YDevice
         if ($yreq->errorType != YAPI::SUCCESS) {
             return $yreq;
         }
-        $json_req = json_decode(iconv("ISO-8859-1", "UTF-8", $yreq->result), true);
+        $json_req = json_decode(YAPI::Ybin2str($yreq->result), true);
         if (json_last_error() != JSON_ERROR_NONE) {
             return $this->_throw(YAPI::IO_ERROR, 'Request failed, could not parse API result for ' . $this->_rootUrl,
                 YAPI::IO_ERROR);

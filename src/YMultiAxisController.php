@@ -189,9 +189,9 @@ class YMultiAxisController extends YFunction
         $retBin = $this->_download($url);
         $res = ord($retBin[0]);
         if ($res < 58) {
-            if (!($res == 48)) return $this->_throw( YAPI::DEVICE_BUSY, 'Motor command pipeline is full, try again later',YAPI::DEVICE_BUSY);
+            if (!($res == 48)) return $this->_throw(YAPI::DEVICE_BUSY,'Motor command pipeline is full, try again later',YAPI::DEVICE_BUSY);
         } else {
-            if (!($res == 48)) return $this->_throw( YAPI::IO_ERROR, 'Motor command failed permanently',YAPI::IO_ERROR);
+            if (!($res == 48)) return $this->_throw(YAPI::IO_ERROR,'Motor command failed permanently',YAPI::IO_ERROR);
         }
         return YAPI::SUCCESS;
     }

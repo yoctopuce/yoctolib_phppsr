@@ -765,9 +765,9 @@ class YColorLedCluster extends YFunction
         $idx = 0;
         while ($idx < $listlen) {
             $rgb = $rgbList[$idx];
-            $buff[3*$idx] = pack('C', (((($rgb) >> (16))) & (255)));
-            $buff[3*$idx+1] = pack('C', (((($rgb) >> (8))) & (255)));
-            $buff[3*$idx+2] = pack('C', (($rgb) & (255)));
+            $buff[3*$idx] = pack('C', ((($rgb) >> 16) & 255));
+            $buff[3*$idx+1] = pack('C', ((($rgb) >> 8) & 255));
+            $buff[3*$idx+2] = pack('C', (($rgb) & 255));
             $idx = $idx + 1;
         }
 
@@ -801,9 +801,9 @@ class YColorLedCluster extends YFunction
         $idx = 0;
         while ($idx < $listlen) {
             $rgb = $rgbList[$idx];
-            $buff[3*$idx] = pack('C', (((($rgb) >> (16))) & (255)));
-            $buff[3*$idx+1] = pack('C', (((($rgb) >> (8))) & (255)));
-            $buff[3*$idx+2] = pack('C', (($rgb) & (255)));
+            $buff[3*$idx] = pack('C', ((($rgb) >> 16) & 255));
+            $buff[3*$idx+1] = pack('C', ((($rgb) >> 8) & 255));
+            $buff[3*$idx+2] = pack('C', (($rgb) & 255));
             $idx = $idx + 1;
         }
 
@@ -875,9 +875,9 @@ class YColorLedCluster extends YFunction
         $idx = 0;
         while ($idx < $listlen) {
             $hsl = $hslList[$idx];
-            $buff[3*$idx] = pack('C', (((($hsl) >> (16))) & (255)));
-            $buff[3*$idx+1] = pack('C', (((($hsl) >> (8))) & (255)));
-            $buff[3*$idx+2] = pack('C', (($hsl) & (255)));
+            $buff[3*$idx] = pack('C', ((($hsl) >> 16) & 255));
+            $buff[3*$idx+1] = pack('C', ((($hsl) >> 8) & 255));
+            $buff[3*$idx+2] = pack('C', (($hsl) & 255));
             $idx = $idx + 1;
         }
 
@@ -932,9 +932,9 @@ class YColorLedCluster extends YFunction
         $idx = 0;
         while ($idx < $listlen) {
             $hsl = $hslList[$idx];
-            $buff[3*$idx] = pack('C', (((($hsl) >> (16))) & (255)));
-            $buff[3*$idx+1] = pack('C', (((($hsl) >> (8))) & (255)));
-            $buff[3*$idx+2] = pack('C', (($hsl) & (255)));
+            $buff[3*$idx] = pack('C', ((($hsl) >> 16) & 255));
+            $buff[3*$idx+1] = pack('C', ((($hsl) >> 8) & 255));
+            $buff[3*$idx+2] = pack('C', (($hsl) & 255));
             $idx = $idx + 1;
         }
 
@@ -1100,7 +1100,7 @@ class YColorLedCluster extends YFunction
             $hl = ord($buff[4*$idx+1]);
             $lh = ord($buff[4*$idx+2]);
             $ll = ord($buff[4*$idx+3]);
-            $res[] = (($hh) << (24))+(($hl) << (16))+(($lh) << (8))+$ll;
+            $res[] = (($hh) << 24)+(($hl) << 16)+(($lh) << 8)+$ll;
             $idx = $idx + 1;
         }
         return $res;
@@ -1133,7 +1133,7 @@ class YColorLedCluster extends YFunction
         while ($idx < $count) {
             $lh = ord($buff[2*$idx]);
             $ll = ord($buff[2*$idx+1]);
-            $res[] = (($lh) << (8))+$ll;
+            $res[] = (($lh) << 8)+$ll;
             $idx = $idx + 1;
         }
         return $res;
@@ -1233,11 +1233,11 @@ class YColorLedCluster extends YFunction
         // $temp2                  is a int;
         // $temp3                  is a int;
         // $res                    is a int;
-        $L = (($hslValue) & (0xff));
-        $S = (((($hslValue) >> (8))) & (0xff));
-        $H = (((($hslValue) >> (16))) & (0xff));
+        $L = (($hslValue) & 0xff);
+        $S = ((($hslValue) >> 8) & 0xff);
+        $H = ((($hslValue) >> 16) & 0xff);
         if ($S==0) {
-            $res = (($L) << (16))+(($L) << (8))+$L;
+            $res = (($L) << 16)+(($L) << 8)+$L;
             return $res;
         }
         if ($L<=127) {
@@ -1275,7 +1275,7 @@ class YColorLedCluster extends YFunction
         if ($B>255) {
             $B=255;
         }
-        $res = (($R) << (16))+(($G) << (8))+$B;
+        $res = (($R) << 16)+(($G) << 8)+$B;
         return $res;
     }
 

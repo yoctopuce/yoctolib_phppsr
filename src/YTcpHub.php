@@ -121,6 +121,7 @@ class YTcpHub
         }
         return ['whitePages' => $wp, 'yellowPages' => $yp];
     }
+
     static function decodeJZON(array $jzon, array $ref): mixed
     {
         $decoded = self::decodeJZONReq($jzon, $ref);
@@ -213,7 +214,7 @@ class YTcpHub
                     if (isset($_SERVER['HTTP_JSON_POST_DATA'])) {
                         $this->callbackCache = $_SERVER['HTTP_JSON_POST_DATA'];
                     } else {
-                        $utf8_encode = utf8_encode($data);
+                        $utf8_encode = YAPI::Ystr2bin($data);
                         $this->callbackCache = json_decode($utf8_encode, true);
                     }
                     if (is_null($this->callbackCache)) {

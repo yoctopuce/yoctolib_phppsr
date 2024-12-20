@@ -6,7 +6,7 @@ namespace Yoctopuce\YoctoAPI;
  * Yocto-Maxi-IO-V2
  *
  * The YDigitalIO class allows you drive a Yoctopuce digital input/output port.
- * It can be used to setup the direction of each channel, to read the state of each channel
+ * It can be used to set up the direction of each channel, to read the state of each channel
  * and to switch the state of each channel configures as an output.
  * You can work on all channels at once, or one by one. Most functions
  * use a binary representation for channels where bit 0 matches channel #0 , bit 1 matches channel
@@ -416,8 +416,8 @@ class YDigitalIO extends YFunction
      */
     public function set_bitState(int $bitno, int $bitstate): int
     {
-        if (!($bitstate >= 0)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'invalid bit state',YAPI::INVALID_ARGUMENT);
-        if (!($bitstate <= 1)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'invalid bit state',YAPI::INVALID_ARGUMENT);
+        if (!($bitstate >= 0)) return $this->_throw(YAPI::INVALID_ARGUMENT,'invalid bit state',YAPI::INVALID_ARGUMENT);
+        if (!($bitstate <= 1)) return $this->_throw(YAPI::INVALID_ARGUMENT,'invalid bit state',YAPI::INVALID_ARGUMENT);
         return $this->set_command(sprintf('%c%d',82+$bitstate, $bitno));
     }
 
@@ -435,7 +435,7 @@ class YDigitalIO extends YFunction
     {
         // $portVal                is a int;
         $portVal = $this->get_portState();
-        return (((($portVal) >> ($bitno))) & (1));
+        return ((($portVal) >> ($bitno)) & 1);
     }
 
     /**
@@ -467,8 +467,8 @@ class YDigitalIO extends YFunction
      */
     public function set_bitDirection(int $bitno, int $bitdirection): int
     {
-        if (!($bitdirection >= 0)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'invalid direction',YAPI::INVALID_ARGUMENT);
-        if (!($bitdirection <= 1)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'invalid direction',YAPI::INVALID_ARGUMENT);
+        if (!($bitdirection >= 0)) return $this->_throw(YAPI::INVALID_ARGUMENT,'invalid direction',YAPI::INVALID_ARGUMENT);
+        if (!($bitdirection <= 1)) return $this->_throw(YAPI::INVALID_ARGUMENT,'invalid direction',YAPI::INVALID_ARGUMENT);
         return $this->set_command(sprintf('%c%d',73+6*$bitdirection, $bitno));
     }
 
@@ -487,7 +487,7 @@ class YDigitalIO extends YFunction
     {
         // $portDir                is a int;
         $portDir = $this->get_portDirection();
-        return (((($portDir) >> ($bitno))) & (1));
+        return ((($portDir) >> ($bitno)) & 1);
     }
 
     /**
@@ -505,8 +505,8 @@ class YDigitalIO extends YFunction
      */
     public function set_bitPolarity(int $bitno, int $bitpolarity): int
     {
-        if (!($bitpolarity >= 0)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'invalid bit polarity',YAPI::INVALID_ARGUMENT);
-        if (!($bitpolarity <= 1)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'invalid bit polarity',YAPI::INVALID_ARGUMENT);
+        if (!($bitpolarity >= 0)) return $this->_throw(YAPI::INVALID_ARGUMENT,'invalid bit polarity',YAPI::INVALID_ARGUMENT);
+        if (!($bitpolarity <= 1)) return $this->_throw(YAPI::INVALID_ARGUMENT,'invalid bit polarity',YAPI::INVALID_ARGUMENT);
         return $this->set_command(sprintf('%c%d',110+4*$bitpolarity, $bitno));
     }
 
@@ -525,7 +525,7 @@ class YDigitalIO extends YFunction
     {
         // $portPol                is a int;
         $portPol = $this->get_portPolarity();
-        return (((($portPol) >> ($bitno))) & (1));
+        return ((($portPol) >> ($bitno)) & 1);
     }
 
     /**
@@ -543,8 +543,8 @@ class YDigitalIO extends YFunction
      */
     public function set_bitOpenDrain(int $bitno, int $opendrain): int
     {
-        if (!($opendrain >= 0)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'invalid state',YAPI::INVALID_ARGUMENT);
-        if (!($opendrain <= 1)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'invalid state',YAPI::INVALID_ARGUMENT);
+        if (!($opendrain >= 0)) return $this->_throw(YAPI::INVALID_ARGUMENT,'invalid state',YAPI::INVALID_ARGUMENT);
+        if (!($opendrain <= 1)) return $this->_throw(YAPI::INVALID_ARGUMENT,'invalid state',YAPI::INVALID_ARGUMENT);
         return $this->set_command(sprintf('%c%d',100-32*$opendrain, $bitno));
     }
 
@@ -564,7 +564,7 @@ class YDigitalIO extends YFunction
     {
         // $portOpenDrain          is a int;
         $portOpenDrain = $this->get_portOpenDrain();
-        return (((($portOpenDrain) >> ($bitno))) & (1));
+        return ((($portOpenDrain) >> ($bitno)) & 1);
     }
 
     /**

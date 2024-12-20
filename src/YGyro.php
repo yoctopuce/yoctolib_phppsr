@@ -220,8 +220,8 @@ class YGyro extends YSensor
     {
         // $now_stamp              is a int;
         // $age_ms                 is a int;
-        $now_stamp = intval(((YAPI::GetTickCount()) & (0x7FFFFFFF)));
-        $age_ms = ((($now_stamp - $this->_qt_stamp)) & (0x7FFFFFFF));
+        $now_stamp = intval(((YAPI::GetTickCount()) & 0x7FFFFFFF));
+        $age_ms = (($now_stamp - $this->_qt_stamp) & 0x7FFFFFFF);
         if (($age_ms >= 10) || ($this->_qt_stamp == 0)) {
             if ($this->load(10) != YAPI::SUCCESS) {
                 return YAPI::DEVICE_NOT_FOUND;
@@ -513,7 +513,7 @@ class YGyro extends YSensor
         if ($qtIndex < 4) {
             return 0;
         }
-        $this->_qt_stamp = intval(((YAPI::GetTickCount()) & (0x7FFFFFFF)));
+        $this->_qt_stamp = intval(((YAPI::GetTickCount()) & 0x7FFFFFFF));
         if (!is_null($this->_quatCallback)) {
             call_user_func($this->_quatCallback, $this, $this->_w, $this->_x, $this->_y, $this->_z);
         }

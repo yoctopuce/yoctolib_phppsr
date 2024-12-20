@@ -73,15 +73,15 @@ class YDataStream
         // $fRef                   is a float;
         $iCalib = [];           // intArr;
         // decode sequence header to extract data
-        $this->_runNo = $encoded[0] + ((($encoded[1]) << (16)));
-        $this->_utcStamp = $encoded[2] + ((($encoded[3]) << (16)));
+        $this->_runNo = $encoded[0] + ((($encoded[1]) << 16));
+        $this->_utcStamp = $encoded[2] + ((($encoded[3]) << 16));
         $val = $encoded[4];
-        $this->_isAvg = ((($val) & (0x100)) == 0);
-        $samplesPerHour = (($val) & (0xff));
-        if ((($val) & (0x100)) != 0) {
+        $this->_isAvg = ((($val) & 0x100) == 0);
+        $samplesPerHour = (($val) & 0xff);
+        if ((($val) & 0x100) != 0) {
             $samplesPerHour = $samplesPerHour * 3600;
         } else {
-            if ((($val) & (0x200)) != 0) {
+            if ((($val) & 0x200) != 0) {
                 $samplesPerHour = $samplesPerHour * 60;
             }
         }
@@ -163,9 +163,9 @@ class YDataStream
         }
         // decode min/avg/max values for the sequence
         if ($this->_nRows > 0) {
-            $this->_avgVal = $this->_decodeAvg($encoded[8] + ((((($encoded[9]) ^ (0x8000))) << (16))), 1);
-            $this->_minVal = $this->_decodeVal($encoded[10] + ((($encoded[11]) << (16))));
-            $this->_maxVal = $this->_decodeVal($encoded[12] + ((($encoded[13]) << (16))));
+            $this->_avgVal = $this->_decodeAvg($encoded[8] + (((($encoded[9]) ^ 0x8000) << 16)), 1);
+            $this->_minVal = $this->_decodeVal($encoded[10] + ((($encoded[11]) << 16)));
+            $this->_maxVal = $this->_decodeVal($encoded[12] + ((($encoded[13]) << 16)));
         }
         return 0;
     }
@@ -201,9 +201,9 @@ class YDataStream
                     $dat[] = NAN;
                     $dat[] = NAN;
                 } else {
-                    $dat[] = $this->_decodeVal($udat[$idx + 2] + ((($udat[$idx + 3]) << (16))));
-                    $dat[] = $this->_decodeAvg($udat[$idx] + ((((($udat[$idx + 1]) ^ (0x8000))) << (16))), 1);
-                    $dat[] = $this->_decodeVal($udat[$idx + 4] + ((($udat[$idx + 5]) << (16))));
+                    $dat[] = $this->_decodeVal($udat[$idx + 2] + ((($udat[$idx + 3]) << 16)));
+                    $dat[] = $this->_decodeAvg($udat[$idx] + (((($udat[$idx + 1]) ^ 0x8000) << 16)), 1);
+                    $dat[] = $this->_decodeVal($udat[$idx + 4] + ((($udat[$idx + 5]) << 16)));
                 }
                 $idx = $idx + 6;
                 $this->_values[] = $dat;
@@ -216,7 +216,7 @@ class YDataStream
                 if (($udat[$idx] == 65535) && ($udat[$idx + 1] == 65535)) {
                     $dat[] = NAN;
                 } else {
-                    $dat[] = $this->_decodeAvg($udat[$idx] + ((((($udat[$idx + 1]) ^ (0x8000))) << (16))), 1);
+                    $dat[] = $this->_decodeAvg($udat[$idx] + (((($udat[$idx + 1]) ^ 0x8000) << 16)), 1);
                 }
                 $this->_values[] = $dat;
                 $idx = $idx + 2;

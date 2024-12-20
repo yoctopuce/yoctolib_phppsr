@@ -123,15 +123,15 @@ class YInputCaptureData
         // $v                      is a float;
 
         $buffSize = strlen($sdata);
-        if (!($buffSize >= 24)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid snapshot data (too short)',YAPI::INVALID_ARGUMENT);
+        if (!($buffSize >= 24)) return $this->_throw(YAPI::INVALID_ARGUMENT,'Invalid snapshot data (too short)',YAPI::INVALID_ARGUMENT);
         $this->_fmt = ord($sdata[0]);
         $this->_var1size = ord($sdata[1]) - 48;
         $this->_var2size = ord($sdata[2]) - 48;
         $this->_var3size = ord($sdata[3]) - 48;
-        if (!($this->_fmt == 83)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Unsupported snapshot format',YAPI::INVALID_ARGUMENT);
-        if (!(($this->_var1size >= 2) && ($this->_var1size <= 4))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid sample size',YAPI::INVALID_ARGUMENT);
-        if (!(($this->_var2size >= 0) && ($this->_var1size <= 4))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid sample size',YAPI::INVALID_ARGUMENT);
-        if (!(($this->_var3size >= 0) && ($this->_var1size <= 4))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid sample size',YAPI::INVALID_ARGUMENT);
+        if (!($this->_fmt == 83)) return $this->_throw(YAPI::INVALID_ARGUMENT,'Unsupported snapshot format',YAPI::INVALID_ARGUMENT);
+        if (!(($this->_var1size >= 2) && ($this->_var1size <= 4))) return $this->_throw(YAPI::INVALID_ARGUMENT,'Invalid sample size',YAPI::INVALID_ARGUMENT);
+        if (!(($this->_var2size >= 0) && ($this->_var1size <= 4))) return $this->_throw(YAPI::INVALID_ARGUMENT,'Invalid sample size',YAPI::INVALID_ARGUMENT);
+        if (!(($this->_var3size >= 0) && ($this->_var1size <= 4))) return $this->_throw(YAPI::INVALID_ARGUMENT,'Invalid sample size',YAPI::INVALID_ARGUMENT);
         if ($this->_var2size == 0) {
             $this->_nVars = 1;
         } else {
@@ -170,7 +170,7 @@ class YInputCaptureData
                 $recOfs = $recOfs + 1;
             }
         }
-        if ((($recOfs) & (1)) == 1) {
+        if ((($recOfs) & 1) == 1) {
             // align to next word
             $recOfs = $recOfs + 1;
         }
@@ -330,7 +330,7 @@ class YInputCaptureData
      */
     public function get_serie2Unit(): string
     {
-        if (!($this->_nVars >= 2)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'There is no serie 2 in $this capture data','');
+        if (!($this->_nVars >= 2)) return $this->_throw(YAPI::INVALID_ARGUMENT,'There is no serie 2 in $this capture data','');
         return $this->_var2unit;
     }
 
@@ -343,7 +343,7 @@ class YInputCaptureData
      */
     public function get_serie3Unit(): string
     {
-        if (!($this->_nVars >= 3)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'There is no serie 3 in $this capture data','');
+        if (!($this->_nVars >= 3)) return $this->_throw(YAPI::INVALID_ARGUMENT,'There is no serie 3 in $this capture data','');
         return $this->_var3unit;
     }
 
@@ -376,7 +376,7 @@ class YInputCaptureData
      */
     public function get_serie2Values(): array
     {
-        if (!($this->_nVars >= 2)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'There is no serie 2 in $this capture data',$this->_var2samples);
+        if (!($this->_nVars >= 2)) return $this->_throw(YAPI::INVALID_ARGUMENT,'There is no serie 2 in $this capture data',$this->_var2samples);
         return $this->_var2samples;
     }
 
@@ -393,7 +393,7 @@ class YInputCaptureData
      */
     public function get_serie3Values(): array
     {
-        if (!($this->_nVars >= 3)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'There is no serie 3 in $this capture data',$this->_var3samples);
+        if (!($this->_nVars >= 3)) return $this->_throw(YAPI::INVALID_ARGUMENT,'There is no serie 3 in $this capture data',$this->_var3samples);
         return $this->_var3samples;
     }
 

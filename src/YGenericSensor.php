@@ -233,7 +233,7 @@ class YGenericSensor extends YSensor
 
     /**
      * Changes the electric signal bias for zero shift adjustment.
-     * If your electric signal reads positive when it should be zero, setup
+     * If your electric signal reads positive when it should be zero, set up
      * a positive signalBias of the same value to fix the zero shift.
      * Remember to call the saveToFlash()
      * method of the module if the modification must be kept.

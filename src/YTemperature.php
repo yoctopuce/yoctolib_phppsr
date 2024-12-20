@@ -324,11 +324,11 @@ class YTemperature extends YSensor
         // $currTemp               is a float;
         // $idxres                 is a float;
         $siz = sizeof($tempValues);
-        if (!($siz >= 2)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'thermistor response table must have at least two points',YAPI::INVALID_ARGUMENT);
-        if (!($siz == sizeof($resValues))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'table sizes mismatch',YAPI::INVALID_ARGUMENT);
+        if (!($siz >= 2)) return $this->_throw(YAPI::INVALID_ARGUMENT,'thermistor response table must have at least two points',YAPI::INVALID_ARGUMENT);
+        if (!($siz == sizeof($resValues))) return $this->_throw(YAPI::INVALID_ARGUMENT,'table sizes mismatch',YAPI::INVALID_ARGUMENT);
 
         $res = $this->set_command('Z');
-        if (!($res==YAPI::SUCCESS)) return $this->_throw( YAPI::IO_ERROR, 'unable to reset thermistor parameters',YAPI::IO_ERROR);
+        if (!($res==YAPI::SUCCESS)) return $this->_throw(YAPI::IO_ERROR,'unable to reset thermistor parameters',YAPI::IO_ERROR);
         // add records in growing resistance value
         $found = 1;
         $prev = 0.0;
@@ -348,7 +348,7 @@ class YTemperature extends YSensor
             }
             if ($found > 0) {
                 $res = $this->set_command(sprintf('m%d:%d', intval(round(1000*$curr)), intval(round(1000*$currTemp))));
-                if (!($res==YAPI::SUCCESS)) return $this->_throw( YAPI::IO_ERROR, 'unable to reset thermistor parameters',YAPI::IO_ERROR);
+                if (!($res==YAPI::SUCCESS)) return $this->_throw(YAPI::IO_ERROR,'unable to reset thermistor parameters',YAPI::IO_ERROR);
                 $prev = $curr;
             }
         }
@@ -376,7 +376,7 @@ class YTemperature extends YSensor
     {
         // $id                     is a str;
         // $bin_json               is a bin;
-        $paramlist = [];        // strArr;
+        $paramlist = [];        // binArr;
         $templist = [];         // floatArr;
         // $siz                    is a int;
         // $idx                    is a int;
@@ -393,20 +393,20 @@ class YTemperature extends YSensor
         };
 
         $id = $this->get_functionId();
-        $id = substr($id,  11, strlen($id) - 11);
+        $id = substr($id, 11, mb_strlen($id) - 11);
         if ($id == '') {
             $id = '1';
         }
         $bin_json = $this->_download(sprintf('extra.json?page=%s', $id));
         $paramlist = $this->_json_get_array($bin_json);
         // first convert all temperatures to float
-        $siz = ((sizeof($paramlist)) >> (1));
+        $siz = ((sizeof($paramlist)) >> 1);
         while (sizeof($templist) > 0) {
             array_pop($templist);
         };
         $idx = 0;
         while ($idx < $siz) {
-            $temp = floatval($paramlist[2*$idx+1])/1000.0;
+            $temp = floatval(YAPI::Ybin2str($paramlist[2*$idx+1]))/1000.0;
             $templist[] = $temp;
             $idx = $idx + 1;
         }
@@ -428,7 +428,7 @@ class YTemperature extends YSensor
                 $temp = $templist[$idx];
                 if (($temp > $prev) && ($temp < $curr)) {
                     $curr = $temp;
-                    $currRes = floatval($paramlist[2*$idx])/1000.0;
+                    $currRes = floatval(YAPI::Ybin2str($paramlist[2*$idx]))/1000.0;
                     $found = 1;
                 }
                 $idx = $idx + 1;

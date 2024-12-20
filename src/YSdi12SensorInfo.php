@@ -135,7 +135,7 @@ class YSdi12SensorInfo
      */
     public function get_measureCommand(int $measureIndex): string
     {
-        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid measure index','');
+        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw(YAPI::INVALID_ARGUMENT,'Invalid measure index','');
         return $this->_valuesDesc[$measureIndex][0];
     }
 
@@ -152,7 +152,7 @@ class YSdi12SensorInfo
      */
     public function get_measurePosition(int $measureIndex): int
     {
-        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid measure index',0);
+        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw(YAPI::INVALID_ARGUMENT,'Invalid measure index',0);
         return intVal($this->_valuesDesc[$measureIndex][2]);
     }
 
@@ -169,7 +169,7 @@ class YSdi12SensorInfo
      */
     public function get_measureSymbol(int $measureIndex): string
     {
-        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid measure index','');
+        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw(YAPI::INVALID_ARGUMENT,'Invalid measure index','');
         return $this->_valuesDesc[$measureIndex][3];
     }
 
@@ -186,7 +186,7 @@ class YSdi12SensorInfo
      */
     public function get_measureUnit(int $measureIndex): string
     {
-        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid measure index','');
+        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw(YAPI::INVALID_ARGUMENT,'Invalid measure index','');
         return $this->_valuesDesc[$measureIndex][4];
     }
 
@@ -203,7 +203,7 @@ class YSdi12SensorInfo
      */
     public function get_measureDescription(int $measureIndex): string
     {
-        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Invalid measure index','');
+        if (!($measureIndex < sizeof($this->_valuesDesc))) return $this->_throw(YAPI::INVALID_ARGUMENT,'Invalid measure index','');
         return $this->_valuesDesc[$measureIndex][5];
     }
 
@@ -222,9 +222,9 @@ class YSdi12SensorInfo
     {
         // $errmsg                 is a str;
 
-        if (strlen($infoStr) > 1) {
-            if (substr($infoStr,  0, 2) == 'ER') {
-                $errmsg = substr($infoStr,  2, strlen($infoStr)-2);
+        if (mb_strlen($infoStr) > 1) {
+            if (substr($infoStr, 0, 2) == 'ER') {
+                $errmsg = substr($infoStr, 2, mb_strlen($infoStr)-2);
                 $this->_addr = $errmsg;
                 $this->_proto = $errmsg;
                 $this->_mfg = $errmsg;
@@ -233,12 +233,12 @@ class YSdi12SensorInfo
                 $this->_sn = $errmsg;
                 $this->_isValid = false;
             } else {
-                $this->_addr = substr($infoStr,  0, 1);
-                $this->_proto = substr($infoStr,  1, 2);
-                $this->_mfg = substr($infoStr,  3, 8);
-                $this->_model = substr($infoStr,  11, 6);
-                $this->_ver = substr($infoStr,  17, 3);
-                $this->_sn = substr($infoStr,  20, strlen($infoStr)-20);
+                $this->_addr = substr($infoStr, 0, 1);
+                $this->_proto = substr($infoStr, 1, 2);
+                $this->_mfg = substr($infoStr, 3, 8);
+                $this->_model = substr($infoStr, 11, 6);
+                $this->_ver = substr($infoStr, 17, 3);
+                $this->_sn = substr($infoStr, 20, mb_strlen($infoStr)-20);
                 $this->_isValid = true;
             }
         }
@@ -266,8 +266,8 @@ class YSdi12SensorInfo
         $size = 4;
         while ($k < 10) {
             $infoNbVal = $this->_sdi12Port->querySdi12($this->_addr, sprintf('IM%d', $k), 5000);
-            if (strlen($infoNbVal) > 1) {
-                $value = substr($infoNbVal,  4, strlen($infoNbVal)-4);
+            if (mb_strlen($infoNbVal) > 1) {
+                $value = substr($infoNbVal, 4, mb_strlen($infoNbVal)-4);
                 $nbVal = intVal($value);
                 if ($nbVal != 0) {
                     while (sizeof($val) > 0) {

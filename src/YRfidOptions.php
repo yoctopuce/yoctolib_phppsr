@@ -115,16 +115,16 @@ class YRfidOptions
             $opt = 0;
         }
         if ($this->ForceMultiBlockAccess) {
-            $opt = (($opt) | (2));
+            $opt = (($opt) | 2);
         }
         if ($this->EnableRawAccess) {
-            $opt = (($opt) | (4));
+            $opt = (($opt) | 4);
         }
         if ($this->DisableBoundaryChecks) {
-            $opt = (($opt) | (8));
+            $opt = (($opt) | 8);
         }
         if ($this->EnableDryRun) {
-            $opt = (($opt) | (16));
+            $opt = (($opt) | 16);
         }
         $res = sprintf('&o=%d', $opt);
         if ($this->KeyType != 0) {

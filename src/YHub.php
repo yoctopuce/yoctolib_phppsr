@@ -195,7 +195,7 @@ class YHub
      * Modifies tthe network connection delay for this hub.
      * The default value is inherited from ySetNetworkTimeout
      * at the time when the hub is registered, but it can be updated
-     * afterwards for each specific hub if necessary.
+     * afterward for each specific hub if necessary.
      *
      * @param int $networkMsTimeout : the network connection delay in milliseconds.
      * @noreturn
@@ -209,7 +209,7 @@ class YHub
      * Returns the network connection delay for this hub.
      * The default value is inherited from ySetNetworkTimeout
      * at the time when the hub is registered, but it can be updated
-     * afterwards for each specific hub if necessary.
+     * afterward for each specific hub if necessary.
      *
      * @return int  the network connection delay in milliseconds.
      */

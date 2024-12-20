@@ -442,11 +442,11 @@ class YWeighScale extends YSensor
         // $currComp               is a float;
         // $idxTemp                is a float;
         $siz = sizeof($tempValues);
-        if (!($siz != 1)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'thermal compensation table must have at least two points',YAPI::INVALID_ARGUMENT);
-        if (!($siz == sizeof($compValues))) return $this->_throw( YAPI::INVALID_ARGUMENT, 'table sizes mismatch',YAPI::INVALID_ARGUMENT);
+        if (!($siz != 1)) return $this->_throw(YAPI::INVALID_ARGUMENT,'thermal compensation table must have at least two points',YAPI::INVALID_ARGUMENT);
+        if (!($siz == sizeof($compValues))) return $this->_throw(YAPI::INVALID_ARGUMENT,'table sizes mismatch',YAPI::INVALID_ARGUMENT);
 
         $res = $this->set_command(sprintf('%dZ', $tableIndex));
-        if (!($res==YAPI::SUCCESS)) return $this->_throw( YAPI::IO_ERROR, 'unable to reset thermal compensation table',YAPI::IO_ERROR);
+        if (!($res==YAPI::SUCCESS)) return $this->_throw(YAPI::IO_ERROR,'unable to reset thermal compensation table',YAPI::IO_ERROR);
         // add records in growing temperature value
         $found = 1;
         $prev = -999999.0;
@@ -466,7 +466,7 @@ class YWeighScale extends YSensor
             }
             if ($found > 0) {
                 $res = $this->set_command(sprintf('%dm%d:%d', $tableIndex, intval(round(1000*$curr)), intval(round(1000*$currComp))));
-                if (!($res==YAPI::SUCCESS)) return $this->_throw( YAPI::IO_ERROR, 'unable to set thermal compensation table',YAPI::IO_ERROR);
+                if (!($res==YAPI::SUCCESS)) return $this->_throw(YAPI::IO_ERROR,'unable to set thermal compensation table',YAPI::IO_ERROR);
                 $prev = $curr;
             }
         }
@@ -480,18 +480,18 @@ class YWeighScale extends YSensor
     {
         // $id                     is a str;
         // $bin_json               is a bin;
-        $paramlist = [];        // strArr;
+        $paramlist = [];        // binArr;
         // $siz                    is a int;
         // $idx                    is a int;
         // $temp                   is a float;
         // $comp                   is a float;
 
         $id = $this->get_functionId();
-        $id = substr($id,  10, strlen($id) - 10);
+        $id = substr($id, 10, mb_strlen($id) - 10);
         $bin_json = $this->_download(sprintf('extra.json?page=%d',(4*intVal($id))+$tableIndex));
         $paramlist = $this->_json_get_array($bin_json);
         // convert all values to float and append records
-        $siz = ((sizeof($paramlist)) >> (1));
+        $siz = ((sizeof($paramlist)) >> 1);
         while (sizeof($tempValues) > 0) {
             array_pop($tempValues);
         };
@@ -500,8 +500,8 @@ class YWeighScale extends YSensor
         };
         $idx = 0;
         while ($idx < $siz) {
-            $temp = floatval($paramlist[2*$idx])/1000.0;
-            $comp = floatval($paramlist[2*$idx+1])/1000.0;
+            $temp = floatval(YAPI::Ybin2str($paramlist[2*$idx]))/1000.0;
+            $comp = floatval(YAPI::Ybin2str($paramlist[2*$idx+1]))/1000.0;
             $tempValues[] = $temp;
             $compValues[] = $comp;
             $idx = $idx + 1;

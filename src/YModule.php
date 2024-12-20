@@ -659,7 +659,7 @@ class YModule extends YFunction
         // $modpos                 is a int;
         $cleanHwId = $func;
         $modpos = YAPI::Ystrpos($func,'.module');
-        if ($modpos != (strlen($func) - 7)) {
+        if ($modpos != (mb_strlen($func) - 7)) {
             $cleanHwId = $func . '.module';
         }
         $obj = YFunction::_FindFromCache('Module', $cleanHwId);
@@ -912,7 +912,7 @@ class YModule extends YFunction
         $settings = $this->get_allSettings();
         if (strlen($settings) == 0) {
             $this->_throw(YAPI::IO_ERROR, 'Unable to get device settings');
-            $settings = 'error:Unable to get device settings';
+            $settings = YAPI::Ystr2bin('error:Unable to get device settings');
         }
         return new YFirmwareUpdate($serial, $path, $settings, $force);
     }
@@ -948,13 +948,13 @@ class YModule extends YFunction
         // $name                   is a str;
         // $item                   is a str;
         // $t_type                 is a str;
-        // $id                     is a str;
+        // $pageid                 is a str;
         // $url                    is a str;
         // $file_data              is a str;
         // $file_data_bin          is a bin;
         // $temp_data_bin          is a bin;
         // $ext_settings           is a str;
-        $filelist = [];         // strArr;
+        $filelist = [];         // binArr;
         $templist = [];         // strArr;
 
         $settings = $this->_download('api.json');
@@ -964,18 +964,18 @@ class YModule extends YFunction
         $ext_settings = ', "extras":[';
         $templist = $this->get_functionIds('Temperature');
         $sep = '';
-        foreach ( $templist as $each) {
+        foreach ($templist as $each) {
             if (intVal($this->get_firmwareRelease()) > 9000) {
                 $url = sprintf('api/%s/sensorType',$each);
-                $t_type = $this->_download($url);
+                $t_type = YAPI::Ybin2str($this->_download($url));
                 if ($t_type == 'RES_NTC' || $t_type == 'RES_LINEAR') {
-                    $id = substr($each,  11, strlen($each) - 11);
-                    if ($id == '') {
-                        $id = '1';
+                    $pageid = substr($each, 11, mb_strlen($each) - 11);
+                    if ($pageid == '') {
+                        $pageid = '1';
                     }
-                    $temp_data_bin = $this->_download(sprintf('extra.json?page=%s', $id));
+                    $temp_data_bin = $this->_download(sprintf('extra.json?page=%s', $pageid));
                     if (strlen($temp_data_bin) > 0) {
-                        $item = sprintf('%s{"fid":"%s", "json":%s}'."\n".'', $sep, $each, $temp_data_bin);
+                        $item = sprintf('%s{"fid":"%s", "json":%s}'."\n".'', $sep, $each, YAPI::Ybin2str($temp_data_bin));
                         $ext_settings = $ext_settings . $item;
                         $sep = ',';
                     }
@@ -990,9 +990,9 @@ class YModule extends YFunction
             }
             $filelist = $this->_json_get_array($json);
             $sep = '';
-            foreach ( $filelist as $each) {
+            foreach ($filelist as $each) {
                 $name = $this->_json_get_key($each, 'name');
-                if ((strlen($name) > 0) && !($name == 'startupConf.json')) {
+                if ((mb_strlen($name) > 0) && !($name == 'startupConf.json')) {
                     $file_data_bin = $this->_download($this->_escapeAttr($name));
                     $file_data = YAPI::_bytesToHexStr($file_data_bin);
                     $item = sprintf('%s{"name":"%s", "data":"%s"}'."\n".'', $sep, $name, $file_data);
@@ -1001,7 +1001,7 @@ class YModule extends YFunction
                 }
             }
         }
-        $res = '{ "api":' . $settings . $ext_settings . ']}';
+        $res = YAPI::Ystr2bin('{ "api":' . YAPI::Ybin2str($settings) . $ext_settings . ']}');
         return $res;
     }
 
@@ -1010,22 +1010,26 @@ class YModule extends YFunction
      */
     public function loadThermistorExtra(string $funcId, string $jsonExtra): int
     {
-        $values = [];           // strArr;
+        $values = [];           // binArr;
         // $url                    is a str;
         // $curr                   is a str;
+        // $binCurr                is a bin;
         // $currTemp               is a str;
+        // $binCurrTemp            is a bin;
         // $ofs                    is a int;
         // $size                   is a int;
         $url = 'api/' . $funcId . '.json?command=Z';
 
         $this->_download($url);
         // add records in growing resistance value
-        $values = $this->_json_get_array($jsonExtra);
+        $values = $this->_json_get_array(YAPI::Ystr2bin($jsonExtra));
         $ofs = 0;
         $size = sizeof($values);
         while ($ofs + 1 < $size) {
-            $curr = $values[$ofs];
-            $currTemp = $values[$ofs + 1];
+            $binCurr = $values[$ofs];
+            $binCurrTemp = $values[$ofs + 1];
+            $curr = $this->_json_get_string($binCurr);
+            $currTemp = $this->_json_get_string($binCurrTemp);
             $url = sprintf('api/%s.json?command=m%s:%s', $funcId, $curr, $currTemp);
             $this->_download($url);
             $ofs = $ofs + 2;
@@ -1038,16 +1042,17 @@ class YModule extends YFunction
      */
     public function set_extraSettings(string $jsonExtra): int
     {
-        $extras = [];           // strArr;
+        $extras = [];           // binArr;
+        // $tmp                    is a bin;
         // $functionId             is a str;
-        // $data                   is a str;
-        $extras = $this->_json_get_array($jsonExtra);
-        foreach ( $extras as $each) {
-            $functionId = $this->_get_json_path($each, 'fid');
-            $functionId = $this->_decode_json_string($functionId);
+        // $data                   is a bin;
+        $extras = $this->_json_get_array(YAPI::Ystr2bin($jsonExtra));
+        foreach ($extras as $each) {
+            $tmp = $this->_get_json_path($each, 'fid');
+            $functionId = $this->_json_get_string($tmp);
             $data = $this->_get_json_path($each, 'json');
             if ($this->hasFunction($functionId)) {
-                $this->loadThermistorExtra($functionId, $data);
+                $this->loadThermistorExtra($functionId, YAPI::Ybin2str($data));
             }
         }
         return YAPI::SUCCESS;
@@ -1070,39 +1075,39 @@ class YModule extends YFunction
     public function set_allSettingsAndFiles(string $settings): int
     {
         // $down                   is a bin;
-        // $json                   is a str;
-        // $json_api               is a str;
-        // $json_files             is a str;
-        // $json_extra             is a str;
+        // $json_bin               is a bin;
+        // $json_api               is a bin;
+        // $json_files             is a bin;
+        // $json_extra             is a bin;
         // $fuperror               is a int;
         // $globalres              is a int;
         $fuperror = 0;
-        $json = $settings;
-        $json_api = $this->_get_json_path($json, 'api');
-        if ($json_api == '') {
+        $json_api = $this->_get_json_path($settings, 'api');
+        if (strlen($json_api) == 0) {
             return $this->set_allSettings($settings);
         }
-        $json_extra = $this->_get_json_path($json, 'extras');
-        if (!($json_extra == '')) {
-            $this->set_extraSettings($json_extra);
+        $json_extra = $this->_get_json_path($settings, 'extras');
+        if (strlen($json_extra) > 0) {
+            $this->set_extraSettings(YAPI::Ybin2str($json_extra));
         }
         $this->set_allSettings($json_api);
         if ($this->hasFunction('files')) {
-            $files = [];            // strArr;
+            $files = [];            // binArr;
             // $res                    is a str;
+            // $tmp                    is a bin;
             // $name                   is a str;
             // $data                   is a str;
             $down = $this->_download('files.json?a=format');
-            $res = $this->_get_json_path($down, 'res');
-            $res = $this->_decode_json_string($res);
-            if (!($res == 'ok')) return $this->_throw( YAPI::IO_ERROR, 'format failed',YAPI::IO_ERROR);
-            $json_files = $this->_get_json_path($json, 'files');
+            $down = $this->_get_json_path($down, 'res');
+            $res = $this->_json_get_string($down);
+            if (!($res == 'ok')) return $this->_throw(YAPI::IO_ERROR,'format failed',YAPI::IO_ERROR);
+            $json_files = $this->_get_json_path($settings, 'files');
             $files = $this->_json_get_array($json_files);
-            foreach ( $files as $each) {
-                $name = $this->_get_json_path($each, 'name');
-                $name = $this->_decode_json_string($name);
-                $data = $this->_get_json_path($each, 'data');
-                $data = $this->_decode_json_string($data);
+            foreach ($files as $each) {
+                $tmp = $this->_get_json_path($each, 'name');
+                $name = $this->_json_get_string($tmp);
+                $tmp = $this->_get_json_path($each, 'data');
+                $data = $this->_json_get_string($tmp);
                 if ($name == '') {
                     $fuperror = $fuperror + 1;
                 } else {
@@ -1112,7 +1117,7 @@ class YModule extends YFunction
         }
         // Apply settings a second time for file-dependent settings and dynamic sensor nodes
         $globalres = $this->set_allSettings($json_api);
-        if (!($fuperror == 0)) return $this->_throw( YAPI::IO_ERROR, 'Error during file upload',YAPI::IO_ERROR);
+        if (!($fuperror == 0)) return $this->_throw(YAPI::IO_ERROR,'Error during file upload',YAPI::IO_ERROR);
         return $globalres;
     }
 
@@ -1202,7 +1207,7 @@ class YModule extends YFunction
         if ($cparams == '' || $cparams == '0') {
             return 1;
         }
-        if ((strlen($cparams) < 2) || (YAPI::Ystrpos($cparams,'.') >= 0)) {
+        if ((mb_strlen($cparams) < 2) || (YAPI::Ystrpos($cparams,'.') >= 0)) {
             return 0;
         } else {
             return 2;
@@ -1383,7 +1388,7 @@ class YModule extends YFunction
                 $param = 30 + $calibType;
                 $i = 0;
                 while ($i < sizeof($calibData)) {
-                    if ((($i) & (1)) > 0) {
+                    if ((($i) & 1) > 0) {
                         $param = $param . ':';
                     } else {
                         $param = $param . ' ';
@@ -1461,12 +1466,12 @@ class YModule extends YFunction
     {
         $restoreLast = [];      // strArr;
         // $old_json_flat          is a bin;
-        $old_dslist = [];       // strArr;
+        $old_dslist = [];       // binArr;
         $old_jpath = [];        // strArr;
         $old_jpath_len = [];    // intArr;
         $old_val_arr = [];      // strArr;
         // $actualSettings         is a bin;
-        $new_dslist = [];       // strArr;
+        $new_dslist = [];       // binArr;
         $new_jpath = [];        // strArr;
         $new_jpath_len = [];    // intArr;
         $new_val_arr = [];      // strArr;
@@ -1482,9 +1487,11 @@ class YModule extends YFunction
         // $fun                    is a str;
         // $attr                   is a str;
         // $value                  is a str;
+        // $old_serial             is a str;
+        // $new_serial             is a str;
         // $url                    is a str;
         // $tmp                    is a str;
-        // $new_calib              is a str;
+        // $binTmp                 is a bin;
         // $sensorType             is a str;
         // $unit_name              is a str;
         // $newval                 is a str;
@@ -1494,11 +1501,11 @@ class YModule extends YFunction
         // $do_update              is a bool;
         // $found                  is a bool;
         $res = YAPI::SUCCESS;
-        $tmp = $settings;
-        $tmp = $this->_get_json_path($tmp, 'api');
-        if (!($tmp == '')) {
-            $settings = $tmp;
+        $binTmp = $this->_get_json_path($settings, 'api');
+        if (strlen($binTmp) > 0) {
+            $settings = $binTmp;
         }
+        $old_serial = '';
         $oldval = '';
         $newval = '';
         $old_json_flat = $this->_flattenJsonStruct($settings);
@@ -1506,18 +1513,21 @@ class YModule extends YFunction
         foreach ($old_dslist as $each) {
             $each_str = $this->_json_get_string($each);
             // split json path and attr
-            $leng = strlen($each_str);
+            $leng = mb_strlen($each_str);
             $eqpos = YAPI::Ystrpos($each_str,'=');
             if (($eqpos < 0) || ($leng == 0)) {
                 $this->_throw(YAPI::INVALID_ARGUMENT, 'Invalid settings');
                 return YAPI::INVALID_ARGUMENT;
             }
-            $jpath = substr($each_str,  0, $eqpos);
+            $jpath = substr($each_str, 0, $eqpos);
             $eqpos = $eqpos + 1;
-            $value = substr($each_str,  $eqpos, $leng - $eqpos);
+            $value = substr($each_str, $eqpos, $leng - $eqpos);
             $old_jpath[] = $jpath;
-            $old_jpath_len[] = strlen($jpath);
+            $old_jpath_len[] = mb_strlen($jpath);
             $old_val_arr[] = $value;
+            if ($jpath == 'module/serialNumber') {
+                $old_serial = $value;
+            }
         }
 
         try {
@@ -1527,167 +1537,171 @@ class YModule extends YFunction
             YAPI::Sleep(500);
             $actualSettings = $this->_download('api.json');
         }
+        $new_serial = $this->get_serialNumber();
+        if ($old_serial == $new_serial || $old_serial == '') {
+            $old_serial = '_NO_SERIAL_FILTER_';
+        }
         $actualSettings = $this->_flattenJsonStruct($actualSettings);
         $new_dslist = $this->_json_get_array($actualSettings);
         foreach ($new_dslist as $each) {
             // remove quotes
             $each_str = $this->_json_get_string($each);
             // split json path and attr
-            $leng = strlen($each_str);
+            $leng = mb_strlen($each_str);
             $eqpos = YAPI::Ystrpos($each_str,'=');
             if (($eqpos < 0) || ($leng == 0)) {
                 $this->_throw(YAPI::INVALID_ARGUMENT, 'Invalid settings');
                 return YAPI::INVALID_ARGUMENT;
             }
-            $jpath = substr($each_str,  0, $eqpos);
+            $jpath = substr($each_str, 0, $eqpos);
             $eqpos = $eqpos + 1;
-            $value = substr($each_str,  $eqpos, $leng - $eqpos);
+            $value = substr($each_str, $eqpos, $leng - $eqpos);
             $new_jpath[] = $jpath;
-            $new_jpath_len[] = strlen($jpath);
+            $new_jpath_len[] = mb_strlen($jpath);
             $new_val_arr[] = $value;
         }
         $i = 0;
         while ($i < sizeof($new_jpath)) {
             $njpath = $new_jpath[$i];
-            $leng = strlen($njpath);
+            $leng = mb_strlen($njpath);
             $cpos = YAPI::Ystrpos($njpath,'/');
             if (($cpos < 0) || ($leng == 0)) {
                 continue;
             }
-            $fun = substr($njpath,  0, $cpos);
+            $fun = substr($njpath, 0, $cpos);
             $cpos = $cpos + 1;
-            $attr = substr($njpath,  $cpos, $leng - $cpos);
+            $attr = substr($njpath, $cpos, $leng - $cpos);
             $do_update = true;
             if ($fun == 'services') {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'firmwareRelease')) {
+            if ($do_update && ($attr == 'firmwareRelease')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'usbCurrent')) {
+            if ($do_update && ($attr == 'usbCurrent')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'upTime')) {
+            if ($do_update && ($attr == 'upTime')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'persistentSettings')) {
+            if ($do_update && ($attr == 'persistentSettings')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'adminPassword')) {
+            if ($do_update && ($attr == 'adminPassword')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'userPassword')) {
+            if ($do_update && ($attr == 'userPassword')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'rebootCountdown')) {
+            if ($do_update && ($attr == 'rebootCountdown')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'advertisedValue')) {
+            if ($do_update && ($attr == 'advertisedValue')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'poeCurrent')) {
+            if ($do_update && ($attr == 'poeCurrent')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'readiness')) {
+            if ($do_update && ($attr == 'readiness')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'ipAddress')) {
+            if ($do_update && ($attr == 'ipAddress')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'subnetMask')) {
+            if ($do_update && ($attr == 'subnetMask')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'router')) {
+            if ($do_update && ($attr == 'router')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'linkQuality')) {
+            if ($do_update && ($attr == 'linkQuality')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'ssid')) {
+            if ($do_update && ($attr == 'ssid')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'channel')) {
+            if ($do_update && ($attr == 'channel')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'security')) {
+            if ($do_update && ($attr == 'security')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'message')) {
+            if ($do_update && ($attr == 'message')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'signalValue')) {
+            if ($do_update && ($attr == 'signalValue')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'currentValue')) {
+            if ($do_update && ($attr == 'currentValue')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'currentRawValue')) {
+            if ($do_update && ($attr == 'currentRawValue')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'currentRunIndex')) {
+            if ($do_update && ($attr == 'currentRunIndex')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'pulseTimer')) {
+            if ($do_update && ($attr == 'pulseTimer')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'lastTimePressed')) {
+            if ($do_update && ($attr == 'lastTimePressed')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'lastTimeReleased')) {
+            if ($do_update && ($attr == 'lastTimeReleased')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'filesCount')) {
+            if ($do_update && ($attr == 'filesCount')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'freeSpace')) {
+            if ($do_update && ($attr == 'freeSpace')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'timeUTC')) {
+            if ($do_update && ($attr == 'timeUTC')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'rtcTime')) {
+            if ($do_update && ($attr == 'rtcTime')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'unixTime')) {
+            if ($do_update && ($attr == 'unixTime')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'dateTime')) {
+            if ($do_update && ($attr == 'dateTime')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'rawValue')) {
+            if ($do_update && ($attr == 'rawValue')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'lastMsg')) {
+            if ($do_update && ($attr == 'lastMsg')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'delayedPulseTimer')) {
+            if ($do_update && ($attr == 'delayedPulseTimer')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'rxCount')) {
+            if ($do_update && ($attr == 'rxCount')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'txCount')) {
+            if ($do_update && ($attr == 'txCount')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'msgCount')) {
+            if ($do_update && ($attr == 'msgCount')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'rxMsgCount')) {
+            if ($do_update && ($attr == 'rxMsgCount')) {
                 $do_update = false;
             }
-            if (($do_update) && ($attr == 'txMsgCount')) {
+            if ($do_update && ($attr == 'txMsgCount')) {
                 $do_update = false;
             }
             if ($do_update) {
                 $do_update = false;
-                $newval = $new_val_arr[$i];
                 $j = 0;
                 $found = false;
+                $newval = $new_val_arr[$i];
                 while (($j < sizeof($old_jpath)) && !($found)) {
                     if (($new_jpath_len[$i] == $old_jpath_len[$j]) && ($new_jpath[$i] == $old_jpath[$j])) {
                         $found = true;
                         $oldval = $old_val_arr[$j];
-                        if (!($newval == $oldval)) {
+                        if (!($newval == $oldval) && !($oldval == $old_serial)) {
                             $do_update = true;
                         }
                     }
@@ -1699,7 +1713,6 @@ class YModule extends YFunction
                     $old_calib = '';
                     $unit_name = '';
                     $sensorType = '';
-                    $new_calib = $newval;
                     $j = 0;
                     $found = false;
                     while (($j < sizeof($old_jpath)) && !($found)) {
@@ -1811,7 +1824,7 @@ class YModule extends YFunction
 
     /**
      * Returns the icon of the module. The icon is a PNG image and does not
-     * exceeds 1536 bytes.
+     * exceed 1536 bytes.
      *
      * @return string  a binary buffer with module icon, in png format.
      *         On failure, throws an exception or returns  YAPI::INVALID_STRING.
@@ -1835,7 +1848,7 @@ class YModule extends YFunction
         // $content                is a bin;
 
         $content = $this->_download('logs.txt');
-        return $content;
+        return YAPI::Ybin2str($content);
     }
 
     /**
@@ -1852,7 +1865,7 @@ class YModule extends YFunction
      */
     public function log(string $text): int
     {
-        return $this->_upload('logs.txt', $text);
+        return $this->_upload('logs.txt', YAPI::Ystr2bin($text));
     }
 
     /**

@@ -515,7 +515,7 @@ class YInputChain extends YFunction
 
     /**
      * Resets the application watchdog countdown.
-     * If you have setup a non-zero watchdogPeriod, you should
+     * If you have set up a non-zero watchdogPeriod, you should
      * call this function on a regular basis to prevent the application
      * inactivity error to be triggered.
      *
@@ -543,7 +543,7 @@ class YInputChain extends YFunction
         // $content                is a bin;
 
         $content = $this->_download('events.txt');
-        return $content;
+        return YAPI::Ybin2str($content);
     }
 
     /**
@@ -623,33 +623,33 @@ class YInputChain extends YFunction
         $url = sprintf('events.txt?pos=%d', $this->_eventPos);
 
         $content = $this->_download($url);
-        $contentStr = $content;
+        $contentStr = YAPI::Ybin2str($content);
         $eventArr = explode(''."\n".'', $contentStr);
         $arrLen = sizeof($eventArr);
-        if (!($arrLen > 0)) return $this->_throw( YAPI::IO_ERROR, 'fail to download events',YAPI::IO_ERROR);
+        if (!($arrLen > 0)) return $this->_throw(YAPI::IO_ERROR,'fail to download events',YAPI::IO_ERROR);
         // last element of array is the new position preceeded by '@'
         $arrLen = $arrLen - 1;
         $lenStr = $eventArr[$arrLen];
-        $lenStr = substr($lenStr,  1, strlen($lenStr)-1);
+        $lenStr = substr($lenStr, 1, mb_strlen($lenStr)-1);
         // update processed event position pointer
         $this->_eventPos = intVal($lenStr);
         // now generate callbacks for each event received
         $arrPos = 0;
         while ($arrPos < $arrLen) {
             $eventStr = $eventArr[$arrPos];
-            $eventLen = strlen($eventStr);
+            $eventLen = mb_strlen($eventStr);
             if ($eventLen >= 1) {
-                $hexStamp = substr($eventStr,  0, 8);
+                $hexStamp = substr($eventStr, 0, 8);
                 $evtStamp = hexdec($hexStamp);
                 $typePos = YAPI::Ystrpos($eventStr,':')+1;
                 if (($evtStamp >= $this->_eventStamp) && ($typePos > 8)) {
                     $this->_eventStamp = $evtStamp;
                     $dataPos = YAPI::Ystrpos($eventStr,'=')+1;
-                    $evtType = substr($eventStr,  $typePos, 1);
+                    $evtType = substr($eventStr, $typePos, 1);
                     $evtData = '';
                     $evtChange = '';
                     if ($dataPos > 10) {
-                        $evtData = substr($eventStr,  $dataPos, strlen($eventStr)-$dataPos);
+                        $evtData = substr($eventStr, $dataPos, mb_strlen($eventStr)-$dataPos);
                         if (YAPI::Ystrpos('1234567',$evtType) >= 0) {
                             $chainIdx = intVal($evtType) - 1;
                             $evtChange = $this->_strXor($evtData, $this->_eventChains[$chainIdx]);
@@ -676,21 +676,21 @@ class YInputChain extends YFunction
         // $digitA                 is a int;
         // $digitB                 is a int;
         // make sure the result has the same length as first argument
-        $lenA = strlen($a);
-        $lenB = strlen($b);
+        $lenA = mb_strlen($a);
+        $lenB = mb_strlen($b);
         if ($lenA > $lenB) {
-            $res = substr($a,  0, $lenA-$lenB);
-            $a = substr($a,  $lenA-$lenB, $lenB);
+            $res = substr($a, 0, $lenA-$lenB);
+            $a = substr($a, $lenA-$lenB, $lenB);
             $lenA = $lenB;
         } else {
             $res = '';
-            $b = substr($b,  $lenA-$lenB, $lenA);
+            $b = substr($b, $lenA-$lenB, $lenA);
         }
         // scan strings and compare digit by digit
         $idx = 0;
         while ($idx < $lenA) {
-            $digitA = hexdec(substr($a,  $idx, 1));
-            $digitB = hexdec(substr($b,  $idx, 1));
+            $digitA = hexdec(substr($a, $idx, 1));
+            $digitB = hexdec(substr($b, $idx, 1));
             $res = sprintf('%s%x', $res, (($digitA) ^ ($digitB)));
             $idx = $idx + 1;
         }
@@ -706,18 +706,18 @@ class YInputChain extends YFunction
         $res = [];              // intArr;
         // $idx                    is a int;
         // $digit                  is a int;
-        $hexlen = strlen($hexstr);
+        $hexlen = mb_strlen($hexstr);
         while (sizeof($res) > 0) {
             array_pop($res);
         };
         $idx = $hexlen;
         while ($idx > 0) {
             $idx = $idx - 1;
-            $digit = hexdec(substr($hexstr,  $idx, 1));
-            $res[] = (($digit) & (1));
-            $res[] = (((($digit) >> (1))) & (1));
-            $res[] = (((($digit) >> (2))) & (1));
-            $res[] = (((($digit) >> (3))) & (1));
+            $digit = hexdec(substr($hexstr, $idx, 1));
+            $res[] = (($digit) & 1);
+            $res[] = ((($digit) >> 1) & 1);
+            $res[] = ((($digit) >> 2) & 1);
+            $res[] = ((($digit) >> 3) & 1);
         }
         return $res;
     }

@@ -127,8 +127,7 @@ class YTcpReq
         }
         if (substr($addr, 0, 6) == 'tls://') {
             $sslContext = $this->hub->get_stream_context();
-            stream_context_set_params($sslContext, array("notification" => "stream_notification_callback"));
-
+            stream_context_set_params($sslContext, array());
             $resource = @stream_socket_client($addr, $errno, $errstr, $mstimeout / 1000, STREAM_CLIENT_CONNECT, $sslContext);
         } else {
             $resource = @stream_socket_client($addr, $errno, $errstr, $mstimeout / 1000);

@@ -103,6 +103,8 @@ class YAPI
     const DETECT_NET = 2;
     const DETECT_ALL = 3;
 
+    const DefaultEncoding = "ISO-8859-1";
+
     // Abstract function BaseTypes
     public static array $BASETYPES = array(
         'Function' => 0,
@@ -209,6 +211,17 @@ class YAPI
         return $res;
     }
 
+
+    public static function Ybin2str(string $bin): string
+    {
+        return iconv(YAPI::DefaultEncoding, 'utf-8', $bin);
+    }
+
+    public static function Ystr2bin(string $str): string
+    {
+        return iconv('utf-8', YAPI::DefaultEncoding, $str);
+    }
+
     /**
      * Throw an exception, keeping track of it in the object itself
      * @param int $int_errType
@@ -294,7 +307,7 @@ class YAPI
                     // report problems later
                     continue;
                 }
-                $loadval = json_decode(iconv("ISO-8859-1", "UTF-8", $req->reply), true);
+                $loadval = json_decode(YAPI::Ybin2str($req->reply), true);
                 if (!$loadval) {
                     $req->errorType = YAPI::IO_ERROR;
                     continue;
@@ -1510,7 +1523,7 @@ class YAPI
                 if ($yreq->errorType != YAPI::SUCCESS) {
                     return $yreq;
                 }
-                $loadval = json_decode(iconv("ISO-8859-1", "UTF-8", $yreq->result), true);
+                $loadval = json_decode(YAPI::Ybin2str($yreq->result), true);
                 $loadval = $loadval[$funcid];
             }
         } else {
@@ -1528,7 +1541,7 @@ class YAPI
                 if ($yreq->errorType != YAPI::SUCCESS) {
                     return $yreq;
                 }
-                $loadval = json_decode(iconv("ISO-8859-1", "UTF-8", $yreq->result), true);
+                $loadval = json_decode(YAPI::Ybin2str($yreq->result), true);
             } else {
                 $httpreq = "GET /api/{$funcid}{$str_extra}";
                 $yreq = self::devRequest($devid, $httpreq, true);
@@ -1689,7 +1702,7 @@ class YAPI
      * Modifies the network connection delay for yRegisterHub() and yUpdateDeviceList().
      * This delay impacts only the YoctoHubs and VirtualHub
      * which are accessible through the network. By default, this delay is of 20000 milliseconds,
-     * but depending or you network you may want to change this delay,
+     * but depending on your network you may want to change this delay,
      * gor example if your network infrastructure is based on a GSM connection.
      *
      * @param int $networkMsTimeout : the network connection delay in milliseconds.
@@ -1706,7 +1719,7 @@ class YAPI
      * Returns the network connection delay for yRegisterHub() and yUpdateDeviceList().
      * This delay impacts only the YoctoHubs and VirtualHub
      * which are accessible through the network. By default, this delay is of 20000 milliseconds,
-     * but depending or you network you may want to change this delay,
+     * but depending on your network you may want to change this delay,
      * for example if your network infrastructure is based on a GSM connection.
      *
      * @return int  the network connection delay in milliseconds.
@@ -1795,7 +1808,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "2.0.61858";
+        return "2.0.63797";
     }
 
     /**
@@ -1896,7 +1909,7 @@ class YAPI
      *
      * From an operating system standpoint, it is generally not required to call
      * this function since the OS will automatically free allocated resources
-     * once your program is completed. However there are two situations when
+     * once your program is completed. However, there are two situations when
      * you may really want to use that function:
      *
      * - Free all dynamically allocated memory blocks in order to
@@ -2010,11 +2023,11 @@ class YAPI
             $res['auth'] = substr($str_url, 0, $authpos);
             $str_url = substr($str_url, $authpos + 1);
         }
-        $endv6 =  strpos($str_url, ']');
+        $endv6 = strpos($str_url, ']');
         $p_ofs = strpos($str_url, ':');
         if ($p_ofs > 0 && $endv6 > 0 && $p_ofs < $endv6) {
             // ipv6 URL
-            $p_ofs = strpos($str_url, ':',$endv6);
+            $p_ofs = strpos($str_url, ':', $endv6);
         }
         if ($p_ofs !== false) {
             $res['host'] = substr($str_url, 0, $p_ofs);
@@ -2048,7 +2061,7 @@ class YAPI
         foreach (self::$_hubs as $hub_url => $hub) {
             if ($url == $hub->url_info['org_url']) {
                 $res[] = $hub;
-            }else if ($hub_url == $url_detail['rooturl']) {
+            } elseif ($hub_url == $url_detail['rooturl']) {
                 $res[] = $hub;
             } else {
                 if ($hub->isURLKnown($url)) {
@@ -2061,7 +2074,7 @@ class YAPI
 
 
     /**
-     * Setup the Yoctopuce library to use modules connected on a given machine. Idealy this
+     * Set up the Yoctopuce library to use modules connected on a given machine. Idealy this
      * call will be made once at the begining of your application.  The
      * parameter will determine how the API will work. Use the following values:
      *
@@ -2078,7 +2091,7 @@ class YAPI
      * computer, use the IP address 127.0.0.1. If the given IP is unresponsive, yRegisterHub
      * will not return until a time-out defined by ySetNetworkTimeout has elapsed.
      * However, it is possible to preventively test a connection  with yTestHub.
-     * If you cannot afford a network time-out, you can use the non blocking yPregisterHub
+     * If you cannot afford a network time-out, you can use the non-blocking yPregisterHub
      * function that will establish the connection as soon as it is available.
      *
      *
@@ -2093,7 +2106,7 @@ class YAPI
      * while trying to access the USB modules. In particular, this means
      * that you must stop the VirtualHub software before starting
      * an application that uses direct USB access. The workaround
-     * for this limitation is to setup the library to use the VirtualHub
+     * for this limitation is to set up the library to use the VirtualHub
      * rather than direct USB access.
      *
      * If access control has been activated on the hub, virtual or not, you want to
@@ -2236,7 +2249,7 @@ class YAPI
 
 
     /**
-     * Setup the Yoctopuce library to no more use modules connected on a previously
+     * Set up the Yoctopuce library to no more use modules connected on a previously
      * registered machine with RegisterHub.
      *
      * @param string $url : a string containing either "usb" or the
@@ -2308,10 +2321,16 @@ class YAPI
      */
     public static function TestHub(string $url, int $mstimeout, string &$errmsg = ''): int
     {
+        if ($url == 'net') {
+            $errmsg = "Invalid URL";
+            return YAPI::INVALID_ARGUMENT;
+        } elseif ($url == 'usb') {
+            $errmsg = "USB is not available in PHP";
+            return YAPI::NOT_SUPPORTED;
+        }
         if (is_null(self::$_hubs)) {
             self::_init();
         }
-
         $url_detail = self::_parseRegisteredURL($url);
         if ($url_detail['proto'] == "wss" || $url_detail['proto'] == "ws") {
             $errmsg = "Websocket is not available in PHP";
@@ -2669,7 +2688,7 @@ class YAPI
     /**
      * Checks if a given string is valid as logical name for a module or a function.
      * A valid logical name has a maximum of 19 characters, all among
-     * A..Z, a..z, 0..9, _, and -.
+     * A...Z, a...z, 0...9, _, and -.
      * If you try to configure a logical name with an incorrect string,
      * the invalid characters are ignored.
      *

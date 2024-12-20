@@ -119,7 +119,7 @@ class YDataSet
         $measure_data = [];     // floatArr;
 
         if ($this->_progress < 0) {
-            $strdata = $data;
+            $strdata = YAPI::Ybin2str($data);
             if ($strdata == '{}') {
                 $this->_parent->_throw(YAPI::VERSION_MISMATCH, 'device firmware is too old');
                 return YAPI::VERSION_MISMATCH;
@@ -137,7 +137,7 @@ class YDataSet
         $summaryStopMs = YAPI::MIN_DOUBLE;
 
         // Parse complete streams
-        foreach ( $this->_streams as $each) {
+        foreach ($this->_streams as $each) {
             $streamStartTimeMs = round($each->get_realStartTimeUTC() * 1000);
             $streamDuration = $each->get_realDuration();
             $streamEndTimeMs = $streamStartTimeMs + round($streamDuration * 1000);
@@ -276,9 +276,8 @@ class YDataSet
         $suffixes = [];         // strArr;
         // $idx                    is a int;
         // $bulkFile               is a bin;
-        $streamStr = [];        // strArr;
         // $urlIdx                 is a int;
-        // $streamBin              is a bin;
+        $streamBin = [];        // binArr;
 
         if ($progress != $this->_progress) {
             return $this->_progress;
@@ -352,14 +351,13 @@ class YDataSet
                 $idx = $idx + 1;
             }
             $bulkFile = $this->_parent->_download($url);
-            $streamStr = $this->_parent->_json_get_array($bulkFile);
+            $streamBin = $this->_parent->_json_get_array($bulkFile);
             $urlIdx = 0;
             $idx = $this->_progress;
-            while (($idx < sizeof($this->_streams)) && ($urlIdx < sizeof($suffixes)) && ($urlIdx < sizeof($streamStr))) {
+            while (($idx < sizeof($this->_streams)) && ($urlIdx < sizeof($suffixes)) && ($urlIdx < sizeof($streamBin))) {
                 $stream = $this->_streams[$idx];
                 if (($stream->_get_baseurl() == $baseurl) && ($stream->_get_urlsuffix() == $suffixes[$urlIdx])) {
-                    $streamBin = $streamStr[$urlIdx];
-                    $stream->_parseStream($streamBin);
+                    $stream->_parseStream($streamBin[$urlIdx]);
                     $urlIdx = $urlIdx + 1;
                 }
                 $idx = $idx + 1;
@@ -495,7 +493,7 @@ class YDataSet
         if ($this->_progress >= sizeof($this->_streams)) {
             return 100;
         }
-        return intVal((1 + (1 + $this->_progress) * 98 ) / ((1 + sizeof($this->_streams))));
+        return intVal((1 + (1 + $this->_progress) * 98) / ((1 + sizeof($this->_streams))));
     }
 
     /**
@@ -527,7 +525,7 @@ class YDataSet
                 $stream = $this->_streams[$this->_progress];
                 if ($stream->_wasLoaded()) {
                     // Do not reload stream if it was already loaded
-                    return $this->processMore($this->_progress, '');
+                    return $this->processMore($this->_progress, YAPI::Ystr2bin(''));
                 }
                 $url = $stream->_get_url();
             }
@@ -688,7 +686,7 @@ class YDataSet
     // YDataSet parser for stream list
     public function _parse(string $str_json)
     {
-        $loadval = json_decode(iconv("ISO-8859-1", "UTF-8", $str_json), true);
+        $loadval = json_decode(YAPI::Ybin2str($str_json), true);
 
         $this->_functionId = $loadval['id'];
         $this->_unit = $loadval['unit'];

@@ -7,7 +7,7 @@ namespace Yoctopuce\YoctoAPI;
  * The YSensor class is the parent class for all Yoctopuce sensor types. It can be
  * used to read the current value and unit of any sensor, read the min/max
  * value, configure autonomous recording frequency and access recorded data.
- * It also provide a function to register a callback invoked each time the
+ * It also provides a function to register a callback invoked each time the
  * observed value changes, or at a predefined interval. Using this class rather
  * than a specific subclass makes it possible to create generic applications
  * that work with any Yoctopuce sensor, even those that do not yet exist.
@@ -725,7 +725,7 @@ class YSensor extends YFunction
         // $res                    is a bin;
 
         $res = $this->_download('api/dataLogger/recording?recording=1');
-        if (!(strlen($res) > 0)) return $this->_throw( YAPI::IO_ERROR, 'unable to start datalogger',YAPI::IO_ERROR);
+        if (!(strlen($res) > 0)) return $this->_throw(YAPI::IO_ERROR,'unable to start datalogger',YAPI::IO_ERROR);
         return YAPI::SUCCESS;
     }
 
@@ -739,7 +739,7 @@ class YSensor extends YFunction
         // $res                    is a bin;
 
         $res = $this->_download('api/dataLogger/recording?recording=0');
-        if (!(strlen($res) > 0)) return $this->_throw( YAPI::IO_ERROR, 'unable to stop datalogger',YAPI::IO_ERROR);
+        if (!(strlen($res) > 0)) return $this->_throw(YAPI::IO_ERROR,'unable to stop datalogger',YAPI::IO_ERROR);
         return YAPI::SUCCESS;
     }
 
@@ -993,7 +993,7 @@ class YSensor extends YFunction
                 $poww = $poww * 0x100;
                 $i = $i + 1;
             }
-            if ((($byteVal) & (0x80)) != 0) {
+            if ((($byteVal) & 0x80) != 0) {
                 $avgRaw = $avgRaw - $poww;
             }
             $avgVal = $avgRaw / 1000.0;
@@ -1006,7 +1006,7 @@ class YSensor extends YFunction
             $maxVal = $avgVal;
         } else {
             // averaged report: avg,avg-min,max-avg
-            $sublen = 1 + (($report[1]) & (3));
+            $sublen = 1 + (($report[1]) & 3);
             $poww = 1;
             $avgRaw = 0;
             $byteVal = 0;
@@ -1018,10 +1018,10 @@ class YSensor extends YFunction
                 $i = $i + 1;
                 $sublen = $sublen - 1;
             }
-            if ((($byteVal) & (0x80)) != 0) {
+            if ((($byteVal) & 0x80) != 0) {
                 $avgRaw = $avgRaw - $poww;
             }
-            $sublen = 1 + (((($report[1]) >> (2))) & (3));
+            $sublen = 1 + ((($report[1]) >> 2) & 3);
             $poww = 1;
             $difRaw = 0;
             while (($sublen > 0) && ($i < sizeof($report))) {
@@ -1032,7 +1032,7 @@ class YSensor extends YFunction
                 $sublen = $sublen - 1;
             }
             $minRaw = $avgRaw - $difRaw;
-            $sublen = 1 + (((($report[1]) >> (4))) & (3));
+            $sublen = 1 + ((($report[1]) >> 4) & 3);
             $poww = 1;
             $difRaw = 0;
             while (($sublen > 0) && ($i < sizeof($report))) {

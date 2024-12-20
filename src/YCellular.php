@@ -740,7 +740,7 @@ class YCellular extends YFunction
 
     /**
      * Sends a PUK code to unlock the SIM card after three failed PIN code attempts, and
-     * setup a new PIN into the SIM card. Only ten consecutive tentatives are permitted:
+     * set up a new PIN into the SIM card. Only ten consecutive tentatives are permitted:
      * after that, the SIM card will be blocked permanently without any mean of recovery
      * to use it again. Note that after calling this method, you have usually to invoke
      * method set_pin() to tell the YoctoHub which PIN to use in the future.
@@ -757,7 +757,7 @@ class YCellular extends YFunction
     {
         // $gsmMsg                 is a str;
         $gsmMsg = $this->get_message();
-        if (!(substr($gsmMsg, 0, 13) == 'Enter SIM PUK')) return $this->_throw(YAPI::INVALID_ARGUMENT, 'PUK not expected at $this time',YAPI::INVALID_ARGUMENT);
+        if (!(substr($gsmMsg, 0, 13) == 'Enter SIM PUK')) return $this->_throw(YAPI::INVALID_ARGUMENT,'PUK not expected at $this time',YAPI::INVALID_ARGUMENT);
         if ($newPin == '') {
             return $this->set_command(sprintf('AT+CPIN=%s,0000;+CLCK=SC,0,0000',$puk));
         }
@@ -825,25 +825,25 @@ class YCellular extends YFunction
         // $idx                    is a int;
         // $suffixlen              is a int;
         // quote dangerous characters used in AT commands
-        $cmdLen = strlen($cmd);
+        $cmdLen = mb_strlen($cmd);
         $chrPos = YAPI::Ystrpos($cmd,'#');
         while ($chrPos >= 0) {
-            $cmd = sprintf('%s%c23%s', substr($cmd,  0, $chrPos), 37,
-            substr($cmd,  $chrPos+1, $cmdLen-$chrPos-1));
+            $cmd = sprintf('%s%c23%s', substr($cmd, 0, $chrPos), 37,
+            substr($cmd, $chrPos+1, $cmdLen-$chrPos-1));
             $cmdLen = $cmdLen + 2;
             $chrPos = YAPI::Ystrpos($cmd,'#');
         }
         $chrPos = YAPI::Ystrpos($cmd,'+');
         while ($chrPos >= 0) {
-            $cmd = sprintf('%s%c2B%s', substr($cmd,  0, $chrPos), 37,
-            substr($cmd,  $chrPos+1, $cmdLen-$chrPos-1));
+            $cmd = sprintf('%s%c2B%s', substr($cmd, 0, $chrPos), 37,
+            substr($cmd, $chrPos+1, $cmdLen-$chrPos-1));
             $cmdLen = $cmdLen + 2;
             $chrPos = YAPI::Ystrpos($cmd,'+');
         }
         $chrPos = YAPI::Ystrpos($cmd,'=');
         while ($chrPos >= 0) {
-            $cmd = sprintf('%s%c3D%s', substr($cmd,  0, $chrPos), 37,
-            substr($cmd,  $chrPos+1, $cmdLen-$chrPos-1));
+            $cmd = sprintf('%s%c3D%s', substr($cmd, 0, $chrPos), 37,
+            substr($cmd, $chrPos+1, $cmdLen-$chrPos-1));
             $cmdLen = $cmdLen + 2;
             $chrPos = YAPI::Ystrpos($cmd,'=');
         }
@@ -854,8 +854,8 @@ class YCellular extends YFunction
         while ($waitMore > 0) {
             $buff = $this->_download($cmd);
             $bufflen = strlen($buff);
-            $buffstr = $buff;
-            $buffstrlen = strlen($buffstr);
+            $buffstr = YAPI::Ybin2str($buff);
+            $buffstrlen = mb_strlen($buffstr);
             $idx = $bufflen - 1;
             while (($idx > 0) && (ord($buff[$idx]) != 64) && (ord($buff[$idx]) != 10) && (ord($buff[$idx]) != 13)) {
                 $idx = $idx - 1;
@@ -863,8 +863,8 @@ class YCellular extends YFunction
             if (ord($buff[$idx]) == 64) {
                 // continuation detected
                 $suffixlen = $bufflen - $idx;
-                $cmd = sprintf('at.txt?cmd=%s', substr($buffstr,  $buffstrlen - $suffixlen, $suffixlen));
-                $buffstr = substr($buffstr,  0, $buffstrlen - $suffixlen);
+                $cmd = sprintf('at.txt?cmd=%s', substr($buffstr, $buffstrlen - $suffixlen, $suffixlen));
+                $buffstr = substr($buffstr, 0, $buffstrlen - $suffixlen);
                 $waitMore = $waitMore - 1;
             } else {
                 // request complete
@@ -892,21 +892,21 @@ class YCellular extends YFunction
         $res = [];              // strArr;
 
         $cops = $this->_AT('+COPS=?');
-        $slen = strlen($cops);
+        $slen = mb_strlen($cops);
         while (sizeof($res) > 0) {
             array_pop($res);
         };
         $idx = YAPI::Ystrpos($cops,'(');
         while ($idx >= 0) {
             $slen = $slen - ($idx+1);
-            $cops = substr($cops,  $idx+1, $slen);
+            $cops = substr($cops, $idx+1, $slen);
             $idx = YAPI::Ystrpos($cops,'"');
             if ($idx > 0) {
                 $slen = $slen - ($idx+1);
-                $cops = substr($cops,  $idx+1, $slen);
+                $cops = substr($cops, $idx+1, $slen);
                 $idx = YAPI::Ystrpos($cops,'"');
                 if ($idx > 0) {
-                    $res[] = substr($cops,  0, $idx);
+                    $res[] = substr($cops, 0, $idx);
                 }
             }
             $idx = YAPI::Ystrpos($cops,'(');
@@ -954,7 +954,7 @@ class YCellular extends YFunction
             $mncs = substr($mncs, 0, 2);
         }
         if (substr($mncs, 0, 1) == '0') {
-            $mncs = substr($mncs, 1, strlen($mncs)-1);
+            $mncs = substr($mncs, 1, mb_strlen($mncs)-1);
         }
         $mnc = intVal($mncs);
         $recs = explode('#', $moni);
@@ -963,7 +963,7 @@ class YCellular extends YFunction
             array_pop($res);
         };
         foreach ($recs as $each) {
-            $llen = strlen($each) - 2;
+            $llen = mb_strlen($each) - 2;
             if ($llen >= 44) {
                 if (substr($each, 41, 3) == 'dbm') {
                     $lac = hexdec(substr($each, 16, 4));
@@ -1005,7 +1005,7 @@ class YCellular extends YFunction
         // $ch                     is a str;
         // $plmnid                 is a int;
         // Make sure we have a valid MCC/MNC pair
-        $inputlen = strlen($mccmnc);
+        $inputlen = mb_strlen($mccmnc);
         if ($inputlen < 5) {
             return $mccmnc;
         }
@@ -5471,7 +5471,7 @@ class YCellular extends YFunction
         $profiles = $this->_AT('+UMNOPROF=?');
         $lines = explode(''."\n".'', $profiles);
         $nlines = sizeof($lines);
-        if (!($nlines > 0)) return $this->_throw( YAPI::IO_ERROR, 'fail to retrieve profile list',$res);
+        if (!($nlines > 0)) return $this->_throw(YAPI::IO_ERROR,'fail to retrieve profile list',$res);
         while (sizeof($res) > 0) {
             array_pop($res);
         };
@@ -5480,7 +5480,7 @@ class YCellular extends YFunction
             $line = $lines[$idx];
             $cpos = YAPI::Ystrpos($line,':');
             if ($cpos > 0) {
-                $profno = intVal(substr($line,  0, $cpos));
+                $profno = intVal(substr($line, 0, $cpos));
                 if ($profno > 1) {
                     $res[] = $line;
                 }

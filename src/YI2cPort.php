@@ -570,7 +570,7 @@ class YI2cPort extends YFunction
     {
         // $url                    is a str;
         // $msgbin                 is a bin;
-        $msgarr = [];           // strArr;
+        $msgarr = [];           // binArr;
         // $msglen                 is a int;
         // $res                    is a str;
 
@@ -583,7 +583,7 @@ class YI2cPort extends YFunction
         }
         // last element of array is the new position
         $msglen = $msglen - 1;
-        $this->_rxptr = intVal($msgarr[$msglen]);
+        $this->_rxptr = $this->_decode_json_int($msgarr[$msglen]);
         if ($msglen == 0) {
             return '';
         }
@@ -617,7 +617,7 @@ class YI2cPort extends YFunction
     {
         // $url                    is a str;
         // $msgbin                 is a bin;
-        $msgarr = [];           // strArr;
+        $msgarr = [];           // binArr;
         // $msglen                 is a int;
         $res = [];              // strArr;
         // $idx                    is a int;
@@ -631,7 +631,7 @@ class YI2cPort extends YFunction
         }
         // last element of array is the new position
         $msglen = $msglen - 1;
-        $this->_rxptr = intVal($msgarr[$msglen]);
+        $this->_rxptr = $this->_decode_json_int($msgarr[$msglen]);
         $idx = 0;
         while ($idx < $msglen) {
             $res[] = $this->_json_get_string($msgarr[$idx]);
@@ -679,9 +679,9 @@ class YI2cPort extends YFunction
         // $databin                is a bin;
 
         $databin = $this->_download(sprintf('rxcnt.bin?pos=%d', $this->_rxptr));
-        $availPosStr = $databin;
+        $availPosStr = YAPI::Ybin2str($databin);
         $atPos = YAPI::Ystrpos($availPosStr,'@');
-        $res = intVal(substr($availPosStr,  0, $atPos));
+        $res = intVal(substr($availPosStr, 0, $atPos));
         return $res;
     }
 
@@ -696,9 +696,9 @@ class YI2cPort extends YFunction
         // $databin                is a bin;
 
         $databin = $this->_download(sprintf('rxcnt.bin?pos=%d', $this->_rxptr));
-        $availPosStr = $databin;
+        $availPosStr = YAPI::Ybin2str($databin);
         $atPos = YAPI::Ystrpos($availPosStr,'@');
-        $res = intVal(substr($availPosStr,  $atPos+1, strlen($availPosStr)-$atPos-1));
+        $res = intVal(substr($availPosStr, $atPos+1, mb_strlen($availPosStr)-$atPos-1));
         return $res;
     }
 
@@ -720,16 +720,16 @@ class YI2cPort extends YFunction
         // $prevpos                is a int;
         // $url                    is a str;
         // $msgbin                 is a bin;
-        $msgarr = [];           // strArr;
+        $msgarr = [];           // binArr;
         // $msglen                 is a int;
         // $res                    is a str;
-        if (strlen($query) <= 80) {
+        if (mb_strlen($query) <= 80) {
             // fast query
             $url = sprintf('rxmsg.json?len=1&maxw=%d&cmd=!%s', $maxWait, $this->_escapeAttr($query));
         } else {
             // long query
             $prevpos = $this->end_tell();
-            $this->_upload('txdata', $query . ''."\r".''."\n".'');
+            $this->_upload('txdata', YAPI::Ystr2bin($query . ''."\r".''."\n".''));
             $url = sprintf('rxmsg.json?len=1&maxw=%d&pos=%d', $maxWait, $prevpos);
         }
 
@@ -741,7 +741,7 @@ class YI2cPort extends YFunction
         }
         // last element of array is the new position
         $msglen = $msglen - 1;
-        $this->_rxptr = intVal($msgarr[$msglen]);
+        $this->_rxptr = $this->_decode_json_int($msgarr[$msglen]);
         if ($msglen == 0) {
             return '';
         }
@@ -768,10 +768,10 @@ class YI2cPort extends YFunction
         // $prevpos                is a int;
         // $url                    is a str;
         // $msgbin                 is a bin;
-        $msgarr = [];           // strArr;
+        $msgarr = [];           // binArr;
         // $msglen                 is a int;
         // $res                    is a str;
-        if (strlen($hexString) <= 80) {
+        if (mb_strlen($hexString) <= 80) {
             // fast query
             $url = sprintf('rxmsg.json?len=1&maxw=%d&cmd=$%s', $maxWait, $hexString);
         } else {
@@ -789,7 +789,7 @@ class YI2cPort extends YFunction
         }
         // last element of array is the new position
         $msglen = $msglen - 1;
-        $this->_rxptr = intVal($msgarr[$msglen]);
+        $this->_rxptr = $this->_decode_json_int($msgarr[$msglen]);
         if ($msglen == 0) {
             return '';
         }
@@ -811,7 +811,7 @@ class YI2cPort extends YFunction
      */
     public function uploadJob(string $jobfile, string $jsonDef): int
     {
-        $this->_upload($jobfile, $jsonDef);
+        $this->_upload($jobfile, YAPI::Ystr2bin($jsonDef));
         return YAPI::SUCCESS;
     }
 
@@ -878,11 +878,11 @@ class YI2cPort extends YFunction
         }
 
         $reply = $this->queryLine($msg,1000);
-        if (!(strlen($reply) > 0)) return $this->_throw( YAPI::IO_ERROR, 'No response from I2C device',YAPI::IO_ERROR);
+        if (!(mb_strlen($reply) > 0)) return $this->_throw(YAPI::IO_ERROR,'No response from I2C device',YAPI::IO_ERROR);
         $idx = YAPI::Ystrpos($reply,'[N]!');
-        if (!($idx < 0)) return $this->_throw( YAPI::IO_ERROR, 'No I2C ACK received',YAPI::IO_ERROR);
+        if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'No I2C ACK received',YAPI::IO_ERROR);
         $idx = YAPI::Ystrpos($reply,'!');
-        if (!($idx < 0)) return $this->_throw( YAPI::IO_ERROR, 'I2C protocol error',YAPI::IO_ERROR);
+        if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'I2C protocol error',YAPI::IO_ERROR);
         return YAPI::SUCCESS;
     }
 
@@ -915,11 +915,11 @@ class YI2cPort extends YFunction
         }
 
         $reply = $this->queryLine($msg,1000);
-        if (!(strlen($reply) > 0)) return $this->_throw( YAPI::IO_ERROR, 'No response from I2C device',YAPI::IO_ERROR);
+        if (!(mb_strlen($reply) > 0)) return $this->_throw(YAPI::IO_ERROR,'No response from I2C device',YAPI::IO_ERROR);
         $idx = YAPI::Ystrpos($reply,'[N]!');
-        if (!($idx < 0)) return $this->_throw( YAPI::IO_ERROR, 'No I2C ACK received',YAPI::IO_ERROR);
+        if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'No I2C ACK received',YAPI::IO_ERROR);
         $idx = YAPI::Ystrpos($reply,'!');
-        if (!($idx < 0)) return $this->_throw( YAPI::IO_ERROR, 'I2C protocol error',YAPI::IO_ERROR);
+        if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'I2C protocol error',YAPI::IO_ERROR);
         return YAPI::SUCCESS;
     }
 
@@ -946,7 +946,7 @@ class YI2cPort extends YFunction
         // $reply                  is a str;
         // $rcvbytes               is a bin;
         $rcvbytes = '';
-        if (!($rcvCount<=512)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Cannot read more than 512 bytes',$rcvbytes);
+        if (!($rcvCount<=512)) return $this->_throw(YAPI::INVALID_ARGUMENT,'Cannot read more than 512 bytes',$rcvbytes);
         $msg = sprintf('@%02x:', $slaveAddr);
         $nBytes = strlen($buff);
         $idx = 0;
@@ -972,12 +972,12 @@ class YI2cPort extends YFunction
         }
 
         $reply = $this->queryLine($msg,1000);
-        if (!(strlen($reply) > 0)) return $this->_throw( YAPI::IO_ERROR, 'No response from I2C device',$rcvbytes);
+        if (!(mb_strlen($reply) > 0)) return $this->_throw(YAPI::IO_ERROR,'No response from I2C device',$rcvbytes);
         $idx = YAPI::Ystrpos($reply,'[N]!');
-        if (!($idx < 0)) return $this->_throw( YAPI::IO_ERROR, 'No I2C ACK received',$rcvbytes);
+        if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'No I2C ACK received',$rcvbytes);
         $idx = YAPI::Ystrpos($reply,'!');
-        if (!($idx < 0)) return $this->_throw( YAPI::IO_ERROR, 'I2C protocol error',$rcvbytes);
-        $reply = substr($reply,  strlen($reply)-2*$rcvCount, 2*$rcvCount);
+        if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'I2C protocol error',$rcvbytes);
+        $reply = substr($reply, mb_strlen($reply)-2*$rcvCount, 2*$rcvCount);
         $rcvbytes = YAPI::_hexStrToBin($reply);
         return $rcvbytes;
     }
@@ -1008,7 +1008,7 @@ class YI2cPort extends YFunction
         while (sizeof($res) > 0) {
             array_pop($res);
         };
-        if (!($rcvCount<=512)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'Cannot read more than 512 bytes',$res);
+        if (!($rcvCount<=512)) return $this->_throw(YAPI::INVALID_ARGUMENT,'Cannot read more than 512 bytes',$res);
         $msg = sprintf('@%02x:', $slaveAddr);
         $nBytes = sizeof($values);
         $idx = 0;
@@ -1034,12 +1034,12 @@ class YI2cPort extends YFunction
         }
 
         $reply = $this->queryLine($msg,1000);
-        if (!(strlen($reply) > 0)) return $this->_throw( YAPI::IO_ERROR, 'No response from I2C device',$res);
+        if (!(mb_strlen($reply) > 0)) return $this->_throw(YAPI::IO_ERROR,'No response from I2C device',$res);
         $idx = YAPI::Ystrpos($reply,'[N]!');
-        if (!($idx < 0)) return $this->_throw( YAPI::IO_ERROR, 'No I2C ACK received',$res);
+        if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'No I2C ACK received',$res);
         $idx = YAPI::Ystrpos($reply,'!');
-        if (!($idx < 0)) return $this->_throw( YAPI::IO_ERROR, 'I2C protocol error',$res);
-        $reply = substr($reply,  strlen($reply)-2*$rcvCount, 2*$rcvCount);
+        if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'I2C protocol error',$res);
+        $reply = substr($reply, mb_strlen($reply)-2*$rcvCount, 2*$rcvCount);
         $rcvbytes = YAPI::_hexStrToBin($reply);
         while (sizeof($res) > 0) {
             array_pop($res);
@@ -1080,7 +1080,7 @@ class YI2cPort extends YFunction
         // $buff                   is a bin;
         // $idx                    is a int;
         // $ch                     is a int;
-        $buff = $codes;
+        $buff = YAPI::Ystr2bin($codes);
         $bufflen = strlen($buff);
         if ($bufflen < 100) {
             // if string is pure text, we can send it as a simple command (faster)
@@ -1127,12 +1127,12 @@ class YI2cPort extends YFunction
     {
         // $bufflen                is a int;
         // $buff                   is a bin;
-        $bufflen = strlen($codes);
+        $bufflen = mb_strlen($codes);
         if ($bufflen < 100) {
             return $this->sendCommand(sprintf('!%s',$codes));
         }
         // send string using file upload
-        $buff = sprintf('%s'."\n".'', $codes);
+        $buff = YAPI::Ystr2bin(sprintf('%s'."\n".'', $codes));
         return $this->_upload('txdata', $buff);
     }
 
@@ -1168,11 +1168,11 @@ class YI2cPort extends YFunction
     {
         // $bufflen                is a int;
         // $buff                   is a bin;
-        $bufflen = strlen($hexString);
+        $bufflen = mb_strlen($hexString);
         if ($bufflen < 100) {
             return $this->sendCommand(sprintf('+%s',$hexString));
         }
-        $buff = $hexString;
+        $buff = YAPI::Ystr2bin($hexString);
 
         return $this->_upload('txdata', $buff);
     }
@@ -1256,7 +1256,7 @@ class YI2cPort extends YFunction
     {
         // $url                    is a str;
         // $msgbin                 is a bin;
-        $msgarr = [];           // strArr;
+        $msgarr = [];           // binArr;
         // $msglen                 is a int;
         $res = [];              // YI2cSnoopingRecordArr;
         // $idx                    is a int;
@@ -1270,10 +1270,10 @@ class YI2cPort extends YFunction
         }
         // last element of array is the new position
         $msglen = $msglen - 1;
-        $this->_rxptr = intVal($msgarr[$msglen]);
+        $this->_rxptr = $this->_decode_json_int($msgarr[$msglen]);
         $idx = 0;
         while ($idx < $msglen) {
-            $res[] = new YI2cSnoopingRecord($msgarr[$idx]);
+            $res[] = new YI2cSnoopingRecord(YAPI::Ybin2str($msgarr[$idx]));
             $idx = $idx + 1;
         }
         return $res;

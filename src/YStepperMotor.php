@@ -162,7 +162,7 @@ class YStepperMotor extends YFunction
 
     /**
      * Changes the current logical motor position, measured in steps.
-     * This command does not cause any motor move, as its purpose is only to setup
+     * This command does not cause any motor move, as its purpose is only to set up
      * the origin of the position counter. The fractional part of the position,
      * that corresponds to the physical position of the rotor, is not changed.
      * To trigger a motor move, use methods moveTo() or moveRel()
@@ -647,15 +647,15 @@ class YStepperMotor extends YFunction
         // $retBin                 is a bin;
         // $res                    is a int;
         $id = $this->get_functionId();
-        $id = substr($id,  12, 1);
+        $id = substr($id, 12, 1);
         $url = sprintf('cmd.txt?%s=%s', $id, $command);
         //may throw an exception
         $retBin = $this->_download($url);
         $res = ord($retBin[0]);
         if ($res < 58) {
-            if (!($res == 48)) return $this->_throw( YAPI::DEVICE_BUSY, 'Motor command pipeline is full, try again later',YAPI::DEVICE_BUSY);
+            if (!($res == 48)) return $this->_throw(YAPI::DEVICE_BUSY,'Motor command pipeline is full, try again later',YAPI::DEVICE_BUSY);
         } else {
-            if (!($res == 48)) return $this->_throw( YAPI::IO_ERROR, 'Motor command failed permanently',YAPI::IO_ERROR);
+            if (!($res == 48)) return $this->_throw(YAPI::IO_ERROR,'Motor command failed permanently',YAPI::IO_ERROR);
         }
         return YAPI::SUCCESS;
     }
@@ -804,7 +804,7 @@ class YStepperMotor extends YFunction
      */
     public function alertStepDir(int $dir): int
     {
-        if (!($dir != 0)) return $this->_throw( YAPI::INVALID_ARGUMENT, 'direction must be +1 or -1',YAPI::INVALID_ARGUMENT);
+        if (!($dir != 0)) return $this->_throw(YAPI::INVALID_ARGUMENT,'direction must be +1 or -1',YAPI::INVALID_ARGUMENT);
         if ($dir > 0) {
             return $this->set_command('.+');
         }

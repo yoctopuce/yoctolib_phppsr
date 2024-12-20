@@ -296,7 +296,7 @@ class YFunction
         // $attrVal                is a bin;
         $url = sprintf('api/%s/%s', $this->get_functionId(), $attrName);
         $attrVal = $this->_download($url);
-        return $attrVal;
+        return YAPI::Ybin2str($attrVal);
     }
 
     /**
@@ -728,7 +728,7 @@ class YFunction
     //
     public function _json_get_key(string $bin_jsonbuff, string $str_key): mixed
     {
-        $loadval = json_decode($bin_jsonbuff, true);
+        $loadval = json_decode(YAPI::Ybin2str($bin_jsonbuff), true);
         if (isset($loadval[$str_key])) {
             return $loadval[$str_key];
         }
@@ -739,24 +739,24 @@ class YFunction
     //
     public function _json_get_string(string $bin_jsonbuff): string
     {
-        return json_decode($bin_jsonbuff, true);
+        return json_decode(YAPI::Ybin2str($bin_jsonbuff), true);
     }
 
     // Get an array of strings from a JSON buffer
     //
     public function _json_get_array(string $bin_jsonbuff): array
     {
-        $loadval = json_decode($bin_jsonbuff, true);
+        $loadval = json_decode(YAPI::Ybin2str($bin_jsonbuff), true);
         $res = array();
         foreach ($loadval as $record) {
-            $res[] = json_encode($record);
+            $res[] = YAPI::Ystr2bin(json_encode($record, JSON_UNESCAPED_UNICODE));
         }
         return $res;
     }
 
-    public function _get_json_path(string $str_json, string $path): string
+    public function _get_json_path(string $bin_jsonbuff, string $path): string
     {
-        $json = json_decode($str_json, true);
+        $json = json_decode(YAPI::Ybin2str($bin_jsonbuff), true);
         $paths = explode('|', $path);
         foreach ($paths as $key) {
             if (array_key_exists($key, $json)) {
@@ -765,14 +765,23 @@ class YFunction
                 return '';
             }
         }
-        return json_encode($json);
+        return YAPI::Ystr2bin(json_encode($json, JSON_UNESCAPED_UNICODE));
     }
 
-    public function _decode_json_string(string $json): string
+    public function _decode_json_string(string $bin_json): string
     {
-        $decoded = json_decode($json);
+        $decoded = json_decode(YAPI::Ybin2str($bin_json));
         if (is_null($decoded)) {
             return '';
+        }
+        return $decoded;
+    }
+
+    public function _decode_json_int(string $bin_json): int
+    {
+        $decoded = json_decode(YAPI::Ybin2str($bin_json));
+        if (is_null($decoded)) {
+            return 0;
         }
         return $decoded;
     }

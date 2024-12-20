@@ -679,7 +679,7 @@ class YSpiPort extends YFunction
     {
         // $url                    is a str;
         // $msgbin                 is a bin;
-        $msgarr = [];           // strArr;
+        $msgarr = [];           // binArr;
         // $msglen                 is a int;
         // $res                    is a str;
 
@@ -692,7 +692,7 @@ class YSpiPort extends YFunction
         }
         // last element of array is the new position
         $msglen = $msglen - 1;
-        $this->_rxptr = intVal($msgarr[$msglen]);
+        $this->_rxptr = $this->_decode_json_int($msgarr[$msglen]);
         if ($msglen == 0) {
             return '';
         }
@@ -726,7 +726,7 @@ class YSpiPort extends YFunction
     {
         // $url                    is a str;
         // $msgbin                 is a bin;
-        $msgarr = [];           // strArr;
+        $msgarr = [];           // binArr;
         // $msglen                 is a int;
         $res = [];              // strArr;
         // $idx                    is a int;
@@ -740,7 +740,7 @@ class YSpiPort extends YFunction
         }
         // last element of array is the new position
         $msglen = $msglen - 1;
-        $this->_rxptr = intVal($msgarr[$msglen]);
+        $this->_rxptr = $this->_decode_json_int($msgarr[$msglen]);
         $idx = 0;
         while ($idx < $msglen) {
             $res[] = $this->_json_get_string($msgarr[$idx]);
@@ -788,9 +788,9 @@ class YSpiPort extends YFunction
         // $databin                is a bin;
 
         $databin = $this->_download(sprintf('rxcnt.bin?pos=%d', $this->_rxptr));
-        $availPosStr = $databin;
+        $availPosStr = YAPI::Ybin2str($databin);
         $atPos = YAPI::Ystrpos($availPosStr,'@');
-        $res = intVal(substr($availPosStr,  0, $atPos));
+        $res = intVal(substr($availPosStr, 0, $atPos));
         return $res;
     }
 
@@ -805,9 +805,9 @@ class YSpiPort extends YFunction
         // $databin                is a bin;
 
         $databin = $this->_download(sprintf('rxcnt.bin?pos=%d', $this->_rxptr));
-        $availPosStr = $databin;
+        $availPosStr = YAPI::Ybin2str($databin);
         $atPos = YAPI::Ystrpos($availPosStr,'@');
-        $res = intVal(substr($availPosStr,  $atPos+1, strlen($availPosStr)-$atPos-1));
+        $res = intVal(substr($availPosStr, $atPos+1, mb_strlen($availPosStr)-$atPos-1));
         return $res;
     }
 
@@ -829,16 +829,16 @@ class YSpiPort extends YFunction
         // $prevpos                is a int;
         // $url                    is a str;
         // $msgbin                 is a bin;
-        $msgarr = [];           // strArr;
+        $msgarr = [];           // binArr;
         // $msglen                 is a int;
         // $res                    is a str;
-        if (strlen($query) <= 80) {
+        if (mb_strlen($query) <= 80) {
             // fast query
             $url = sprintf('rxmsg.json?len=1&maxw=%d&cmd=!%s', $maxWait, $this->_escapeAttr($query));
         } else {
             // long query
             $prevpos = $this->end_tell();
-            $this->_upload('txdata', $query . ''."\r".''."\n".'');
+            $this->_upload('txdata', YAPI::Ystr2bin($query . ''."\r".''."\n".''));
             $url = sprintf('rxmsg.json?len=1&maxw=%d&pos=%d', $maxWait, $prevpos);
         }
 
@@ -850,7 +850,7 @@ class YSpiPort extends YFunction
         }
         // last element of array is the new position
         $msglen = $msglen - 1;
-        $this->_rxptr = intVal($msgarr[$msglen]);
+        $this->_rxptr = $this->_decode_json_int($msgarr[$msglen]);
         if ($msglen == 0) {
             return '';
         }
@@ -877,10 +877,10 @@ class YSpiPort extends YFunction
         // $prevpos                is a int;
         // $url                    is a str;
         // $msgbin                 is a bin;
-        $msgarr = [];           // strArr;
+        $msgarr = [];           // binArr;
         // $msglen                 is a int;
         // $res                    is a str;
-        if (strlen($hexString) <= 80) {
+        if (mb_strlen($hexString) <= 80) {
             // fast query
             $url = sprintf('rxmsg.json?len=1&maxw=%d&cmd=$%s', $maxWait, $hexString);
         } else {
@@ -898,7 +898,7 @@ class YSpiPort extends YFunction
         }
         // last element of array is the new position
         $msglen = $msglen - 1;
-        $this->_rxptr = intVal($msgarr[$msglen]);
+        $this->_rxptr = $this->_decode_json_int($msgarr[$msglen]);
         if ($msglen == 0) {
             return '';
         }
@@ -920,7 +920,7 @@ class YSpiPort extends YFunction
      */
     public function uploadJob(string $jobfile, string $jsonDef): int
     {
-        $this->_upload($jobfile, $jsonDef);
+        $this->_upload($jobfile, YAPI::Ystr2bin($jsonDef));
         return YAPI::SUCCESS;
     }
 
@@ -990,7 +990,7 @@ class YSpiPort extends YFunction
         // $bufflen                is a int;
         // $idx                    is a int;
         // $ch                     is a int;
-        $buff = $text;
+        $buff = YAPI::Ystr2bin($text);
         $bufflen = strlen($buff);
         if ($bufflen < 100) {
             // if string is pure text, we can send it as a simple command (faster)
@@ -1074,15 +1074,15 @@ class YSpiPort extends YFunction
         // $idx                    is a int;
         // $hexb                   is a int;
         // $res                    is a int;
-        $bufflen = strlen($hexString);
+        $bufflen = mb_strlen($hexString);
         if ($bufflen < 100) {
             return $this->sendCommand(sprintf('$%s',$hexString));
         }
-        $bufflen = (($bufflen) >> (1));
+        $bufflen = (($bufflen) >> 1);
         $buff = ($bufflen > 0 ? pack('C',array_fill(0, $bufflen, 0)) : '');
         $idx = 0;
         while ($idx < $bufflen) {
-            $hexb = hexdec(substr($hexString,  2 * $idx, 2));
+            $hexb = hexdec(substr($hexString, 2 * $idx, 2));
             $buff[$idx] = pack('C', $hexb);
             $idx = $idx + 1;
         }
@@ -1107,7 +1107,7 @@ class YSpiPort extends YFunction
         // $bufflen                is a int;
         // $idx                    is a int;
         // $ch                     is a int;
-        $buff = sprintf('%s'."\r".''."\n".'', $text);
+        $buff = YAPI::Ystr2bin(sprintf('%s'."\r".''."\n".'', $text));
         $bufflen = strlen($buff)-2;
         if ($bufflen < 100) {
             // if string is pure text, we can send it as a simple command (faster)
@@ -1232,7 +1232,7 @@ class YSpiPort extends YFunction
             $bufflen = $bufflen - 1;
         }
         $this->_rxptr = $endpos;
-        $res = substr($buff,  0, $bufflen);
+        $res = substr(YAPI::Ybin2str($buff), 0, $bufflen);
         return $res;
     }
 
@@ -1408,7 +1408,7 @@ class YSpiPort extends YFunction
     {
         // $url                    is a str;
         // $msgbin                 is a bin;
-        $msgarr = [];           // strArr;
+        $msgarr = [];           // binArr;
         // $msglen                 is a int;
         $res = [];              // YSpiSnoopingRecordArr;
         // $idx                    is a int;
@@ -1422,10 +1422,10 @@ class YSpiPort extends YFunction
         }
         // last element of array is the new position
         $msglen = $msglen - 1;
-        $this->_rxptr = intVal($msgarr[$msglen]);
+        $this->_rxptr = $this->_decode_json_int($msgarr[$msglen]);
         $idx = 0;
         while ($idx < $msglen) {
-            $res[] = new YSpiSnoopingRecord($msgarr[$idx]);
+            $res[] = new YSpiSnoopingRecord(YAPI::Ybin2str($msgarr[$idx]));
             $idx = $idx + 1;
         }
         return $res;

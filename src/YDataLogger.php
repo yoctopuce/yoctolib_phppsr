@@ -410,19 +410,19 @@ class YDataLogger extends YFunction
     /**
      * @throws YAPI_Exception on error
      */
-    public function parse_dataSets(string $json): array
+    public function parse_dataSets(string $jsonbuff): array
     {
-        $dslist = [];           // strArr;
+        $dslist = [];           // binArr;
         // $dataset                is a YDataSetPtr;
         $res = [];              // YDataSetArr;
 
-        $dslist = $this->_json_get_array($json);
+        $dslist = $this->_json_get_array($jsonbuff);
         while (sizeof($res) > 0) {
             array_pop($res);
         };
         foreach ($dslist as $each) {
             $dataset = new YDataSet($this);
-            $dataset->_parse($each);
+            $dataset->_parse(YAPI::Ybin2str($each));
             $res[] = $dataset;
         }
         return $res;

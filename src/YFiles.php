@@ -151,7 +151,7 @@ class YFiles extends YFunction
         // $res                    is a str;
         $json = $this->sendCommand('format');
         $res = $this->_json_get_key($json, 'res');
-        if (!($res == 'ok')) return $this->_throw( YAPI::IO_ERROR, 'format failed',YAPI::IO_ERROR);
+        if (!($res == 'ok')) return $this->_throw(YAPI::IO_ERROR,'format failed',YAPI::IO_ERROR);
         return YAPI::SUCCESS;
     }
 
@@ -172,7 +172,7 @@ class YFiles extends YFunction
     public function get_list(string $pattern): array
     {
         // $json                   is a bin;
-        $filelist = [];         // strArr;
+        $filelist = [];         // binArr;
         $res = [];              // YFileRecordArr;
         $json = $this->sendCommand(sprintf('dir&f=%s',$pattern));
         $filelist = $this->_json_get_array($json);
@@ -180,7 +180,7 @@ class YFiles extends YFunction
             array_pop($res);
         };
         foreach ($filelist as $each) {
-            $res[] = new YFileRecord($each);
+            $res[] = new YFileRecord(YAPI::Ybin2str($each));
         }
         return $res;
     }
@@ -198,8 +198,8 @@ class YFiles extends YFunction
     public function fileExist(string $filename): bool
     {
         // $json                   is a bin;
-        $filelist = [];         // strArr;
-        if (strlen($filename) == 0) {
+        $filelist = [];         // binArr;
+        if (mb_strlen($filename) == 0) {
             return false;
         }
         $json = $this->sendCommand(sprintf('dir&f=%s',$filename));
@@ -263,7 +263,7 @@ class YFiles extends YFunction
         // $res                    is a str;
         $json = $this->sendCommand(sprintf('del&f=%s',$pathname));
         $res  = $this->_json_get_key($json, 'res');
-        if (!($res == 'ok')) return $this->_throw( YAPI::IO_ERROR, 'unable to remove file',YAPI::IO_ERROR);
+        if (!($res == 'ok')) return $this->_throw(YAPI::IO_ERROR,'unable to remove file',YAPI::IO_ERROR);
         return YAPI::SUCCESS;
     }
 

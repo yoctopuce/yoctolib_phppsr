@@ -7,7 +7,7 @@ namespace Yoctopuce\YoctoAPI;
  * The YProximity class allows you to read and configure Yoctopuce proximity sensors.
  * It inherits from YSensor class the core functions to read measurements,
  * to register callback functions, and to access the autonomous datalogger.
- * This class adds the ability to setup a detection threshold and to count the
+ * This class adds the ability to set up a detection threshold and to count the
  * number of detected state changes.
  */
 class YProximity extends YSensor
