@@ -26,6 +26,10 @@ class YAPIContext
         //--- (end of generated code: YAPIContext constructor)
     }
 
+    private function GetYAPISharedLibraryPath_internal()
+    {
+        return "";
+    }
     private function AddUdevRule_internal(bool $force): string
     {
         return "error: Not supported in PHP";
@@ -112,6 +116,22 @@ class YAPIContext
 
     //cannot be generated for PHP:
     //private function GetDeviceListValidity_internal()
+
+    /**
+     * Returns the path to the dynamic YAPI library. This function is useful for debugging problems loading the
+     * dynamic library YAPI:: This function is supported by the C#, Python and VB languages. The other
+     * libraries return an
+     * empty string.
+     *
+     * @return string  a string containing the path of the YAPI dynamic library.
+     */
+    public function GetYAPISharedLibraryPath(): string
+    {
+        return $this->GetYAPISharedLibraryPath_internal();
+    }
+
+    //cannot be generated for PHP:
+    //private function GetYAPISharedLibraryPath_internal()
 
     /**
      * Adds a UDEV rule which authorizes all users to access Yoctopuce modules
@@ -365,6 +385,8 @@ class YAPIContext
     {
         return YAPI::getTcpHubFromRef($hubref);
     }
+
+
 
 }
 

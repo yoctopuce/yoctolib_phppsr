@@ -406,9 +406,9 @@ class YColorLedCluster extends YFunction
     /**
      * Allows you to modify the current color of a group of adjacent LEDs  to another color, in a seamless and
      * autonomous manner. The transition is performed in the HSL space. In HSL, hue is a circular
-     * value (0..360°). There are always two paths to perform the transition: by increasing
+     * value (0..360 deg). There are always two paths to perform the transition: by increasing
      * or by decreasing the hue. The module selects the shortest transition.
-     * If the difference is exactly 180°, the module selects the transition which increases
+     * If the difference is exactly 180 deg, the module selects the transition which increases
      * the hue.
      *
      * @param int $ledIndex :  index of the first affected LED.

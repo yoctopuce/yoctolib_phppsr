@@ -259,8 +259,9 @@ class YColorLed extends YFunction
 
     /**
      * Changes the color that the LED displays by default when the module is turned on.
-     * Remember to call the saveToFlash()
-     * method of the module if the modification must be kept.
+     * Remember to call the saveLedsConfigAtPowerOn() method of the module if the modification must be kept.
+     * Note: for the original modules Yocto-Color (version 1) et Yocto-PowerColor, the  saveToFlash()
+     * method must be used instead.
      *
      * @param int $newval : an integer corresponding to the color that the LED displays by default when
      * the module is turned on
@@ -478,6 +479,19 @@ class YColorLed extends YFunction
     public function resetBlinkSeq(): int
     {
         return $this->sendCommand('Z');
+    }
+
+    /**
+     * Saves the LEDs power-on configuration.  Warning: this method is not supported by
+     * Yocto-Color (version 1) and Yocto-PowerColor modules. For these devices, the saveToFlash()
+     * method of the module must be used instead.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function saveLedsConfigAtPowerOn(): int
+    {
+        return $this->sendCommand('W');
     }
 
     /**

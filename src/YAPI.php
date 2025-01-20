@@ -94,7 +94,7 @@ class YAPI
     const NO_TRUSTED_CA_CHECK   = 1;       // Disables certificate checking
     const NO_EXPIRATION_CHECK   = 2;       // Disables certificate expiration date checking
     const NO_HOSTNAME_CHECK     = 4;       // Disable hostname checking
-    const LEGACY                = 8;       // Allow non secure connection (similar to v1.10)
+    const LEGACY                = 8;       // Allow non-secure connection (similar to v1.10)
 //--- (end of generated code: YFunction return codes)
 
     // yInitAPI constants (not really useful in JavaScript)
@@ -1611,6 +1611,21 @@ class YAPI
         return self::$_yapiContext->GetDeviceListValidity();
     }
     /**
+     * Returns the path to the dynamic YAPI library. This function is useful for debugging problems loading the
+     * dynamic library YAPI:: This function is supported by the C#, Python and VB languages. The other
+     * libraries return an
+     * empty string.
+     *
+     * @return string  a string containing the path of the YAPI dynamic library.
+     */
+    public static function GetYAPISharedLibraryPath(): string
+    {
+        if (is_null(self::$_hubs)) {
+            self::_init();
+        }
+        return self::$_yapiContext->GetYAPISharedLibraryPath();
+    }
+    /**
      * Adds a UDEV rule which authorizes all users to access Yoctopuce modules
      * connected to the USB ports. This function works only under Linux. The process that
      * calls this method must have root privileges because this method changes the Linux configuration.
@@ -1808,7 +1823,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "2.0.63797";
+        return "2.0.64286";
     }
 
     /**

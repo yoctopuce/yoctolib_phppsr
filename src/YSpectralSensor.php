@@ -26,6 +26,7 @@ class YSpectralSensor extends YFunction
     const NEARRAL2_INVALID = YAPI::INVALID_STRING;
     const NEARRAL3_INVALID = YAPI::INVALID_STRING;
     const NEARHTMLCOLOR_INVALID = YAPI::INVALID_STRING;
+    const NEARSIMPLECOLOR_INVALID = YAPI::INVALID_STRING;
     const LEDCURRENTATPOWERON_INVALID = YAPI::INVALID_INT;
     const INTEGRATIONTIMEATPOWERON_INVALID = YAPI::INVALID_INT;
     const GAINATPOWERON_INVALID = YAPI::INVALID_INT;
@@ -46,6 +47,7 @@ class YSpectralSensor extends YFunction
     protected string $_nearRAL2 = self::NEARRAL2_INVALID;       // Text
     protected string $_nearRAL3 = self::NEARRAL3_INVALID;       // Text
     protected string $_nearHTMLColor = self::NEARHTMLCOLOR_INVALID;  // Text
+    protected string $_nearSimpleColor = self::NEARSIMPLECOLOR_INVALID; // Text
     protected int $_ledCurrentAtPowerOn = self::LEDCURRENTATPOWERON_INVALID; // Int
     protected int $_integrationTimeAtPowerOn = self::INTEGRATIONTIMEATPOWERON_INVALID; // Int
     protected int $_gainAtPowerOn = self::GAINATPOWERON_INVALID;  // Int
@@ -108,6 +110,9 @@ class YSpectralSensor extends YFunction
         case 'nearHTMLColor':
             $this->_nearHTMLColor = $val;
             return 1;
+        case 'nearSimpleColor':
+            $this->_nearSimpleColor = $val;
+            return 1;
         case 'ledCurrentAtPowerOn':
             $this->_ledCurrentAtPowerOn = intval($val);
             return 1;
@@ -145,9 +150,7 @@ class YSpectralSensor extends YFunction
 
     /**
      * Changes the luminosity of the module leds. The parameter is a
-     * value between 0 and 100.
-     * Remember to call the saveToFlash() method of the module if the
-     * modification must be kept.
+     * value between 0 and 254.
      *
      * @param int $newval : an integer corresponding to the luminosity of the module leds
      *
@@ -183,7 +186,6 @@ class YSpectralSensor extends YFunction
     /**
      * Returns the resolution of the measured values. The resolution corresponds to the numerical precision
      * of the measures, which is not always the same as the actual precision of the sensor.
-     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @return float  a floating point number corresponding to the resolution of the measured values
      *
@@ -284,9 +286,10 @@ class YSpectralSensor extends YFunction
     }
 
     /**
-     * Return the model for the estimation colors.
+     * Returns the model for color estimation.
      *
-     * @return int  either YSpectralSensor::ESTIMATIONMODEL_REFLECTION or YSpectralSensor::ESTIMATIONMODEL_EMISSION
+     * @return int  either YSpectralSensor::ESTIMATIONMODEL_REFLECTION or
+     * YSpectralSensor::ESTIMATIONMODEL_EMISSION, according to the model for color estimation
      *
      * On failure, throws an exception or returns YSpectralSensor::ESTIMATIONMODEL_INVALID.
      * @throws YAPI_Exception on error
@@ -304,10 +307,11 @@ class YSpectralSensor extends YFunction
     }
 
     /**
-     * Change the model for the estimation colors.
+     * Changes the model for color estimation.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param int $newval : either YSpectralSensor::ESTIMATIONMODEL_REFLECTION or
-     * YSpectralSensor::ESTIMATIONMODEL_EMISSION
+     * YSpectralSensor::ESTIMATIONMODEL_EMISSION, according to the model for color estimation
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
@@ -342,11 +346,11 @@ class YSpectralSensor extends YFunction
     }
 
     /**
-     * Returns the estimated color in RGB format.
+     * Returns the estimated color in RGB format (0xRRGGBB).
      * This method retrieves the estimated color values
      * and returns them as an RGB object or structure.
      *
-     * @return int  an integer corresponding to the estimated color in RGB format
+     * @return int  an integer corresponding to the estimated color in RGB format (0xRRGGBB)
      *
      * On failure, throws an exception or returns YSpectralSensor::ESTIMATEDRGB_INVALID.
      * @throws YAPI_Exception on error
@@ -364,11 +368,11 @@ class YSpectralSensor extends YFunction
     }
 
     /**
-     * Returns the estimated color in HSL format.
+     * Returns the estimated color in HSL (Hue, Saturation, Lightness) format.
      * This method retrieves the estimated color values
      * and returns them as an HSL object or structure.
      *
-     * @return int  an integer corresponding to the estimated color in HSL format
+     * @return int  an integer corresponding to the estimated color in HSL (Hue, Saturation, Lightness) format
      *
      * On failure, throws an exception or returns YSpectralSensor::ESTIMATEDHSL_INVALID.
      * @throws YAPI_Exception on error
@@ -490,6 +494,28 @@ class YSpectralSensor extends YFunction
     }
 
     /**
+     * Returns the estimated color.
+     * This method retrieves the estimated color values
+     * and returns them as the color name.
+     *
+     * @return string  a string corresponding to the estimated color
+     *
+     * On failure, throws an exception or returns YSpectralSensor::NEARSIMPLECOLOR_INVALID.
+     * @throws YAPI_Exception on error
+     */
+    public function get_nearSimpleColor(): string
+    {
+        // $res                    is a string;
+        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
+            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
+                return self::NEARSIMPLECOLOR_INVALID;
+            }
+        }
+        $res = $this->_nearSimpleColor;
+        return $res;
+    }
+
+    /**
      * @throws YAPI_Exception on error
      */
     public function get_ledCurrentAtPowerOn(): int
@@ -524,12 +550,6 @@ class YSpectralSensor extends YFunction
     }
 
     /**
-     * Retrieves the integration time at power-on.
-     * This method updates the power-on integration time value.
-     *
-     * @return int  an integer
-     *
-     * On failure, throws an exception or returns YSpectralSensor::INTEGRATIONTIMEATPOWERON_INVALID.
      * @throws YAPI_Exception on error
      */
     public function get_integrationTimeAtPowerOn(): int
@@ -785,6 +805,14 @@ class YSpectralSensor extends YFunction
     public function nearHTMLColor(): string
 {
     return $this->get_nearHTMLColor();
+}
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function nearSimpleColor(): string
+{
+    return $this->get_nearSimpleColor();
 }
 
     /**

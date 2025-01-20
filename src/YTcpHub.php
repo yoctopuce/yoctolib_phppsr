@@ -551,7 +551,7 @@ class YTcpHub
 
     public function isReadOnly(): bool
     {
-        return $this->writeProtected;
+        return $this->writeProtected && $this->user != 'admin' && !$this->isCachedHub();
     }
 
     public function get_networkTimeout(): int
