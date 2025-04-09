@@ -31,6 +31,7 @@ class YPwmInput extends YSensor
     const PWMREPORTMODE_PWM_PERIODCOUNT = 10;
     const PWMREPORTMODE_INVALID = -1;
     const DEBOUNCEPERIOD_INVALID = YAPI::INVALID_UINT;
+    const MINFREQUENCY_INVALID = YAPI::INVALID_DOUBLE;
     const BANDWIDTH_INVALID = YAPI::INVALID_UINT;
     const EDGESPERPERIOD_INVALID = YAPI::INVALID_UINT;
     //--- (end of YPwmInput declaration)
@@ -44,6 +45,7 @@ class YPwmInput extends YSensor
     protected float $_pulseTimer = self::PULSETIMER_INVALID;     // Time
     protected int $_pwmReportMode = self::PWMREPORTMODE_INVALID;  // PwmReportModeType
     protected int $_debouncePeriod = self::DEBOUNCEPERIOD_INVALID; // UInt31
+    protected float $_minFrequency = self::MINFREQUENCY_INVALID;   // MeasureVal
     protected int $_bandwidth = self::BANDWIDTH_INVALID;      // UInt31
     protected int $_edgesPerPeriod = self::EDGESPERPERIOD_INVALID; // UInt31
 
@@ -86,6 +88,9 @@ class YPwmInput extends YSensor
             return 1;
         case 'debouncePeriod':
             $this->_debouncePeriod = intval($val);
+            return 1;
+        case 'minFrequency':
+            $this->_minFrequency = round($val / 65.536) / 1000.0;
             return 1;
         case 'bandwidth':
             $this->_bandwidth = intval($val);
@@ -342,6 +347,43 @@ class YPwmInput extends YSensor
     }
 
     /**
+     * Changes the minimum detected frequency, in Hz. Slower signals will be consider as zero frequency.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     * @param float $newval : a floating point number corresponding to the minimum detected frequency, in Hz
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function set_minFrequency(float $newval): int
+    {
+        $rest_val = strval(round($newval * 65536.0));
+        return $this->_setAttr("minFrequency", $rest_val);
+    }
+
+    /**
+     * Returns the minimum detected frequency, in Hz. Slower signals will be consider as zero frequency.
+     *
+     * @return float  a floating point number corresponding to the minimum detected frequency, in Hz
+     *
+     * On failure, throws an exception or returns YPwmInput::MINFREQUENCY_INVALID.
+     * @throws YAPI_Exception on error
+     */
+    public function get_minFrequency(): float
+    {
+        // $res                    is a double;
+        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
+            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
+                return self::MINFREQUENCY_INVALID;
+            }
+        }
+        $res = $this->_minFrequency;
+        return $res;
+    }
+
+    /**
      * Returns the input signal sampling rate, in kHz.
      *
      * @return int  an integer corresponding to the input signal sampling rate, in kHz
@@ -442,7 +484,20 @@ class YPwmInput extends YSensor
     }
 
     /**
-     * Returns the pulse counter value as well as its timer.
+     * Resets the periodicity detection algorithm.
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function resetPeriodDetection(): int
+    {
+        return $this->set_bandwidth($this->get_bandwidth());
+    }
+
+    /**
+     * Resets the pulse counter value as well as its timer.
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
@@ -548,6 +603,22 @@ class YPwmInput extends YSensor
     public function setDebouncePeriod(int $newval): int
 {
     return $this->set_debouncePeriod($newval);
+}
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setMinFrequency(float $newval): int
+{
+    return $this->set_minFrequency($newval);
+}
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function minFrequency(): float
+{
+    return $this->get_minFrequency();
 }
 
     /**

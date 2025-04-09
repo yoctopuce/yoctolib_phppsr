@@ -19,6 +19,7 @@ class YWakeUpMonitor extends YFunction
     const WAKEUPREASON_EXTSIG1 = 3;
     const WAKEUPREASON_SCHEDULE1 = 4;
     const WAKEUPREASON_SCHEDULE2 = 5;
+    const WAKEUPREASON_SCHEDULE3 = 6;
     const WAKEUPREASON_INVALID = -1;
     const WAKEUPSTATE_SLEEPING = 0;
     const WAKEUPSTATE_AWAKE = 1;
@@ -190,8 +191,9 @@ class YWakeUpMonitor extends YFunction
      *
      * @return int  a value among YWakeUpMonitor::WAKEUPREASON_USBPOWER,
      * YWakeUpMonitor::WAKEUPREASON_EXTPOWER, YWakeUpMonitor::WAKEUPREASON_ENDOFSLEEP,
-     * YWakeUpMonitor::WAKEUPREASON_EXTSIG1, YWakeUpMonitor::WAKEUPREASON_SCHEDULE1 and
-     * YWakeUpMonitor::WAKEUPREASON_SCHEDULE2 corresponding to the latest wake up reason
+     * YWakeUpMonitor::WAKEUPREASON_EXTSIG1, YWakeUpMonitor::WAKEUPREASON_SCHEDULE1,
+     * YWakeUpMonitor::WAKEUPREASON_SCHEDULE2 and YWakeUpMonitor::WAKEUPREASON_SCHEDULE3 corresponding to
+     * the latest wake up reason
      *
      * On failure, throws an exception or returns YWakeUpMonitor::WAKEUPREASON_INVALID.
      * @throws YAPI_Exception on error

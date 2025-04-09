@@ -51,8 +51,7 @@ class YI2cSnoopingRecord
     /**
      * Returns the absolute position of the message end.
      *
-     * @return the absolute position of the message end.
-     * @throws YAPI_Exception on error
+     * @return int  the absolute position of the message end.
      */
     public function get_pos(): int
     {
