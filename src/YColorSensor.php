@@ -5,8 +5,6 @@ namespace Yoctopuce\YoctoAPI;
  * YColorSensor Class: color sensor control interface
  *
  * The YColorSensor class allows you to read and configure Yoctopuce color sensors.
- * It inherits from YSensor class the core functions to read measurements,
- * to register callback functions, and to access the autonomous datalogger.
  */
 class YColorSensor extends YFunction
 {
@@ -16,11 +14,11 @@ class YColorSensor extends YFunction
     const WORKINGMODE_AUTO = 0;
     const WORKINGMODE_EXPERT = 1;
     const WORKINGMODE_INVALID = -1;
-    const SATURATION_INVALID = YAPI::INVALID_UINT;
     const LEDCURRENT_INVALID = YAPI::INVALID_UINT;
     const LEDCALIBRATION_INVALID = YAPI::INVALID_UINT;
     const INTEGRATIONTIME_INVALID = YAPI::INVALID_UINT;
     const GAIN_INVALID = YAPI::INVALID_UINT;
+    const SATURATION_INVALID = YAPI::INVALID_UINT;
     const ESTIMATEDRGB_INVALID = YAPI::INVALID_UINT;
     const ESTIMATEDHSL_INVALID = YAPI::INVALID_UINT;
     const ESTIMATEDXYZ_INVALID = YAPI::INVALID_STRING;
@@ -29,7 +27,6 @@ class YColorSensor extends YFunction
     const NEARRAL2_INVALID = YAPI::INVALID_STRING;
     const NEARRAL3_INVALID = YAPI::INVALID_STRING;
     const NEARHTMLCOLOR_INVALID = YAPI::INVALID_STRING;
-    const NEARSIMPLECOLOR_INVALID = YAPI::INVALID_STRING;
     const NEARSIMPLECOLORINDEX_BROWN = 0;
     const NEARSIMPLECOLORINDEX_RED = 1;
     const NEARSIMPLECOLORINDEX_ORANGE = 2;
@@ -42,16 +39,17 @@ class YColorSensor extends YFunction
     const NEARSIMPLECOLORINDEX_PURPLE = 9;
     const NEARSIMPLECOLORINDEX_PINK = 10;
     const NEARSIMPLECOLORINDEX_INVALID = -1;
+    const NEARSIMPLECOLOR_INVALID = YAPI::INVALID_STRING;
     //--- (end of YColorSensor declaration)
 
     //--- (YColorSensor attributes)
     protected int $_estimationModel = self::ESTIMATIONMODEL_INVALID; // EstimationModel
     protected int $_workingMode = self::WORKINGMODE_INVALID;    // WorkingMode
-    protected int $_saturation = self::SATURATION_INVALID;     // SaturationBits
     protected int $_ledCurrent = self::LEDCURRENT_INVALID;     // UInt31
     protected int $_ledCalibration = self::LEDCALIBRATION_INVALID; // UInt31
     protected int $_integrationTime = self::INTEGRATIONTIME_INVALID; // UInt31
     protected int $_gain = self::GAIN_INVALID;           // UInt31
+    protected int $_saturation = self::SATURATION_INVALID;     // SaturationBits
     protected int $_estimatedRGB = self::ESTIMATEDRGB_INVALID;   // U24Color
     protected int $_estimatedHSL = self::ESTIMATEDHSL_INVALID;   // U24Color
     protected string $_estimatedXYZ = self::ESTIMATEDXYZ_INVALID;   // ColorCoord
@@ -60,8 +58,8 @@ class YColorSensor extends YFunction
     protected string $_nearRAL2 = self::NEARRAL2_INVALID;       // Text
     protected string $_nearRAL3 = self::NEARRAL3_INVALID;       // Text
     protected string $_nearHTMLColor = self::NEARHTMLCOLOR_INVALID;  // Text
-    protected string $_nearSimpleColor = self::NEARSIMPLECOLOR_INVALID; // Text
     protected int $_nearSimpleColorIndex = self::NEARSIMPLECOLORINDEX_INVALID; // SimpleColor
+    protected string $_nearSimpleColor = self::NEARSIMPLECOLOR_INVALID; // Text
 
     //--- (end of YColorSensor attributes)
 
@@ -85,9 +83,6 @@ class YColorSensor extends YFunction
         case 'workingMode':
             $this->_workingMode = intval($val);
             return 1;
-        case 'saturation':
-            $this->_saturation = intval($val);
-            return 1;
         case 'ledCurrent':
             $this->_ledCurrent = intval($val);
             return 1;
@@ -99,6 +94,9 @@ class YColorSensor extends YFunction
             return 1;
         case 'gain':
             $this->_gain = intval($val);
+            return 1;
+        case 'saturation':
+            $this->_saturation = intval($val);
             return 1;
         case 'estimatedRGB':
             $this->_estimatedRGB = intval($val);
@@ -124,21 +122,22 @@ class YColorSensor extends YFunction
         case 'nearHTMLColor':
             $this->_nearHTMLColor = $val;
             return 1;
-        case 'nearSimpleColor':
-            $this->_nearSimpleColor = $val;
-            return 1;
         case 'nearSimpleColorIndex':
             $this->_nearSimpleColorIndex = intval($val);
+            return 1;
+        case 'nearSimpleColor':
+            $this->_nearSimpleColor = $val;
             return 1;
         }
         return parent::_parseAttr($name, $val);
     }
 
     /**
-     * Returns the model for color estimation.
+     * Returns the predictive model used for color estimation (reflective or emissive).
      *
      * @return int  either YColorSensor::ESTIMATIONMODEL_REFLECTION or
-     * YColorSensor::ESTIMATIONMODEL_EMISSION, according to the model for color estimation
+     * YColorSensor::ESTIMATIONMODEL_EMISSION, according to the predictive model used for color estimation
+     * (reflective or emissive)
      *
      * On failure, throws an exception or returns YColorSensor::ESTIMATIONMODEL_INVALID.
      * @throws YAPI_Exception on error
@@ -156,11 +155,12 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Changes the model for color estimation.
+     * Changes the mpredictive model to be used for color estimation (reflective or emissive).
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param int $newval : either YColorSensor::ESTIMATIONMODEL_REFLECTION or
-     * YColorSensor::ESTIMATIONMODEL_EMISSION, according to the model for color estimation
+     * YColorSensor::ESTIMATIONMODEL_EMISSION, according to the mpredictive model to be used for color
+     * estimation (reflective or emissive)
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
@@ -174,10 +174,12 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the active working mode.
+     * Returns the sensor working mode.
+     * In Auto mode, sensor parameters are automatically set based on the selected estimation model.
+     * In Expert mode, sensor parameters such as gain and integration time are configured manually.
      *
      * @return int  either YColorSensor::WORKINGMODE_AUTO or YColorSensor::WORKINGMODE_EXPERT, according to
-     * the active working mode
+     * the sensor working mode
      *
      * On failure, throws an exception or returns YColorSensor::WORKINGMODE_INVALID.
      * @throws YAPI_Exception on error
@@ -195,11 +197,13 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Changes the operating mode.
+     * Changes the sensor working mode.
+     * In Auto mode, sensor parameters are automatically set based on the selected estimation model.
+     * In Expert mode, sensor parameters such as gain and integration time are configured manually.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param int $newval : either YColorSensor::WORKINGMODE_AUTO or YColorSensor::WORKINGMODE_EXPERT,
-     * according to the operating mode
+     * according to the sensor working mode
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
@@ -213,30 +217,11 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the current saturation of the sensor.
-     * This function updates the sensor's saturation value.
+     * Returns the amount of current sent to the illumination LEDs, for reflection measurements.
+     * The value is an integer ranging from 0 (LEDs off) to 254 (LEDs at maximum intensity).
      *
-     * @return int  an integer corresponding to the current saturation of the sensor
-     *
-     * On failure, throws an exception or returns YColorSensor::SATURATION_INVALID.
-     * @throws YAPI_Exception on error
-     */
-    public function get_saturation(): int
-    {
-        // $res                    is a int;
-        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
-            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
-                return self::SATURATION_INVALID;
-            }
-        }
-        $res = $this->_saturation;
-        return $res;
-    }
-
-    /**
-     * Returns the current value of the LED.
-     *
-     * @return int  an integer corresponding to the current value of the LED
+     * @return int  an integer corresponding to the amount of current sent to the illumination LEDs, for
+     * reflection measurements
      *
      * On failure, throws an exception or returns YColorSensor::LEDCURRENT_INVALID.
      * @throws YAPI_Exception on error
@@ -254,10 +239,11 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Changes the luminosity of the module leds. The parameter is a
-     * value between 0 and 254.
+     * Changes the amount of current sent to the illumination LEDs, for reflection measurements.
+     * The value is an integer ranging from 0 (LEDs off) to 254 (LEDs at maximum intensity).
      *
-     * @param int $newval : an integer corresponding to the luminosity of the module leds
+     * @param int $newval : an integer corresponding to the amount of current sent to the illumination
+     * LEDs, for reflection measurements
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
@@ -271,9 +257,9 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the LED current at calibration.
+     * Returns the current sent to the illumination LEDs during the last calibration.
      *
-     * @return int  an integer corresponding to the LED current at calibration
+     * @return int  an integer corresponding to the current sent to the illumination LEDs during the last calibration
      *
      * On failure, throws an exception or returns YColorSensor::LEDCALIBRATION_INVALID.
      * @throws YAPI_Exception on error
@@ -291,7 +277,8 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Sets the LED current for calibration.
+     * Remember the LED current sent to the illumination LEDs during a calibration.
+     * Thanks to this, the device will be able to use the same current during measurements.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param int $newval : an integer
@@ -308,11 +295,11 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the current integration time.
-     * This method retrieves the integration time value
-     * used for data processing and returns it as an integer or an object.
+     * Returns the current integration time for spectral measurement, in milliseconds.
+     * A longer integration time increase the sensitivity for low light conditions,
+     * but reduces the measurement rate and may lead to saturation for lighter colors.
      *
-     * @return int  an integer corresponding to the current integration time
+     * @return int  an integer corresponding to the current integration time for spectral measurement, in milliseconds
      *
      * On failure, throws an exception or returns YColorSensor::INTEGRATIONTIME_INVALID.
      * @throws YAPI_Exception on error
@@ -330,13 +317,14 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Changes the integration time for data processing.
-     * This method takes a parameter and assigns it
-     * as the new integration time. This affects the duration
-     * for which data is integrated before being processed.
+     * Changes the integration time for spectral measurement, in milliseconds.
+     * A longer integration time increase the sensitivity for low light conditions,
+     * but reduces the measurement rate and may lead to saturation for lighter colors.
+     * This method can only be used when the sensor is configured in expert mode;
+     * when running in auto mode, the change will be ignored.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
-     * @param int $newval : an integer corresponding to the integration time for data processing
+     * @param int $newval : an integer corresponding to the integration time for spectral measurement, in milliseconds
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
@@ -350,10 +338,11 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the current gain.
-     * This method updates the gain value.
+     * Returns the current spectral channel detector gain exponent.
+     * For a value n ranging from 0 to 12, the applied gain is 2^(n-1).
+     * 0 corresponds to a gain of 0.5, and 12 corresponds to a gain of 2048.
      *
-     * @return int  an integer corresponding to the current gain
+     * @return int  an integer corresponding to the current spectral channel detector gain exponent
      *
      * On failure, throws an exception or returns YColorSensor::GAIN_INVALID.
      * @throws YAPI_Exception on error
@@ -371,13 +360,14 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Changes the gain for signal processing.
-     * This method takes a parameter and assigns it
-     * as the new gain. This affects the sensitivity and
-     * intensity of the processed signal.
+     * Changes the spectral channel detector gain exponent.
+     * For a value n ranging from 0 to 12, the applied gain is 2^(n-1).
+     * 0 corresponds to a gain of 0.5, and 12 corresponds to a gain of 2048.
+     * This method can only be used when the sensor is configured in expert mode;
+     * when running in auto mode, the change will be ignored.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
-     * @param int $newval : an integer corresponding to the gain for signal processing
+     * @param int $newval : an integer corresponding to the spectral channel detector gain exponent
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
@@ -391,9 +381,37 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the estimated color in RGB format (0xRRGGBB).
+     * Returns the current saturation state of the sensor, as an integer.
+     * Bit 0 indicates saturation of the analog sensor, which can only
+     * be corrected by reducing the gain parameters or the luminosity.
+     * Bit 1 indicates saturation of the digital interface, which can
+     * be corrected by reducing the integration time or the gain.
      *
-     * @return int  an integer corresponding to the estimated color in RGB format (0xRRGGBB)
+     * @return int  an integer corresponding to the current saturation state of the sensor, as an integer
+     *
+     * On failure, throws an exception or returns YColorSensor::SATURATION_INVALID.
+     * @throws YAPI_Exception on error
+     */
+    public function get_saturation(): int
+    {
+        // $res                    is a int;
+        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
+            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
+                return self::SATURATION_INVALID;
+            }
+        }
+        $res = $this->_saturation;
+        return $res;
+    }
+
+    /**
+     * Returns the estimated color in RGB color model (0xRRGGBB).
+     * The RGB color model describes each color using a combination of 3 components:
+     * - Red (R): the intensity of red, in thee range 0...255
+     * - Green (G): the intensity of green, in thee range 0...255
+     * - Blue (B): the intensity of blue, in thee range 0...255
+     *
+     * @return int  an integer corresponding to the estimated color in RGB color model (0xRRGGBB)
      *
      * On failure, throws an exception or returns YColorSensor::ESTIMATEDRGB_INVALID.
      * @throws YAPI_Exception on error
@@ -411,9 +429,13 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the estimated color in HSL (Hue, Saturation, Lightness) format.
+     * Returns the estimated color in HSL color model (0xHHSSLL).
+     * The HSL color model describes each color using a combination of 3 components:
+     * - Hue (H): the angle on the color wheel (0-360 degrees), mapped to 0...255
+     * - Saturation (S): the intensity of the color (0-100%), mapped to 0...255
+     * - Lightness (L): the brightness of the color (0-100%), mapped to 0...255
      *
-     * @return int  an integer corresponding to the estimated color in HSL (Hue, Saturation, Lightness) format
+     * @return int  an integer corresponding to the estimated color in HSL color model (0xHHSSLL)
      *
      * On failure, throws an exception or returns YColorSensor::ESTIMATEDHSL_INVALID.
      * @throws YAPI_Exception on error
@@ -431,9 +453,14 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the estimated color in XYZ format.
+     * Returns the estimated color according to the CIE XYZ color model.
+     * This color model is based on human vision and light perception, with three components
+     * represented by real numbers between 0 and 1:
+     * - X: corresponds to a component mixing sensitivity to red and green
+     * - Y: represents luminance (perceived brightness)
+     * - Z: corresponds to sensitivity to blue
      *
-     * @return string  a string corresponding to the estimated color in XYZ format
+     * @return string  a string corresponding to the estimated color according to the CIE XYZ color model
      *
      * On failure, throws an exception or returns YColorSensor::ESTIMATEDXYZ_INVALID.
      * @throws YAPI_Exception on error
@@ -451,9 +478,14 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the estimated color in OkLab format.
+     * Returns the estimated color according to the OkLab color model.
+     * OkLab is a perceptual color model that aims to align human color perception with numerical
+     * values, so that visually near colors are also numerically near. Colors are represented using three components:
+     * - L: lightness, a real number between 0 and 1-
+     * - a: color variations between green and red, between -0.5 and 0.5-
+     * - b: color variations between blue and yellow, between -0.5 and 0.5.
      *
-     * @return string  a string corresponding to the estimated color in OkLab format
+     * @return string  a string corresponding to the estimated color according to the OkLab color model
      *
      * On failure, throws an exception or returns YColorSensor::ESTIMATEDOKLAB_INVALID.
      * @throws YAPI_Exception on error
@@ -471,9 +503,10 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the estimated color in RAL format.
+     * Returns the RAL Classic color closest to the estimated color, with a similarity ratio.
      *
-     * @return string  a string corresponding to the estimated color in RAL format
+     * @return string  a string corresponding to the RAL Classic color closest to the estimated color,
+     * with a similarity ratio
      *
      * On failure, throws an exception or returns YColorSensor::NEARRAL1_INVALID.
      * @throws YAPI_Exception on error
@@ -491,9 +524,10 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the estimated color in RAL format.
+     * Returns the second closest RAL Classic color to the estimated color, with a similarity ratio.
      *
-     * @return string  a string corresponding to the estimated color in RAL format
+     * @return string  a string corresponding to the second closest RAL Classic color to the estimated
+     * color, with a similarity ratio
      *
      * On failure, throws an exception or returns YColorSensor::NEARRAL2_INVALID.
      * @throws YAPI_Exception on error
@@ -511,9 +545,10 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the estimated color in RAL format.
+     * Returns the third closest RAL Classic color to the estimated color, with a similarity ratio.
      *
-     * @return string  a string corresponding to the estimated color in RAL format
+     * @return string  a string corresponding to the third closest RAL Classic color to the estimated
+     * color, with a similarity ratio
      *
      * On failure, throws an exception or returns YColorSensor::NEARRAL3_INVALID.
      * @throws YAPI_Exception on error
@@ -531,9 +566,9 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the estimated HTML color .
+     * Returns the name of the HTML color closest to the estimated color.
      *
-     * @return string  a string corresponding to the estimated HTML color
+     * @return string  a string corresponding to the name of the HTML color closest to the estimated color
      *
      * On failure, throws an exception or returns YColorSensor::NEARHTMLCOLOR_INVALID.
      * @throws YAPI_Exception on error
@@ -551,27 +586,19 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Returns the estimated color .
-     *
-     * @return string  a string corresponding to the estimated color
-     *
-     * On failure, throws an exception or returns YColorSensor::NEARSIMPLECOLOR_INVALID.
-     * @throws YAPI_Exception on error
-     */
-    public function get_nearSimpleColor(): string
-    {
-        // $res                    is a string;
-        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
-            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
-                return self::NEARSIMPLECOLOR_INVALID;
-            }
-        }
-        $res = $this->_nearSimpleColor;
-        return $res;
-    }
-
-    /**
-     * Returns the estimated color as an index.
+     * Returns the index of the basic color typically used to refer to the estimated color (enumerated value).
+     * The list of basic colors recognized is:
+     * - 0 - Brown
+     * - 1 - Red
+     * - 2 - Orange
+     * - 3 - Yellow
+     * - 4 - White
+     * - 5 - Gray
+     * - 6 - Black
+     * - 7 - Green
+     * - 8 - Blue
+     * - 9 - Purple
+     * - 10 - Pink
      *
      * @return int  a value among YColorSensor::NEARSIMPLECOLORINDEX_BROWN,
      * YColorSensor::NEARSIMPLECOLORINDEX_RED, YColorSensor::NEARSIMPLECOLORINDEX_ORANGE,
@@ -579,7 +606,7 @@ class YColorSensor extends YFunction
      * YColorSensor::NEARSIMPLECOLORINDEX_GRAY, YColorSensor::NEARSIMPLECOLORINDEX_BLACK,
      * YColorSensor::NEARSIMPLECOLORINDEX_GREEN, YColorSensor::NEARSIMPLECOLORINDEX_BLUE,
      * YColorSensor::NEARSIMPLECOLORINDEX_PURPLE and YColorSensor::NEARSIMPLECOLORINDEX_PINK corresponding
-     * to the estimated color as an index
+     * to the index of the basic color typically used to refer to the estimated color (enumerated value)
      *
      * On failure, throws an exception or returns YColorSensor::NEARSIMPLECOLORINDEX_INVALID.
      * @throws YAPI_Exception on error
@@ -593,6 +620,27 @@ class YColorSensor extends YFunction
             }
         }
         $res = $this->_nearSimpleColorIndex;
+        return $res;
+    }
+
+    /**
+     * Returns the name of the basic color typically used to refer to the estimated color.
+     *
+     * @return string  a string corresponding to the name of the basic color typically used to refer to
+     * the estimated color
+     *
+     * On failure, throws an exception or returns YColorSensor::NEARSIMPLECOLOR_INVALID.
+     * @throws YAPI_Exception on error
+     */
+    public function get_nearSimpleColor(): string
+    {
+        // $res                    is a string;
+        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
+            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
+                return self::NEARSIMPLECOLOR_INVALID;
+            }
+        }
+        $res = $this->_nearSimpleColor;
         return $res;
     }
 
@@ -636,8 +684,8 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Turns on the LEDs at the current used during calibration.
-     * On failure, throws an exception or returns YColorSensor::DATA_INVALID.
+     * Turns on the built-in illumination LEDs using the same current as used during last calibration.
+     * On failure, throws an exception or returns a negative error code.
      * @throws YAPI_Exception on error
      */
     public function turnLedOn(): int
@@ -646,8 +694,8 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Turns off the LEDs.
-     * On failure, throws an exception or returns YColorSensor::DATA_INVALID.
+     * Turns off the built-in illumination LEDs.
+     * On failure, throws an exception or returns a negative error code.
      * @throws YAPI_Exception on error
      */
     public function turnLedOff(): int
@@ -685,14 +733,6 @@ class YColorSensor extends YFunction
     public function setWorkingMode(int $newval): int
 {
     return $this->set_workingMode($newval);
-}
-
-    /**
-     * @throws YAPI_Exception
-     */
-    public function saturation(): int
-{
-    return $this->get_saturation();
 }
 
     /**
@@ -762,6 +802,14 @@ class YColorSensor extends YFunction
     /**
      * @throws YAPI_Exception
      */
+    public function saturation(): int
+{
+    return $this->get_saturation();
+}
+
+    /**
+     * @throws YAPI_Exception
+     */
     public function estimatedRGB(): int
 {
     return $this->get_estimatedRGB();
@@ -826,17 +874,17 @@ class YColorSensor extends YFunction
     /**
      * @throws YAPI_Exception
      */
-    public function nearSimpleColor(): string
+    public function nearSimpleColorIndex(): int
 {
-    return $this->get_nearSimpleColor();
+    return $this->get_nearSimpleColorIndex();
 }
 
     /**
      * @throws YAPI_Exception
      */
-    public function nearSimpleColorIndex(): int
+    public function nearSimpleColor(): string
 {
-    return $this->get_nearSimpleColorIndex();
+    return $this->get_nearSimpleColor();
 }
 
     /**
