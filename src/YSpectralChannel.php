@@ -5,16 +5,20 @@ namespace Yoctopuce\YoctoAPI;
  * YSpectralChannel Class: spectral analysis channel control interface
  *
  * The YSpectralChannel class allows you to read and configure Yoctopuce spectral analysis channels.
- * It inherits from YSensor class the core functions to read measurements,
+ * It inherits from YSensor class the core functions to read measures,
  * to register callback functions, and to access the autonomous datalogger.
  */
 class YSpectralChannel extends YSensor
 {
     const RAWCOUNT_INVALID = YAPI::INVALID_INT;
+    const CHANNELNAME_INVALID = YAPI::INVALID_STRING;
+    const PEAKWAVELENGTH_INVALID = YAPI::INVALID_INT;
     //--- (end of YSpectralChannel declaration)
 
     //--- (YSpectralChannel attributes)
     protected int $_rawCount = self::RAWCOUNT_INVALID;       // Int
+    protected string $_channelName = self::CHANNELNAME_INVALID;    // Text
+    protected int $_peakWavelength = self::PEAKWAVELENGTH_INVALID; // Int
 
     //--- (end of YSpectralChannel attributes)
 
@@ -35,12 +39,18 @@ class YSpectralChannel extends YSensor
         case 'rawCount':
             $this->_rawCount = intval($val);
             return 1;
+        case 'channelName':
+            $this->_channelName = $val;
+            return 1;
+        case 'peakWavelength':
+            $this->_peakWavelength = intval($val);
+            return 1;
         }
         return parent::_parseAttr($name, $val);
     }
 
     /**
-     * Retrieves the raw cspectral intensity value as measured by the sensor, without any scaling or calibration.
+     * Retrieves the raw spectral intensity value as measured by the sensor, without any scaling or calibration.
      *
      * @return int  an integer
      *
@@ -56,6 +66,46 @@ class YSpectralChannel extends YSensor
             }
         }
         $res = $this->_rawCount;
+        return $res;
+    }
+
+    /**
+     * Returns the target spectral band name.
+     *
+     * @return string  a string corresponding to the target spectral band name
+     *
+     * On failure, throws an exception or returns YSpectralChannel::CHANNELNAME_INVALID.
+     * @throws YAPI_Exception on error
+     */
+    public function get_channelName(): string
+    {
+        // $res                    is a string;
+        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
+            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
+                return self::CHANNELNAME_INVALID;
+            }
+        }
+        $res = $this->_channelName;
+        return $res;
+    }
+
+    /**
+     * Returns the target spectral band peak wavelenght, in nm.
+     *
+     * @return int  an integer corresponding to the target spectral band peak wavelenght, in nm
+     *
+     * On failure, throws an exception or returns YSpectralChannel::PEAKWAVELENGTH_INVALID.
+     * @throws YAPI_Exception on error
+     */
+    public function get_peakWavelength(): int
+    {
+        // $res                    is a int;
+        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
+            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
+                return self::PEAKWAVELENGTH_INVALID;
+            }
+        }
+        $res = $this->_peakWavelength;
         return $res;
     }
 
@@ -104,6 +154,22 @@ class YSpectralChannel extends YSensor
     public function rawCount(): int
 {
     return $this->get_rawCount();
+}
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function channelName(): string
+{
+    return $this->get_channelName();
+}
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function peakWavelength(): int
+{
+    return $this->get_peakWavelength();
 }
 
     /**
