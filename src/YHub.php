@@ -2,7 +2,7 @@
 namespace Yoctopuce\YoctoAPI;
 
 /**
- * YHub Class: Hub Interface
+ * YHub Class: YoctoHub or VirtualHub currently in use by the API.
  *
  *
  */
