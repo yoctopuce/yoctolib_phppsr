@@ -19,6 +19,7 @@ class YFiles extends YFunction
     //--- (generated code: YFiles attributes)
     protected int $_filesCount = self::FILESCOUNT_INVALID;     // UInt31
     protected int $_freeSpace = self::FREESPACE_INVALID;      // UInt31
+    protected int $_ver = 0;                            // int
 
     //--- (end of generated code: YFiles attributes)
 
@@ -137,6 +138,26 @@ class YFiles extends YFunction
     }
 
     /**
+     * @throws YAPI_Exception on error
+     */
+    public function _getVersion(): int
+    {
+        // $json                   is a bin;
+        if ($this->_ver > 0) {
+            return $this->_ver;
+        }
+        //may throw an exception
+        $json = $this->sendCommand('info');
+        if (ord($json[0]) != 123) {
+            // ascii code for '{'
+            $this->_ver = 30;
+        } else {
+            $this->_ver = intVal($this->_json_get_key($json, 'ver'));
+        }
+        return $this->_ver;
+    }
+
+    /**
      * Reinitialize the filesystem to its clean, unfragmented, empty state.
      * All files previously uploaded are permanently lost.
      *
@@ -179,18 +200,18 @@ class YFiles extends YFunction
         while (sizeof($res) > 0) {
             array_pop($res);
         };
-        foreach ($filelist as $each) {
-            $res[] = new YFileRecord(YAPI::Ybin2str($each));
+        foreach ($filelist as $ii_0) {
+            $res[] = new YFileRecord(YAPI::Ybin2str($ii_0));
         }
         return $res;
     }
 
     /**
-     * Test if a file exist on the filesystem of the module.
+     * Tests if a file exists on the filesystem of the module.
      *
-     * @param string $filename : the file name to test.
+     * @param string $filename : the filename to test.
      *
-     * @return boolean  a true if the file exist, false otherwise.
+     * @return boolean  true if the file exists, false otherwise.
      *
      * On failure, throws an exception.
      * @throws YAPI_Exception on error
@@ -265,6 +286,58 @@ class YFiles extends YFunction
         $res  = $this->_json_get_key($json, 'res');
         if (!($res == 'ok')) return $this->_throw(YAPI::IO_ERROR,'unable to remove file',YAPI::IO_ERROR);
         return YAPI::SUCCESS;
+    }
+
+    /**
+     * Returns the expected file CRC for a given content.
+     * Note that the CRC value may vary depending on the version
+     * of the filesystem used by the hub, so it is important to
+     * use this method if a reference value needs to be computed.
+     *
+     * @param string $content : a buffer representing a file content
+     *
+     * @return int  the 32-bit CRC summarizing the file content, as it would
+     *         be returned by the get_crc() method of
+     *         YFileRecord objects returned by get_list().
+     */
+    public function get_content_crc(string $content): int
+    {
+        // $fsver                  is a int;
+        // $sz                     is a int;
+        // $blkcnt                 is a int;
+        // $meta                   is a bin;
+        // $blkidx                 is a int;
+        // $blksz                  is a int;
+        // $part                   is a int;
+        // $res                    is a int;
+        $sz = strlen($content);
+        if ($sz == 0) {
+            $res = YAPI::_bincrc($content, 0, 0);
+            return $res;
+        }
+
+        $fsver = $this->_getVersion();
+        if ($fsver < 40) {
+            $res = YAPI::_bincrc($content, 0, $sz);
+            return $res;
+        }
+        $blkcnt = intVal(($sz + 255) / 256);
+        $meta = (4 * $blkcnt > 0 ? pack('C',array_fill(0, 4 * $blkcnt, 0)) : '');
+        $blkidx = 0;
+        while ($blkidx < $blkcnt) {
+            $blksz = $sz - $blkidx * 256;
+            if ($blksz > 256) {
+                $blksz = 256;
+            }
+            $part = ((YAPI::_bincrc($content, $blkidx * 256, $blksz)) ^ intval(0xffffffff));
+            $meta[4 * $blkidx] = pack('C', ($part & 255));
+            $meta[4 * $blkidx + 1] = pack('C', (($part >> 8) & 255));
+            $meta[4 * $blkidx + 2] = pack('C', (($part >> 16) & 255));
+            $meta[4 * $blkidx + 3] = pack('C', (($part >> 24) & 255));
+            $blkidx = $blkidx + 1;
+        }
+        $res = ((YAPI::_bincrc($meta, 0, 4 * $blkcnt)) ^ intval(0xffffffff));
+        return $res;
     }
 
     /**

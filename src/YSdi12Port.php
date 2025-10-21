@@ -987,7 +987,7 @@ class YSdi12Port extends YFunction
         if ($bufflen < 100) {
             return $this->sendCommand(sprintf('$%s',$hexString));
         }
-        $bufflen = (($bufflen) >> 1);
+        $bufflen = ($bufflen >> 1);
         $buff = ($bufflen > 0 ? pack('C',array_fill(0, $bufflen, 0)) : '');
         $idx = 0;
         while ($idx < $bufflen) {

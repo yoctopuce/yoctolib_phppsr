@@ -6,7 +6,7 @@ namespace Yoctopuce\YoctoAPI;
  * Yocto-Volt or the Yocto-Watt
  *
  * The YVoltage class allows you to read and configure Yoctopuce voltage sensors.
- * It inherits from YSensor class the core functions to read measures,
+ * It inherits from YSensor class the core functions to read measurements,
  * to register callback functions, and to access the autonomous datalogger.
  */
 class YVoltage extends YSensor
@@ -14,10 +14,12 @@ class YVoltage extends YSensor
     const ENABLED_FALSE = 0;
     const ENABLED_TRUE = 1;
     const ENABLED_INVALID = -1;
+    const SIGNALBIAS_INVALID = YAPI::INVALID_DOUBLE;
     //--- (end of YVoltage declaration)
 
     //--- (YVoltage attributes)
     protected int $_enabled = self::ENABLED_INVALID;        // Bool
+    protected float $_signalBias = self::SIGNALBIAS_INVALID;     // MeasureVal
 
     //--- (end of YVoltage attributes)
 
@@ -37,6 +39,9 @@ class YVoltage extends YSensor
         switch ($name) {
         case 'enabled':
             $this->_enabled = intval($val);
+            return 1;
+        case 'signalBias':
+            $this->_signalBias = round($val / 65.536) / 1000.0;
             return 1;
         }
         return parent::_parseAttr($name, $val);
@@ -64,8 +69,8 @@ class YVoltage extends YSensor
     }
 
     /**
-     * Changes the activation state of this voltage input. When AC measures are disabled,
-     * the device will always assume a DC signal, and vice-versa. When both AC and DC measures
+     * Changes the activation state of this voltage input. When AC measurements are disabled,
+     * the device will always assume a DC signal, and vice-versa. When both AC and DC measurements
      * are active, the device switches between AC and DC mode based on the relative amplitude
      * of variations compared to the average value.
      * Remember to call the saveToFlash()
@@ -83,6 +88,48 @@ class YVoltage extends YSensor
     {
         $rest_val = strval($newval);
         return $this->_setAttr("enabled", $rest_val);
+    }
+
+    /**
+     * Changes the DC bias configured for zero shift adjustment.
+     * If your DC current reads positive when it should be zero, set up
+     * a positive signalBias of the same value to fix the zero shift.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @param float $newval : a floating point number corresponding to the DC bias configured for zero shift adjustment
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function set_signalBias(float $newval): int
+    {
+        $rest_val = strval(round($newval * 65536.0));
+        return $this->_setAttr("signalBias", $rest_val);
+    }
+
+    /**
+     * Returns the DC bias configured for zero shift adjustment.
+     * A positive bias value is used to correct a positive DC bias,
+     * while a negative bias value is used to correct a negative DC bias.
+     *
+     * @return float  a floating point number corresponding to the DC bias configured for zero shift adjustment
+     *
+     * On failure, throws an exception or returns YVoltage::SIGNALBIAS_INVALID.
+     * @throws YAPI_Exception on error
+     */
+    public function get_signalBias(): float
+    {
+        // $res                    is a double;
+        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
+            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
+                return self::SIGNALBIAS_INVALID;
+            }
+        }
+        $res = $this->_signalBias;
+        return $res;
     }
 
     /**
@@ -125,6 +172,29 @@ class YVoltage extends YSensor
     }
 
     /**
+     * Calibrate the device by adjusting signalBias so that the current
+     * input voltage is precisely seen as zero. Before calling this method, make
+     * sure to short the power source inputs as close as possible to the connector, and
+     * to disconnect the load to ensure the wires don't capture radiated noise.
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function zeroAdjust(): int
+    {
+        // $currSignal             is a float;
+        // $bias                   is a float;
+        $currSignal = $this->get_currentRawValue();
+        $bias = $this->get_signalBias() + $currSignal;
+        if (!(($bias > -0.5) && ($bias < 0.5))) return $this->_throw(YAPI::INVALID_ARGUMENT,'suspicious zeroAdjust, please ensure that the power source inputs are shorted',YAPI::INVALID_ARGUMENT);
+        return $this->set_signalBias($bias);
+    }
+
+    /**
      * @throws YAPI_Exception
      */
     public function enabled(): int
@@ -138,6 +208,22 @@ class YVoltage extends YSensor
     public function setEnabled(int $newval): int
 {
     return $this->set_enabled($newval);
+}
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setSignalBias(float $newval): int
+{
+    return $this->set_signalBias($newval);
+}
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function signalBias(): float
+{
+    return $this->get_signalBias();
 }
 
     /**

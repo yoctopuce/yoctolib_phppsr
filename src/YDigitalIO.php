@@ -435,7 +435,7 @@ class YDigitalIO extends YFunction
     {
         // $portVal                is a int;
         $portVal = $this->get_portState();
-        return ((($portVal) >> ($bitno)) & 1);
+        return (($portVal >> $bitno) & 1);
     }
 
     /**
@@ -487,7 +487,7 @@ class YDigitalIO extends YFunction
     {
         // $portDir                is a int;
         $portDir = $this->get_portDirection();
-        return ((($portDir) >> ($bitno)) & 1);
+        return (($portDir >> $bitno) & 1);
     }
 
     /**
@@ -525,7 +525,7 @@ class YDigitalIO extends YFunction
     {
         // $portPol                is a int;
         $portPol = $this->get_portPolarity();
-        return ((($portPol) >> ($bitno)) & 1);
+        return (($portPol >> $bitno) & 1);
     }
 
     /**
@@ -564,7 +564,7 @@ class YDigitalIO extends YFunction
     {
         // $portOpenDrain          is a int;
         $portOpenDrain = $this->get_portOpenDrain();
-        return ((($portOpenDrain) >> ($bitno)) & 1);
+        return (($portOpenDrain >> $bitno) & 1);
     }
 
     /**

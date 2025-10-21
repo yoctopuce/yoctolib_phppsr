@@ -691,7 +691,7 @@ class YInputChain extends YFunction
         while ($idx < $lenA) {
             $digitA = hexdec(substr($a, $idx, 1));
             $digitB = hexdec(substr($b, $idx, 1));
-            $res = sprintf('%s%x', $res, (($digitA) ^ ($digitB)));
+            $res = sprintf('%s%x', $res, ($digitA ^ $digitB));
             $idx = $idx + 1;
         }
         return $res;
@@ -714,10 +714,10 @@ class YInputChain extends YFunction
         while ($idx > 0) {
             $idx = $idx - 1;
             $digit = hexdec(substr($hexstr, $idx, 1));
-            $res[] = (($digit) & 1);
-            $res[] = ((($digit) >> 1) & 1);
-            $res[] = ((($digit) >> 2) & 1);
-            $res[] = ((($digit) >> 3) & 1);
+            $res[] = ($digit & 1);
+            $res[] = (($digit >> 1) & 1);
+            $res[] = (($digit >> 2) & 1);
+            $res[] = (($digit >> 3) & 1);
         }
         return $res;
     }

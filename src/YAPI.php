@@ -90,6 +90,7 @@ class YAPI
     const BUFFER_TOO_SMALL      = -18;     // The buffer provided is too small
     const DNS_ERROR             = -19;     // Error during name resolutions (invalid hostname or dns communication error)
     const SSL_UNK_CERT          = -20;     // The certificate is not correctly signed by the trusted CA
+    const UNCONFIGURED          = -21;     // Remote hub is not yet configured
     // TLS / SSL definitions
     const NO_TRUSTED_CA_CHECK   = 1;       // Disables certificate checking
     const NO_EXPIRATION_CHECK   = 2;       // Disables certificate expiration date checking
@@ -382,11 +383,7 @@ class YAPI
                 // Keep track of all unplugged devices on this hub
                 foreach ($hub->missing as $serial => $missing) {
                     if ($missing) {
-                        if (!is_null(self::$_removalCallback)) {
-                            self::$_pendingCallbacks[] = "-$serial";
-                        } else {
-                            self::forgetDevice(self::$_devs[$serial]);
-                        }
+                        self::_unplugDevice($serial);
                     }
                 }
 
@@ -470,6 +467,7 @@ class YAPI
                     //Printf("Event channel at eof, reopen\n");
                     $something_done = true;
                     $hub->notifReq = $req = null;
+                    $hub->connectionState = YHub::RECONNECTING;
                     self::monitorEvents($hub);
                 }
             } elseif ($hub->retryExpires > 0 && $hub->retryExpires <= self::GetTickCount()) {
@@ -610,6 +608,7 @@ class YAPI
                         }
                     } elseif (strlen($ev) > 5 && substr($ev, 0, 4) == 'YN01') {
                         $hub->isNotifWorking = true;
+                        $hub->connectionState = YHub::CONNECTED;
                         $hub->retryDelay = 15;
                         if ($hub->notifPos >= 0) {
                             $hub->notifPos += strlen($ev) + 1;
@@ -623,8 +622,14 @@ class YAPI
                                 case 0: // device name change, or arrival
                                     $parts = explode(',', substr($ev, 5));
                                     YAPI::setBeaconChange($parts[0], intval($parts[2]));
-                                // no break on purpose
+                                    $hub->devListExpires = 0;
+                                    break;
                                 case 2: // device plug/unplug
+                                    $parts = explode(',', substr($ev, 5));
+                                    if ($parts[2] == '0') {
+                                        YAPI::_unplugDevice($parts[1]);
+                                    }
+                                    // no break on purpose
                                 case 4: // function name change
                                 case 8: // function name change (ydx)
                                     $hub->devListExpires = 0;
@@ -862,6 +867,25 @@ class YAPI
             $result .= chr($code);
         }
         return $result;
+    }
+
+
+    public static function _bincrc(string $data, int $ofs, int $len): int
+    {
+        $crc = crc32(substr($data, $ofs, $len));
+        if ($crc > 0x7fffffff) {
+            return $crc - 0x100000000;
+        }
+        return $crc;
+    }
+
+    public static function _unplugDevice(string $serial): void
+    {
+        if (!is_null(self::$_removalCallback)) {
+            self::$_pendingCallbacks[] = "-{$serial}";
+        } else {
+            self::forgetDevice(self::$_devs[$serial]);
+        }
     }
 
 
@@ -1802,6 +1826,16 @@ class YAPI
         }
         return self::$_yapiContext->getYHubObj($hubref);
     }
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public static function findYHubFromID(string $id): ?YHub
+    {
+        if (is_null(self::$_hubs)) {
+            self::_init();
+        }
+        return self::$_yapiContext->findYHubFromID($id);
+    }
    #--- (end of generated code: YAPIContext yapiwrapper)
 
 
@@ -1823,7 +1857,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "2.1.6320";
+        return "2.1.9553";
     }
 
     /**
@@ -2294,12 +2328,7 @@ class YAPI
             }
             // remove all connected devices
             foreach ($hub->serialByYdx as $serial) {
-                if (!is_null(self::$_removalCallback)) {
-                    self::$_pendingCallbacks[] = "-$serial";
-                } else {
-                    self::forgetDevice(self::$_devs[$serial]);
-                }
-
+                self::_unplugDevice($serial);
             }
             if ($hub->notifReq) {
                 $hub->notifReq->close();

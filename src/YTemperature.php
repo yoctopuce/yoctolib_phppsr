@@ -6,7 +6,7 @@ namespace Yoctopuce\YoctoAPI;
  * Yocto-Meteo-V2, the Yocto-PT100, the Yocto-Temperature or the Yocto-Thermocouple
  *
  * The YTemperature class allows you to read and configure Yoctopuce temperature sensors.
- * It inherits from YSensor class the core functions to read measures,
+ * It inherits from YSensor class the core functions to read measurements,
  * to register callback functions, and to access the autonomous datalogger.
  * This class adds the ability to configure some specific parameters
  * for some sensors (connection type, temperature mapping table).
@@ -400,7 +400,7 @@ class YTemperature extends YSensor
         $bin_json = $this->_download(sprintf('extra.json?page=%s', $id));
         $paramlist = $this->_json_get_array($bin_json);
         // first convert all temperatures to float
-        $siz = ((sizeof($paramlist)) >> 1);
+        $siz = (sizeof($paramlist) >> 1);
         while (sizeof($templist) > 0) {
             array_pop($templist);
         };

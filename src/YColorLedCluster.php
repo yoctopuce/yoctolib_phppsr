@@ -765,9 +765,9 @@ class YColorLedCluster extends YFunction
         $idx = 0;
         while ($idx < $listlen) {
             $rgb = $rgbList[$idx];
-            $buff[3*$idx] = pack('C', ((($rgb) >> 16) & 255));
-            $buff[3*$idx+1] = pack('C', ((($rgb) >> 8) & 255));
-            $buff[3*$idx+2] = pack('C', (($rgb) & 255));
+            $buff[3*$idx] = pack('C', (($rgb >> 16) & 255));
+            $buff[3*$idx+1] = pack('C', (($rgb >> 8) & 255));
+            $buff[3*$idx+2] = pack('C', ($rgb & 255));
             $idx = $idx + 1;
         }
 
@@ -801,9 +801,9 @@ class YColorLedCluster extends YFunction
         $idx = 0;
         while ($idx < $listlen) {
             $rgb = $rgbList[$idx];
-            $buff[3*$idx] = pack('C', ((($rgb) >> 16) & 255));
-            $buff[3*$idx+1] = pack('C', ((($rgb) >> 8) & 255));
-            $buff[3*$idx+2] = pack('C', (($rgb) & 255));
+            $buff[3*$idx] = pack('C', (($rgb >> 16) & 255));
+            $buff[3*$idx+1] = pack('C', (($rgb >> 8) & 255));
+            $buff[3*$idx+2] = pack('C', ($rgb & 255));
             $idx = $idx + 1;
         }
 
@@ -875,9 +875,9 @@ class YColorLedCluster extends YFunction
         $idx = 0;
         while ($idx < $listlen) {
             $hsl = $hslList[$idx];
-            $buff[3*$idx] = pack('C', ((($hsl) >> 16) & 255));
-            $buff[3*$idx+1] = pack('C', ((($hsl) >> 8) & 255));
-            $buff[3*$idx+2] = pack('C', (($hsl) & 255));
+            $buff[3*$idx] = pack('C', (($hsl >> 16) & 255));
+            $buff[3*$idx+1] = pack('C', (($hsl >> 8) & 255));
+            $buff[3*$idx+2] = pack('C', ($hsl & 255));
             $idx = $idx + 1;
         }
 
@@ -932,9 +932,9 @@ class YColorLedCluster extends YFunction
         $idx = 0;
         while ($idx < $listlen) {
             $hsl = $hslList[$idx];
-            $buff[3*$idx] = pack('C', ((($hsl) >> 16) & 255));
-            $buff[3*$idx+1] = pack('C', ((($hsl) >> 8) & 255));
-            $buff[3*$idx+2] = pack('C', (($hsl) & 255));
+            $buff[3*$idx] = pack('C', (($hsl >> 16) & 255));
+            $buff[3*$idx+1] = pack('C', (($hsl >> 8) & 255));
+            $buff[3*$idx+2] = pack('C', ($hsl & 255));
             $idx = $idx + 1;
         }
 
@@ -957,7 +957,7 @@ class YColorLedCluster extends YFunction
      */
     public function get_rgbColorBuffer(int $ledIndex, int $count): string
     {
-        return $this->_download(sprintf('rgb.bin?typ=0&pos=%d&len=%d',3*$ledIndex,3*$count));
+        return $this->_download(sprintf('rgb.bin?typ=%d&pos=%d&len=%d',0,3*$ledIndex,3*$count));
     }
 
     /**
@@ -982,7 +982,7 @@ class YColorLedCluster extends YFunction
         // $g                      is a int;
         // $b                      is a int;
 
-        $buff = $this->_download(sprintf('rgb.bin?typ=0&pos=%d&len=%d',3*$ledIndex,3*$count));
+        $buff = $this->_download(sprintf('rgb.bin?typ=%d&pos=%d&len=%d',0,3*$ledIndex,3*$count));
         while (sizeof($res) > 0) {
             array_pop($res);
         };
@@ -1019,7 +1019,7 @@ class YColorLedCluster extends YFunction
         // $g                      is a int;
         // $b                      is a int;
 
-        $buff = $this->_download(sprintf('rgb.bin?typ=4&pos=%d&len=%d',3*$ledIndex,3*$count));
+        $buff = $this->_download(sprintf('rgb.bin?typ=%d&pos=%d&len=%d',4,3*$ledIndex,3*$count));
         while (sizeof($res) > 0) {
             array_pop($res);
         };
@@ -1054,7 +1054,7 @@ class YColorLedCluster extends YFunction
         // $idx                    is a int;
         // $seq                    is a int;
 
-        $buff = $this->_download(sprintf('rgb.bin?typ=1&pos=%d&len=%d',$ledIndex,$count));
+        $buff = $this->_download(sprintf('rgb.bin?typ=%d&pos=%d&len=%d',1,$ledIndex,$count));
         while (sizeof($res) > 0) {
             array_pop($res);
         };
@@ -1090,7 +1090,7 @@ class YColorLedCluster extends YFunction
         // $lh                     is a int;
         // $ll                     is a int;
 
-        $buff = $this->_download(sprintf('rgb.bin?typ=2&pos=%d&len=%d',4*$seqIndex,4*$count));
+        $buff = $this->_download(sprintf('rgb.bin?typ=%d&pos=%d&len=%d',2,4*$seqIndex,4*$count));
         while (sizeof($res) > 0) {
             array_pop($res);
         };
@@ -1100,7 +1100,7 @@ class YColorLedCluster extends YFunction
             $hl = ord($buff[4*$idx+1]);
             $lh = ord($buff[4*$idx+2]);
             $ll = ord($buff[4*$idx+3]);
-            $res[] = (($hh) << 24)+(($hl) << 16)+(($lh) << 8)+$ll;
+            $res[] = ($hh << 24)+($hl << 16)+($lh << 8)+$ll;
             $idx = $idx + 1;
         }
         return $res;
@@ -1125,7 +1125,7 @@ class YColorLedCluster extends YFunction
         // $lh                     is a int;
         // $ll                     is a int;
 
-        $buff = $this->_download(sprintf('rgb.bin?typ=6&pos=%d&len=%d',$seqIndex,$count));
+        $buff = $this->_download(sprintf('rgb.bin?typ=%d&pos=%d&len=%d',6,$seqIndex,$count));
         while (sizeof($res) > 0) {
             array_pop($res);
         };
@@ -1133,7 +1133,7 @@ class YColorLedCluster extends YFunction
         while ($idx < $count) {
             $lh = ord($buff[2*$idx]);
             $ll = ord($buff[2*$idx+1]);
-            $res[] = (($lh) << 8)+$ll;
+            $res[] = ($lh << 8)+$ll;
             $idx = $idx + 1;
         }
         return $res;
@@ -1157,7 +1157,7 @@ class YColorLedCluster extends YFunction
         // $idx                    is a int;
         // $started                is a int;
 
-        $buff = $this->_download(sprintf('rgb.bin?typ=5&pos=%d&len=%d',$seqIndex,$count));
+        $buff = $this->_download(sprintf('rgb.bin?typ=%d&pos=%d&len=%d',5,$seqIndex,$count));
         while (sizeof($res) > 0) {
             array_pop($res);
         };
@@ -1188,7 +1188,7 @@ class YColorLedCluster extends YFunction
         // $idx                    is a int;
         // $started                is a int;
 
-        $buff = $this->_download(sprintf('rgb.bin?typ=3&pos=%d&len=%d',$seqIndex,$count));
+        $buff = $this->_download(sprintf('rgb.bin?typ=%d&pos=%d&len=%d',3,$seqIndex,$count));
         while (sizeof($res) > 0) {
             array_pop($res);
         };
@@ -1207,15 +1207,15 @@ class YColorLedCluster extends YFunction
     public function hsl2rgbInt(int $temp1, int $temp2, int $temp3): int
     {
         if ($temp3 >= 170) {
-            return intVal((($temp1 + 127)) / (255));
+            return intVal(($temp1 + 127) / 255);
         }
         if ($temp3 > 42) {
             if ($temp3 <= 127) {
-                return intVal((($temp2 + 127)) / (255));
+                return intVal(($temp2 + 127) / 255);
             }
             $temp3 = 170 - $temp3;
         }
-        return intVal((($temp1*255 + ($temp2-$temp1) * (6 * $temp3) + 32512)) / (65025));
+        return intVal(($temp1*255 + ($temp2-$temp1) * (6 * $temp3) + 32512) / 65025);
     }
 
     /**
@@ -1233,49 +1233,39 @@ class YColorLedCluster extends YFunction
         // $temp2                  is a int;
         // $temp3                  is a int;
         // $res                    is a int;
-        $L = (($hslValue) & 0xff);
-        $S = ((($hslValue) >> 8) & 0xff);
-        $H = ((($hslValue) >> 16) & 0xff);
+        $L = ($hslValue & 0xff);
+        $S = (($hslValue >> 8) & 0xff);
+        $H = (($hslValue >> 16) & 0xff);
         if ($S==0) {
-            $res = (($L) << 16)+(($L) << 8)+$L;
+            $res = ($L << 16)+($L << 8)+$L;
             return $res;
         }
         if ($L<=127) {
             $temp2 = $L * (255 + $S);
         } else {
-            $temp2 = ($L+$S) * 255 - $L*$S;
+            $temp2 = ($L + $S) * 255 - $L * $S;
         }
         $temp1 = 510 * $L - $temp2;
         // R
-        $temp3 = ($H + 85);
-        if ($temp3 > 255) {
-            $temp3 = $temp3-255;
-        }
+        $temp3 = (($H + 85) & 0xff);
         $R = $this->hsl2rgbInt($temp1, $temp2, $temp3);
         // G
-        $temp3 = $H;
-        if ($temp3 > 255) {
-            $temp3 = $temp3-255;
-        }
+        $temp3 = ($H & 0xff);
         $G = $this->hsl2rgbInt($temp1, $temp2, $temp3);
         // B
-        if ($H >= 85) {
-            $temp3 = $H - 85 ;
-        } else {
-            $temp3 = $H + 170;
-        }
+        $temp3 = (($H + 170) & 0xff);
         $B = $this->hsl2rgbInt($temp1, $temp2, $temp3);
         // just in case
-        if ($R>255) {
-            $R=255;
+        if ($R > 255) {
+            $R = 255;
         }
-        if ($G>255) {
-            $G=255;
+        if ($G > 255) {
+            $G = 255;
         }
-        if ($B>255) {
-            $B=255;
+        if ($B > 255) {
+            $B = 255;
         }
-        $res = (($R) << 16)+(($G) << 8)+$B;
+        $res = ($R << 16) + ($G << 8) + $B;
         return $res;
     }
 

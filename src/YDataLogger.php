@@ -420,9 +420,9 @@ class YDataLogger extends YFunction
         while (sizeof($res) > 0) {
             array_pop($res);
         };
-        foreach ($dslist as $each) {
+        foreach ($dslist as $ii_0) {
             $dataset = new YDataSet($this);
-            $dataset->_parse(YAPI::Ybin2str($each));
+            $dataset->_parse(YAPI::Ybin2str($ii_0));
             $res[] = $dataset;
         }
         return $res;

@@ -318,6 +318,25 @@ class YAPIContext
         return $obj;
     }
 
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function findYHubFromID(string $id): ?YHub
+    {
+        // $rhub                   is a YHub;
+        $rhub = $this->nextHubInUseInternal(-1);
+        while (!($rhub == null)) {
+            if ($rhub->get_serialNumber() == $id) {
+                return $rhub;
+            }
+            if ($rhub->get_registeredUrl() == $id) {
+                return $rhub;
+            }
+            $rhub = $rhub->nextHubInUse();
+        }
+        return $rhub;
+    }
+
     //--- (end of generated code: YAPIContext implementation)
 
     private function nextHubInUseInternal_internal(int $hubref): ?YHub

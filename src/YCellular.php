@@ -962,24 +962,24 @@ class YCellular extends YFunction
         while (sizeof($res) > 0) {
             array_pop($res);
         };
-        foreach ($recs as $each) {
-            $llen = mb_strlen($each) - 2;
+        foreach ($recs as $ii_0) {
+            $llen = mb_strlen($ii_0) - 2;
             if ($llen >= 44) {
-                if (substr($each, 41, 3) == 'dbm') {
-                    $lac = hexdec(substr($each, 16, 4));
-                    $cellId = hexdec(substr($each, 23, 4));
-                    $dbms = substr($each, 37, 4);
+                if (substr($ii_0, 41, 3) == 'dbm') {
+                    $lac = hexdec(substr($ii_0, 16, 4));
+                    $cellId = hexdec(substr($ii_0, 23, 4));
+                    $dbms = substr($ii_0, 37, 4);
                     if (substr($dbms, 0, 1) == ' ') {
                         $dbms = substr($dbms, 1, 3);
                     }
                     $dbm = intVal($dbms);
                     if ($llen > 66) {
-                        $tads = substr($each, 54, 2);
+                        $tads = substr($ii_0, 54, 2);
                         if (substr($tads, 0, 1) == ' ') {
                             $tads = substr($tads, 1, 3);
                         }
                         $tad = intVal($tads);
-                        $oper = substr($each, 66, $llen-66);
+                        $oper = substr($ii_0, 66, $llen-66);
                     } else {
                         $tad = -1;
                         $oper = '';

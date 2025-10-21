@@ -964,18 +964,18 @@ class YModule extends YFunction
         $ext_settings = ', "extras":[';
         $templist = $this->get_functionIds('Temperature');
         $sep = '';
-        foreach ($templist as $each) {
+        foreach ($templist as $ii_0) {
             if (intVal($this->get_firmwareRelease()) > 9000) {
-                $url = sprintf('api/%s/sensorType',$each);
+                $url = sprintf('api/%s/sensorType',$ii_0);
                 $t_type = YAPI::Ybin2str($this->_download($url));
                 if ($t_type == 'RES_NTC' || $t_type == 'RES_LINEAR') {
-                    $pageid = substr($each, 11, mb_strlen($each) - 11);
+                    $pageid = substr($ii_0, 11, mb_strlen($ii_0) - 11);
                     if ($pageid == '') {
                         $pageid = '1';
                     }
                     $temp_data_bin = $this->_download(sprintf('extra.json?page=%s', $pageid));
                     if (strlen($temp_data_bin) > 0) {
-                        $item = sprintf('%s{"fid":"%s", "json":%s}'."\n".'', $sep, $each, YAPI::Ybin2str($temp_data_bin));
+                        $item = sprintf('%s{"fid":"%s", "json":%s}'."\n".'', $sep, $ii_0, YAPI::Ybin2str($temp_data_bin));
                         $ext_settings = $ext_settings . $item;
                         $sep = ',';
                     }
@@ -990,8 +990,8 @@ class YModule extends YFunction
             }
             $filelist = $this->_json_get_array($json);
             $sep = '';
-            foreach ($filelist as $each) {
-                $name = $this->_json_get_key($each, 'name');
+            foreach ($filelist as $ii_1) {
+                $name = $this->_json_get_key($ii_1, 'name');
                 if ((mb_strlen($name) > 0) && !($name == 'startupConf.json')) {
                     if (substr($name, mb_strlen($name)-1, 1) == '/') {
                         $file_data = '';
@@ -1051,10 +1051,10 @@ class YModule extends YFunction
         // $functionId             is a str;
         // $data                   is a bin;
         $extras = $this->_json_get_array(YAPI::Ystr2bin($jsonExtra));
-        foreach ($extras as $each) {
-            $tmp = $this->_get_json_path($each, 'fid');
+        foreach ($extras as $ii_0) {
+            $tmp = $this->_get_json_path($ii_0, 'fid');
             $functionId = $this->_json_get_string($tmp);
-            $data = $this->_get_json_path($each, 'json');
+            $data = $this->_get_json_path($ii_0, 'json');
             if ($this->hasFunction($functionId)) {
                 $this->loadThermistorExtra($functionId, YAPI::Ybin2str($data));
             }
@@ -1079,7 +1079,6 @@ class YModule extends YFunction
     public function set_allSettingsAndFiles(string $settings): int
     {
         // $down                   is a bin;
-        // $json_bin               is a bin;
         // $json_api               is a bin;
         // $json_files             is a bin;
         // $json_extra             is a bin;
@@ -1107,10 +1106,10 @@ class YModule extends YFunction
             if (!($res == 'ok')) return $this->_throw(YAPI::IO_ERROR,'format failed',YAPI::IO_ERROR);
             $json_files = $this->_get_json_path($settings, 'files');
             $files = $this->_json_get_array($json_files);
-            foreach ($files as $each) {
-                $tmp = $this->_get_json_path($each, 'name');
+            foreach ($files as $ii_0) {
+                $tmp = $this->_get_json_path($ii_0, 'name');
                 $name = $this->_json_get_string($tmp);
-                $tmp = $this->_get_json_path($each, 'data');
+                $tmp = $this->_get_json_path($ii_0, 'data');
                 $data = $this->_json_get_string($tmp);
                 if ($name == '') {
                     $fuperror = $fuperror + 1;
@@ -1331,8 +1330,8 @@ class YModule extends YFunction
             } else {
                 if ($paramVer == 1) {
                     $words_str = explode(',', $param);
-                    foreach ($words_str as $each) {
-                        $words[] = intVal($each);
+                    foreach ($words_str as $ii_0) {
+                        $words[] = intVal($ii_0);
                     }
                     if ($param == '' || ($words[0] > 10)) {
                         $paramScale = 0;
@@ -1392,7 +1391,7 @@ class YModule extends YFunction
                 $param = 30 + $calibType;
                 $i = 0;
                 while ($i < sizeof($calibData)) {
-                    if ((($i) & 1) > 0) {
+                    if (($i & 1) > 0) {
                         $param = $param . ':';
                     } else {
                         $param = $param . ' ';
@@ -1405,7 +1404,7 @@ class YModule extends YFunction
         } else {
             if ($funVer >= 1) {
                 // Encode parameters for older devices
-                $nPoints = intVal((sizeof($calibData)) / (2));
+                $nPoints = intVal(sizeof($calibData) / 2);
                 $param = $nPoints;
                 $i = 0;
                 while ($i < 2 * $nPoints) {
@@ -1514,8 +1513,8 @@ class YModule extends YFunction
         $newval = '';
         $old_json_flat = $this->_flattenJsonStruct($settings);
         $old_dslist = $this->_json_get_array($old_json_flat);
-        foreach ($old_dslist as $each) {
-            $each_str = $this->_json_get_string($each);
+        foreach ($old_dslist as $ii_0) {
+            $each_str = $this->_json_get_string($ii_0);
             // split json path and attr
             $leng = mb_strlen($each_str);
             $eqpos = YAPI::Ystrpos($each_str,'=');
@@ -1547,9 +1546,9 @@ class YModule extends YFunction
         }
         $actualSettings = $this->_flattenJsonStruct($actualSettings);
         $new_dslist = $this->_json_get_array($actualSettings);
-        foreach ($new_dslist as $each) {
+        foreach ($new_dslist as $ii_1) {
             // remove quotes
-            $each_str = $this->_json_get_string($each);
+            $each_str = $this->_json_get_string($ii_1);
             // split json path and attr
             $leng = mb_strlen($each_str);
             $eqpos = YAPI::Ystrpos($each_str,'=');
@@ -1766,8 +1765,8 @@ class YModule extends YFunction
             }
             $i = $i + 1;
         }
-        foreach ($restoreLast as $each) {
-            $subres = $this->_tryExec($each);
+        foreach ($restoreLast as $ii_2) {
+            $subres = $this->_tryExec($ii_2);
             if (($res == YAPI::SUCCESS) && ($subres != YAPI::SUCCESS)) {
                 $res = $subres;
             }
@@ -1818,7 +1817,7 @@ class YModule extends YFunction
      *
      * @return string  a binary buffer with the file content
      *
-     * On failure, throws an exception or returns  YAPI::INVALID_STRING.
+     * On failure, throws an exception or returns an empty content.
      * @throws YAPI_Exception on error
      */
     public function download(string $pathname): string
@@ -1828,10 +1827,10 @@ class YModule extends YFunction
 
     /**
      * Returns the icon of the module. The icon is a PNG image and does not
-     * exceed 1536 bytes.
+     * exceeds 1536 bytes.
      *
      * @return string  a binary buffer with module icon, in png format.
-     *         On failure, throws an exception or returns  YAPI::INVALID_STRING.
+     *         On failure, throws an exception or returns an empty content.
      * @throws YAPI_Exception on error
      */
     public function get_icon2d(): string
@@ -1852,6 +1851,9 @@ class YModule extends YFunction
         // $content                is a bin;
 
         $content = $this->_download('logs.txt');
+        if (strlen($content) == 0) {
+            return YAPI::INVALID_STRING;
+        }
         return YAPI::Ybin2str($content);
     }
 

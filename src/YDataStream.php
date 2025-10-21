@@ -18,6 +18,7 @@ class YDataStream
 {
     //--- (end of generated code: YDataStream declaration)
     const DATA_INVALID = YAPI::INVALID_DOUBLE;
+    protected mixed $_cal = null;
 
     //--- (generated code: YDataStream attributes)
     protected ?YFunction $_parent = null;                         // YFunction
@@ -36,17 +37,13 @@ class YDataStream
     protected float $_minVal = 0;                            // float
     protected float $_avgVal = 0;                            // float
     protected float $_maxVal = 0;                            // float
-    protected int $_caltyp = 0;                            // int
-    protected array $_calpar = [];                           // intArr
-    protected array $_calraw = [];                           // floatArr
-    protected array $_calref = [];                           // floatArr
     protected array $_values = [];                           // floatArrArr
     protected bool $_isLoaded = false;                        // bool
 
     //--- (end of generated code: YDataStream attributes)
     private mixed $_calhdl;
 
-    public function __construct(YFunction $obj_parent, ?YDataSet $obj_dataset = null, array $encoded = null)
+    public function __construct(YFunction $obj_parent, ?YDataSet $obj_dataset = null, ?array $encoded = null)
     {
         //--- (generated code: YDataStream constructor)
         //--- (end of generated code: YDataStream constructor)
@@ -62,26 +59,79 @@ class YDataStream
     /**
      * @throws YAPI_Exception on error
      */
+    public function _parseCalibArr(array $iCalib): int
+    {
+        // $caltyp                 is a int;
+        // $calhdl                 is a yCalibrationHandler;
+        // $maxpos                 is a int;
+        // $position               is a int;
+        $calpar = [];           // intArr;
+        $calraw = [];           // floatArr;
+        $calref = [];           // floatArr;
+        // $fRaw                   is a float;
+        // $fRef                   is a float;
+        $caltyp = intVal($iCalib[0] / 1000);
+        if ($caltyp < YOCTO_CALIB_TYPE_OFS) {
+            // Unknown calibration type: calibrated value will be provided by the device
+            $this->_cal = null;
+            return YAPI::SUCCESS;
+        }
+        $calhdl = YAPI::_getCalibrationHandler($caltyp);
+        if (!(!is_null($calhdl))) {
+            // Unknown calibration type: calibrated value will be provided by the device
+            $this->_cal = null;
+            return YAPI::SUCCESS;
+        }
+        // New 32 bits text format
+        $maxpos = sizeof($iCalib);
+        while (sizeof($calpar) > 0) {
+            array_pop($calpar);
+        };
+        $position = 1;
+        while ($position < $maxpos) {
+            $calpar[] = $iCalib[$position];
+            $position = $position + 1;
+        }
+        while (sizeof($calraw) > 0) {
+            array_pop($calraw);
+        };
+        while (sizeof($calref) > 0) {
+            array_pop($calref);
+        };
+        $position = 1;
+        while ($position + 1 < $maxpos) {
+            $fRaw = $iCalib[$position];
+            $fRaw = $fRaw / 1000.0;
+            $fRef = $iCalib[$position + 1];
+            $fRef = $fRef / 1000.0;
+            $calraw[] = $fRaw;
+            $calref[] = $fRef;
+            $position = $position + 2;
+        }
+        $this->_cal = new YCalibCtx('', $calhdl, $caltyp, $calpar, $calraw, $calref);
+        return YAPI::SUCCESS;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function _initFromDataSet(?YDataSet $dataset, array $encoded): int
     {
         // $val                    is a int;
-        // $i                      is a int;
-        // $maxpos                 is a int;
         // $ms_offset              is a int;
         // $samplesPerHour         is a int;
-        // $fRaw                   is a float;
-        // $fRef                   is a float;
+        // $caltyp                 is a int;
         $iCalib = [];           // intArr;
         // decode sequence header to extract data
-        $this->_runNo = $encoded[0] + ((($encoded[1]) << 16));
-        $this->_utcStamp = $encoded[2] + ((($encoded[3]) << 16));
+        $this->_runNo = $encoded[0] + (($encoded[1] << 16));
+        $this->_utcStamp = $encoded[2] + (($encoded[3] << 16));
         $val = $encoded[4];
-        $this->_isAvg = ((($val) & 0x100) == 0);
-        $samplesPerHour = (($val) & 0xff);
-        if ((($val) & 0x100) != 0) {
+        $this->_isAvg = (($val & 0x100) == 0);
+        $samplesPerHour = ($val & 0xff);
+        if (($val & 0x100) != 0) {
             $samplesPerHour = $samplesPerHour * 3600;
         } else {
-            if ((($val) & 0x200) != 0) {
+            if (($val & 0x200) != 0) {
                 $samplesPerHour = $samplesPerHour * 60;
             }
         }
@@ -115,34 +165,11 @@ class YDataStream
         }
         // precompute decoding parameters
         $iCalib = $dataset->_get_calibration();
-        $this->_caltyp = $iCalib[0];
-        if ($this->_caltyp != 0) {
-            $this->_calhdl = YAPI::_getCalibrationHandler($this->_caltyp);
-            $maxpos = sizeof($iCalib);
-            while (sizeof($this->_calpar) > 0) {
-                array_pop($this->_calpar);
-            };
-            while (sizeof($this->_calraw) > 0) {
-                array_pop($this->_calraw);
-            };
-            while (sizeof($this->_calref) > 0) {
-                array_pop($this->_calref);
-            };
-            $i = 1;
-            while ($i < $maxpos) {
-                $this->_calpar[] = $iCalib[$i];
-                $i = $i + 1;
-            }
-            $i = 1;
-            while ($i + 1 < $maxpos) {
-                $fRaw = $iCalib[$i];
-                $fRaw = $fRaw / 1000.0;
-                $fRef = $iCalib[$i + 1];
-                $fRef = $fRef / 1000.0;
-                $this->_calraw[] = $fRaw;
-                $this->_calref[] = $fRef;
-                $i = $i + 2;
-            }
+        $caltyp = $iCalib[0];
+        if ($caltyp == 0) {
+            $this->_cal = null;
+        } else {
+            $this->_parseCalibArr($iCalib);
         }
         // preload column names for backward-compatibility
         $this->_functionId = $dataset->get_functionId();
@@ -163,9 +190,9 @@ class YDataStream
         }
         // decode min/avg/max values for the sequence
         if ($this->_nRows > 0) {
-            $this->_avgVal = $this->_decodeAvg($encoded[8] + (((($encoded[9]) ^ 0x8000) << 16)), 1);
-            $this->_minVal = $this->_decodeVal($encoded[10] + ((($encoded[11]) << 16)));
-            $this->_maxVal = $this->_decodeVal($encoded[12] + ((($encoded[13]) << 16)));
+            $this->_avgVal = $this->_decodeAvg($encoded[8] + ((($encoded[9] ^ 0x8000) << 16)), 1);
+            $this->_minVal = $this->_decodeVal($encoded[10] + (($encoded[11] << 16)));
+            $this->_maxVal = $this->_decodeVal($encoded[12] + (($encoded[13] << 16)));
         }
         return 0;
     }
@@ -282,12 +309,9 @@ class YDataStream
     public function _decodeVal(int $w): float
     {
         // $val                    is a float;
-        $val = $w;
-        $val = $val / 1000.0;
-        if ($this->_caltyp != 0) {
-            if (!is_null($this->_calhdl)) {
-                $val = call_user_func($this->_calhdl, $val, $this->_caltyp, $this->_calpar, $this->_calraw, $this->_calref);
-            }
+        $val = ($w) / 1000.0;
+        if (!($this->_cal == null)) {
+            $val = call_user_func($this->_cal->hdl, $val, $this->_cal->typ, $this->_cal->par, $this->_cal->raw, $this->_cal->cal);
         }
         return $val;
     }
@@ -298,12 +322,9 @@ class YDataStream
     public function _decodeAvg(int $dw, int $count): float
     {
         // $val                    is a float;
-        $val = $dw;
-        $val = $val / 1000.0;
-        if ($this->_caltyp != 0) {
-            if (!is_null($this->_calhdl)) {
-                $val = call_user_func($this->_calhdl, $val, $this->_caltyp, $this->_calpar, $this->_calraw, $this->_calref);
-            }
+        $val = ($dw) / 1000.0;
+        if (!($this->_cal == null)) {
+            $val = call_user_func($this->_cal->hdl, $val, $this->_cal->typ, $this->_cal->par, $this->_cal->raw, $this->_cal->cal);
         }
         return $val;
     }

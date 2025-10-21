@@ -343,10 +343,10 @@ class YMessageBox extends YFunction
             $this->clearCache();
             $bitmapStr = $this->get_slotsBitmap();
             $newBitmap = YAPI::_hexStrToBin($bitmapStr);
-            $idx = (($slot) >> 3);
+            $idx = ($slot >> 3);
             if ($idx < strlen($newBitmap)) {
-                $bitVal = (1 << ((($slot) & 7)));
-                if ((((ord($newBitmap[$idx])) & ($bitVal))) != 0) {
+                $bitVal = (1 << (($slot & 7)));
+                if (((ord($newBitmap[$idx]) & $bitVal)) != 0) {
                     $this->_prevBitmapStr = '';
                     $int_res = $this->set_command(sprintf('DS%d',$slot));
                     if ($int_res < 0) {
@@ -848,10 +848,10 @@ class YMessageBox extends YFunction
         while ($pduIdx < sizeof($this->_pdus)) {
             $sms = $this->_pdus[$pduIdx];
             $slot = $sms->get_slot();
-            $idx = (($slot) >> 3);
+            $idx = ($slot >> 3);
             if ($idx < strlen($newBitmap)) {
-                $bitVal = (1 << ((($slot) & 7)));
-                if ((((ord($newBitmap[$idx])) & ($bitVal))) != 0) {
+                $bitVal = (1 << (($slot & 7)));
+                if (((ord($newBitmap[$idx]) & $bitVal)) != 0) {
                     $newArr[] = $sms;
                     if ($sms->get_concatCount() == 0) {
                         $newMsg[] = $sms;
@@ -876,13 +876,13 @@ class YMessageBox extends YFunction
         // receive new messages
         $slot = 0;
         while ($slot < $nslots) {
-            $idx = (($slot) >> 3);
-            $bitVal = (1 << ((($slot) & 7)));
+            $idx = ($slot >> 3);
+            $bitVal = (1 << (($slot & 7)));
             $prevBit = 0;
             if ($idx < strlen($prevBitmap)) {
-                $prevBit = ((ord($prevBitmap[$idx])) & ($bitVal));
+                $prevBit = (ord($prevBitmap[$idx]) & $bitVal);
             }
-            if ((((ord($newBitmap[$idx])) & ($bitVal))) != 0) {
+            if (((ord($newBitmap[$idx]) & $bitVal)) != 0) {
                 if ($prevBit == 0) {
                     $sms = $this->fetchPdu($slot);
                     $newArr[] = $sms;
@@ -908,6 +908,9 @@ class YMessageBox extends YFunction
         }
         $this->_pdus = $newArr;
         // append complete concatenated messages
+        while (sizeof($newAgg) > 0) {
+            array_pop($newAgg);
+        };
         $i = 0;
         while ($i < $nsig) {
             $sig = $signatures[$i];

@@ -1002,7 +1002,7 @@ class YSerialPort extends YFunction
         if ($bufflen < 100) {
             return $this->sendCommand(sprintf('$%s',$hexString));
         }
-        $bufflen = (($bufflen) >> 1);
+        $bufflen = ($bufflen >> 1);
         $buff = ($bufflen > 0 ? pack('C',array_fill(0, $bufflen, 0)) : '');
         $idx = 0;
         while ($idx < $bufflen) {
@@ -1549,8 +1549,8 @@ class YSerialPort extends YFunction
         // $replen                 is a int;
         // $hexb                   is a int;
         $funCode = $pduBytes[0];
-        $nib = (($funCode) >> 4);
-        $pat = sprintf('%02X[%X%X]%X.*', $slaveNo, $nib, ($nib+8), (($funCode) & 15));
+        $nib = ($funCode >> 4);
+        $pat = sprintf('%02X[%X%X]%X.*', $slaveNo, $nib, ($nib+8), ($funCode & 15));
         $cmd = sprintf('%02X%02X', $slaveNo, $funCode);
         $i = 1;
         while ($i < sizeof($pduBytes)) {
@@ -1613,10 +1613,10 @@ class YSerialPort extends YFunction
         // $val                    is a int;
         // $mask                   is a int;
         $pdu[] = 0x01;
-        $pdu[] = (($pduAddr) >> 8);
-        $pdu[] = (($pduAddr) & 0xff);
-        $pdu[] = (($nBits) >> 8);
-        $pdu[] = (($nBits) & 0xff);
+        $pdu[] = ($pduAddr >> 8);
+        $pdu[] = ($pduAddr & 0xff);
+        $pdu[] = ($nBits >> 8);
+        $pdu[] = ($nBits & 0xff);
 
         $reply = $this->queryMODBUS($slaveNo, $pdu);
         if (sizeof($reply) == 0) {
@@ -1630,7 +1630,7 @@ class YSerialPort extends YFunction
         $val = $reply[$idx];
         $mask = 1;
         while ($bitpos < $nBits) {
-            if ((($val) & ($mask)) == 0) {
+            if (($val & $mask) == 0) {
                 $res[] = 0;
             } else {
                 $res[] = 1;
@@ -1641,7 +1641,7 @@ class YSerialPort extends YFunction
                 $val = $reply[$idx];
                 $mask = 1;
             } else {
-                $mask = (($mask) << 1);
+                $mask = ($mask << 1);
             }
         }
         return $res;
@@ -1670,10 +1670,10 @@ class YSerialPort extends YFunction
         // $val                    is a int;
         // $mask                   is a int;
         $pdu[] = 0x02;
-        $pdu[] = (($pduAddr) >> 8);
-        $pdu[] = (($pduAddr) & 0xff);
-        $pdu[] = (($nBits) >> 8);
-        $pdu[] = (($nBits) & 0xff);
+        $pdu[] = ($pduAddr >> 8);
+        $pdu[] = ($pduAddr & 0xff);
+        $pdu[] = ($nBits >> 8);
+        $pdu[] = ($nBits & 0xff);
 
         $reply = $this->queryMODBUS($slaveNo, $pdu);
         if (sizeof($reply) == 0) {
@@ -1687,7 +1687,7 @@ class YSerialPort extends YFunction
         $val = $reply[$idx];
         $mask = 1;
         while ($bitpos < $nBits) {
-            if ((($val) & ($mask)) == 0) {
+            if (($val & $mask) == 0) {
                 $res[] = 0;
             } else {
                 $res[] = 1;
@@ -1698,7 +1698,7 @@ class YSerialPort extends YFunction
                 $val = $reply[$idx];
                 $mask = 1;
             } else {
-                $mask = (($mask) << 1);
+                $mask = ($mask << 1);
             }
         }
         return $res;
@@ -1727,10 +1727,10 @@ class YSerialPort extends YFunction
         // $val                    is a int;
         if (!($nWords<=256)) return $this->_throw(YAPI::INVALID_ARGUMENT,'Cannot read more than 256 words',$res);
         $pdu[] = 0x03;
-        $pdu[] = (($pduAddr) >> 8);
-        $pdu[] = (($pduAddr) & 0xff);
-        $pdu[] = (($nWords) >> 8);
-        $pdu[] = (($nWords) & 0xff);
+        $pdu[] = ($pduAddr >> 8);
+        $pdu[] = ($pduAddr & 0xff);
+        $pdu[] = ($nWords >> 8);
+        $pdu[] = ($nWords & 0xff);
 
         $reply = $this->queryMODBUS($slaveNo, $pdu);
         if (sizeof($reply) == 0) {
@@ -1774,10 +1774,10 @@ class YSerialPort extends YFunction
         // $idx                    is a int;
         // $val                    is a int;
         $pdu[] = 0x04;
-        $pdu[] = (($pduAddr) >> 8);
-        $pdu[] = (($pduAddr) & 0xff);
-        $pdu[] = (($nWords) >> 8);
-        $pdu[] = (($nWords) & 0xff);
+        $pdu[] = ($pduAddr >> 8);
+        $pdu[] = ($pduAddr & 0xff);
+        $pdu[] = ($nWords >> 8);
+        $pdu[] = ($nWords & 0xff);
 
         $reply = $this->queryMODBUS($slaveNo, $pdu);
         if (sizeof($reply) == 0) {
@@ -1822,8 +1822,8 @@ class YSerialPort extends YFunction
             $value = 0xff;
         }
         $pdu[] = 0x05;
-        $pdu[] = (($pduAddr) >> 8);
-        $pdu[] = (($pduAddr) & 0xff);
+        $pdu[] = ($pduAddr >> 8);
+        $pdu[] = ($pduAddr & 0xff);
         $pdu[] = $value;
         $pdu[] = 0x00;
 
@@ -1865,17 +1865,17 @@ class YSerialPort extends YFunction
         $nBits = sizeof($bits);
         $nBytes = (($nBits + 7) >> 3);
         $pdu[] = 0x0f;
-        $pdu[] = (($pduAddr) >> 8);
-        $pdu[] = (($pduAddr) & 0xff);
-        $pdu[] = (($nBits) >> 8);
-        $pdu[] = (($nBits) & 0xff);
+        $pdu[] = ($pduAddr >> 8);
+        $pdu[] = ($pduAddr & 0xff);
+        $pdu[] = ($nBits >> 8);
+        $pdu[] = ($nBits & 0xff);
         $pdu[] = $nBytes;
         $bitpos = 0;
         $val = 0;
         $mask = 1;
         while ($bitpos < $nBits) {
             if ($bits[$bitpos] != 0) {
-                $val = (($val) | ($mask));
+                $val = ($val | $mask);
             }
             $bitpos = $bitpos + 1;
             if ($mask == 0x80) {
@@ -1883,7 +1883,7 @@ class YSerialPort extends YFunction
                 $val = 0;
                 $mask = 1;
             } else {
-                $mask = (($mask) << 1);
+                $mask = ($mask << 1);
             }
         }
         if ($mask != 1) {
@@ -1897,7 +1897,7 @@ class YSerialPort extends YFunction
         if ($reply[0] != $pdu[0]) {
             return $res;
         }
-        $res = (($reply[3]) << 8);
+        $res = ($reply[3] << 8);
         $res = $res + $reply[4];
         return $res;
     }
@@ -1922,10 +1922,10 @@ class YSerialPort extends YFunction
         // $res                    is a int;
         $res = 0;
         $pdu[] = 0x06;
-        $pdu[] = (($pduAddr) >> 8);
-        $pdu[] = (($pduAddr) & 0xff);
-        $pdu[] = (($value) >> 8);
-        $pdu[] = (($value) & 0xff);
+        $pdu[] = ($pduAddr >> 8);
+        $pdu[] = ($pduAddr & 0xff);
+        $pdu[] = ($value >> 8);
+        $pdu[] = ($value & 0xff);
 
         $reply = $this->queryMODBUS($slaveNo, $pdu);
         if (sizeof($reply) == 0) {
@@ -1964,16 +1964,16 @@ class YSerialPort extends YFunction
         $nWords = sizeof($values);
         $nBytes = 2 * $nWords;
         $pdu[] = 0x10;
-        $pdu[] = (($pduAddr) >> 8);
-        $pdu[] = (($pduAddr) & 0xff);
-        $pdu[] = (($nWords) >> 8);
-        $pdu[] = (($nWords) & 0xff);
+        $pdu[] = ($pduAddr >> 8);
+        $pdu[] = ($pduAddr & 0xff);
+        $pdu[] = ($nWords >> 8);
+        $pdu[] = ($nWords & 0xff);
         $pdu[] = $nBytes;
         $regpos = 0;
         while ($regpos < $nWords) {
             $val = $values[$regpos];
-            $pdu[] = (($val) >> 8);
-            $pdu[] = (($val) & 0xff);
+            $pdu[] = ($val >> 8);
+            $pdu[] = ($val & 0xff);
             $regpos = $regpos + 1;
         }
 
@@ -1984,7 +1984,7 @@ class YSerialPort extends YFunction
         if ($reply[0] != $pdu[0]) {
             return $res;
         }
-        $res = (($reply[3]) << 8);
+        $res = ($reply[3] << 8);
         $res = $res + $reply[4];
         return $res;
     }
@@ -2018,20 +2018,20 @@ class YSerialPort extends YFunction
         $nWriteWords = sizeof($values);
         $nBytes = 2 * $nWriteWords;
         $pdu[] = 0x17;
-        $pdu[] = (($pduReadAddr) >> 8);
-        $pdu[] = (($pduReadAddr) & 0xff);
-        $pdu[] = (($nReadWords) >> 8);
-        $pdu[] = (($nReadWords) & 0xff);
-        $pdu[] = (($pduWriteAddr) >> 8);
-        $pdu[] = (($pduWriteAddr) & 0xff);
-        $pdu[] = (($nWriteWords) >> 8);
-        $pdu[] = (($nWriteWords) & 0xff);
+        $pdu[] = ($pduReadAddr >> 8);
+        $pdu[] = ($pduReadAddr & 0xff);
+        $pdu[] = ($nReadWords >> 8);
+        $pdu[] = ($nReadWords & 0xff);
+        $pdu[] = ($pduWriteAddr >> 8);
+        $pdu[] = ($pduWriteAddr & 0xff);
+        $pdu[] = ($nWriteWords >> 8);
+        $pdu[] = ($nWriteWords & 0xff);
         $pdu[] = $nBytes;
         $regpos = 0;
         while ($regpos < $nWriteWords) {
             $val = $values[$regpos];
-            $pdu[] = (($val) >> 8);
-            $pdu[] = (($val) & 0xff);
+            $pdu[] = ($val >> 8);
+            $pdu[] = ($val & 0xff);
             $regpos = $regpos + 1;
         }
 

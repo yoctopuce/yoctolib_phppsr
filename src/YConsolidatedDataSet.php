@@ -208,7 +208,7 @@ class YConsolidatedDataSet
             $s = $s + 1;
         }
         if ($globprogress > 0) {
-            $globprogress = intVal(($globprogress) / ($this->_nsensors));
+            $globprogress = intVal($globprogress / ($this->_nsensors));
             if ($globprogress > 99) {
                 $globprogress = 99;
             }

@@ -491,7 +491,7 @@ class YWeighScale extends YSensor
         $bin_json = $this->_download(sprintf('extra.json?page=%d',(4*intVal($id))+$tableIndex));
         $paramlist = $this->_json_get_array($bin_json);
         // convert all values to float and append records
-        $siz = ((sizeof($paramlist)) >> 1);
+        $siz = (sizeof($paramlist) >> 1);
         while (sizeof($tempValues) > 0) {
             array_pop($tempValues);
         };

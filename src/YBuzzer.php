@@ -438,7 +438,7 @@ class YBuzzer extends YFunction
             }
             if ($ch == 46) {
                 // . (duration modifier)
-                $num = intVal(($num * 2) / (3));
+                $num = intVal(($num * 2) / 3);
             }
             if ((($ch == 32) || ($i+1 == $notesLen)) && (($note > -99) || ($typ != 3))) {
                 if ($num == 0) {
@@ -459,7 +459,7 @@ class YBuzzer extends YFunction
                     }
                     $pitch = $prevPitch + $dNote;
                     $freq = intval(round(440 * exp($pitch * 0.05776226504666)));
-                    $ms16 = (($ms) >> 4);
+                    $ms16 = ($ms >> 4);
                     $rest = 0;
                     if ($typ == 3) {
                         $rest = 2 * $ms16;

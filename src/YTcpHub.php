@@ -18,6 +18,7 @@ class YTcpHub
     public bool $use_pure_http;              // boolean that is true if the hub is VirtualHub-4web
     public bool $has_unsecure_open_port;     // boolean that is true if the hub has non https port open (mixed mode)
     public ?YTcpReq $notifReq;                   // notification request, or null if not open
+    public int $connectionState;               // the connection status, values are YHub::TRYING, YHub::CONNECTED...
     public int $notifPos;                   // absolute position in notification stream
     public bool $isNotifWorking;            // boolean that is true when we receive ping notification
     public float $devListExpires;             // timestamp of next useful updateDeviceList
@@ -78,6 +79,7 @@ class YTcpHub
         $this->networkTimeout = YAPI::$_yapiContext->_networkTimeoutMs;
         $this->mandatory = $mandatory;
         $this->enabled = true;
+        $this->connectionState = YHub::TRYING;
     }
 
     function isEnable(): bool
@@ -192,8 +194,8 @@ class YTcpHub
             }
             $useragent = strtolower($_SERVER['HTTP_USER_AGENT']);
             $patern = 'yoctohub';
-            if ($useragent != 'virtualhub' && substr($useragent, 0, strlen($patern)) != $patern) {
-                $errmsg = "no user agent provided";
+            if (substr($useragent, 0, 10) != 'virtualhub' && substr($useragent, 0, strlen($patern)) != $patern) {
+                $errmsg = "no user agent provided:[".$useragent."]";
                 $this->callbackCache = array();
                 return YAPI::IO_ERROR;
             }
@@ -214,7 +216,7 @@ class YTcpHub
                     if (isset($_SERVER['HTTP_JSON_POST_DATA'])) {
                         $this->callbackCache = $_SERVER['HTTP_JSON_POST_DATA'];
                     } else {
-                        $utf8_encode = YAPI::Ystr2bin($data);
+                        $utf8_encode = YAPI::Ybin2str($data);
                         $this->callbackCache = json_decode($utf8_encode, true);
                     }
                     if (is_null($this->callbackCache)) {
@@ -246,6 +248,9 @@ class YTcpHub
                             $this->callbackCache = array();
                             return YAPI::UNAUTHORIZED;
                         }
+                    }
+                    if (isset($this->callbackCache['serial'])) {
+                        $this->serial = $this->callbackCache['serial'];
                     }
                     if (isset($this->callbackCache['serial']) && !is_null(YAPI::$_jzonCacheDir)) {
                         $jzonCacheDir = YAPI::$_jzonCacheDir;
@@ -331,6 +336,10 @@ class YTcpHub
             if ($info_json !== false) {
                 $jsonData = json_decode($info_json, true);
                 if ($jsonData != null) {
+                    if (array_key_exists('securityMode', $jsonData) && $jsonData['securityMode'] == 0) {
+                        $errmsg = "Remote hub is not yet configured";
+                        return YAPI::UNCONFIGURED;
+                    }
                     if (array_key_exists('protocol', $jsonData) && $jsonData['protocol'] == 'HTTP/1.1') {
                         $this->use_pure_http = true;
                     }
@@ -543,9 +552,13 @@ class YTcpHub
         return $this->rooturl;
     }
 
+    public function getConnectionState()
+    {
+        return YHub::CONNECTED;
+    }
+
     public function isOnline(): bool
     {
-        //fixme: implement this
         return true;
     }
 

@@ -8,6 +8,11 @@ namespace Yoctopuce\YoctoAPI;
  */
 class YHub
 {
+    const TRYING                         = 1;
+    const CONNECTED                      = 2;
+    const RECONNECTING                   = 3;
+    const ABORTED                        = 4;
+    const UNREGISTERED                   = 5;
     //--- (end of generated code: YHub declaration)
 
 //--- (generated code: YHub attributes)
@@ -53,6 +58,14 @@ class YHub
         if ($attrName == "isInUse") {
             return $hub != null ? 1 : 0;
         }
+        if ($attrName == "connectionState") {
+            if ($hub == null){
+                return YHub::UNREGISTERED;
+            }
+            return $hub->getConnectionState();
+        }
+
+
         if ($hub == null) {
             return -1;
         }
@@ -150,6 +163,14 @@ class YHub
     public function get_connectionUrl(): string
     {
         return $this->_getStrAttr('connectionUrl');
+    }
+
+    /**
+     * Returns the state of the connection with this hub. (TRYING, CONNECTED, RECONNECTING, ABORTED, UNREGISTERED)
+     */
+    public function get_connectionState(): int
+    {
+        return $this->_getIntAttr('connectionState');
     }
 
     /**
@@ -286,11 +307,26 @@ class YHub
     }
 
     /**
+     * Retrieves hub for a given identifier. The identifier can be the URL or the
+     * serial of the hub.
+     *
+     * @param string $url : The url or serial of the hub.
+     *
+     * @return YHub  a pointer to a YHub object, corresponding to
+     *         the first hub currently in use by the API, or a
+     *         null pointer if none has been registered.
+     */
+    public static function FindHubInUse(string $url): ?YHub
+    {
+        return YAPI::findYHubFromID($url);
+    }
+
+    /**
      * Continues the module enumeration started using YHub::FirstHubInUse().
      * Caution: You can't make any assumption about the order of returned hubs.
      *
      * @return ?YHub  a pointer to a YHub object, corresponding to
-     *         the next hub currenlty in use, or a null pointer
+     *         the next hub currently in use, or a null pointer
      *         if there are no more hubs to enumerate.
      */
     public function nextHubInUse(): ?YHub

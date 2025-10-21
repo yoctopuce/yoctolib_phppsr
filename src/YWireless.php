@@ -395,8 +395,8 @@ class YWireless extends YFunction
         while (sizeof($res) > 0) {
             array_pop($res);
         };
-        foreach ($wlanlist as $each) {
-            $res[] = new YWlanRecord(YAPI::Ybin2str($each));
+        foreach ($wlanlist as $ii_0) {
+            $res[] = new YWlanRecord(YAPI::Ybin2str($ii_0));
         }
         return $res;
     }

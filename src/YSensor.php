@@ -33,6 +33,7 @@ class YSensor extends YFunction
     const SENSORSTATE_INVALID = YAPI::INVALID_INT;
     //--- (end of generated code: YSensor declaration)
     const DATA_INVALID = YAPI::INVALID_DOUBLE;
+    protected mixed $_cal = null;
 
     //--- (generated code: YSensor attributes)
     protected string $_unit = self::UNIT_INVALID;           // Text
@@ -47,16 +48,8 @@ class YSensor extends YFunction
     protected float $_resolution = self::RESOLUTION_INVALID;     // MeasureVal
     protected int $_sensorState = self::SENSORSTATE_INVALID;    // Int
     protected mixed $_timedReportCallbackSensor = null;                         // YSensorTimedReportCallback
-    protected float $_prevTimedReport = 0;                            // float
+    protected float $_prevTR = 0;                            // float
     protected float $_iresol = 0;                            // float
-    protected float $_offset = 0;                            // float
-    protected float $_scale = 0;                            // float
-    protected float $_decexp = 0;                            // float
-    protected int $_caltyp = 0;                            // int
-    protected array $_calpar = [];                           // intArr
-    protected array $_calraw = [];                           // floatArr
-    protected array $_calref = [];                           // floatArr
-    protected mixed $_calhdl = null;                         // yCalibrationHandler
 
     //--- (end of generated code: YSensor attributes)
 
@@ -140,7 +133,7 @@ class YSensor extends YFunction
      * Returns the current value of the measure, in the specified unit, as a floating point number.
      * Note that a get_currentValue() call will *not* start a measure in the device, it
      * will just return the last measure that occurred in the device. Indeed, internally, each Yoctopuce
-     * devices is continuously making measures at a hardware specific frequency.
+     * devices is continuously making measurements at a hardware specific frequency.
      *
      * If continuously calling  get_currentValue() leads you to performances issues, then
      * you might consider to switch to callback programming model. Check the "advanced
@@ -154,18 +147,21 @@ class YSensor extends YFunction
      */
     public function get_currentValue(): float
     {
-        // $res                    is a float;
+        // $res                    is a double;
         if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
             if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
                 return self::CURRENTVALUE_INVALID;
             }
         }
-        $res = $this->_applyCalibration($this->_currentRawValue);
-        if ($res == self::CURRENTVALUE_INVALID) {
+        if ($this->_cal == null) {
             $res = $this->_currentValue;
+        } else {
+            $res = $this->_applyCalibration($this->_currentRawValue);
         }
-        $res = $res * $this->_iresol;
-        $res = round($res) / $this->_iresol;
+        if ($res == self::CURRENTVALUE_INVALID) {
+            return $res;
+        }
+        $res = round($res * $this->_iresol) / $this->_iresol;
         return $res;
     }
 
@@ -198,14 +194,13 @@ class YSensor extends YFunction
      */
     public function get_lowestValue(): float
     {
-        // $res                    is a float;
+        // $res                    is a double;
         if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
             if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
                 return self::LOWESTVALUE_INVALID;
             }
         }
-        $res = $this->_lowestValue * $this->_iresol;
-        $res = round($res) / $this->_iresol;
+        $res = round($this->_lowestValue * $this->_iresol) / $this->_iresol;
         return $res;
     }
 
@@ -238,14 +233,13 @@ class YSensor extends YFunction
      */
     public function get_highestValue(): float
     {
-        // $res                    is a float;
+        // $res                    is a double;
         if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
             if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
                 return self::HIGHESTVALUE_INVALID;
             }
         }
-        $res = $this->_highestValue * $this->_iresol;
-        $res = round($res) / $this->_iresol;
+        $res = round($this->_highestValue * $this->_iresol) / $this->_iresol;
         return $res;
     }
 
@@ -534,138 +528,22 @@ class YSensor extends YFunction
      */
     public function _parserHelper(): int
     {
-        // $position               is a int;
-        // $maxpos                 is a int;
-        $iCalib = [];           // intArr;
-        // $iRaw                   is a int;
-        // $iRef                   is a int;
-        // $fRaw                   is a float;
-        // $fRef                   is a float;
-        $this->_caltyp = -1;
-        $this->_scale = -1;
-        while (sizeof($this->_calpar) > 0) {
-            array_pop($this->_calpar);
-        };
-        while (sizeof($this->_calraw) > 0) {
-            array_pop($this->_calraw);
-        };
-        while (sizeof($this->_calref) > 0) {
-            array_pop($this->_calref);
-        };
+        // $calibStr               is a str;
         // Store inverted resolution, to provide better rounding
         if ($this->_resolution > 0) {
             $this->_iresol = round(1.0 / $this->_resolution);
         } else {
             $this->_iresol = 10000;
-            $this->_resolution = 0.0001;
         }
-        // Old format: supported when there is no calibration
-        if ($this->_calibrationParam == '' || $this->_calibrationParam == '0') {
-            $this->_caltyp = 0;
+        // Shortcut when there is no calibration parameter
+        $calibStr = $this->_calibrationParam;
+        if ($calibStr == '0,' || $calibStr == '' || $calibStr == '0') {
+            $this->_cal = null;
             return 0;
         }
-        if (YAPI::Ystrpos($this->_calibrationParam,',') >= 0) {
-            // Plain text format
-            $iCalib = YAPI::_decodeFloats($this->_calibrationParam);
-            $this->_caltyp = intVal(($iCalib[0]) / (1000));
-            if ($this->_caltyp > 0) {
-                if ($this->_caltyp < YOCTO_CALIB_TYPE_OFS) {
-                    // Unknown calibration type: calibrated value will be provided by the device
-                    $this->_caltyp = -1;
-                    return 0;
-                }
-                $this->_calhdl = YAPI::_getCalibrationHandler($this->_caltyp);
-                if (!(!is_null($this->_calhdl))) {
-                    // Unknown calibration type: calibrated value will be provided by the device
-                    $this->_caltyp = -1;
-                    return 0;
-                }
-            }
-            // New 32 bits text format
-            $this->_offset = 0;
-            $this->_scale = 1000;
-            $maxpos = sizeof($iCalib);
-            while (sizeof($this->_calpar) > 0) {
-                array_pop($this->_calpar);
-            };
-            $position = 1;
-            while ($position < $maxpos) {
-                $this->_calpar[] = $iCalib[$position];
-                $position = $position + 1;
-            }
-            while (sizeof($this->_calraw) > 0) {
-                array_pop($this->_calraw);
-            };
-            while (sizeof($this->_calref) > 0) {
-                array_pop($this->_calref);
-            };
-            $position = 1;
-            while ($position + 1 < $maxpos) {
-                $fRaw = $iCalib[$position];
-                $fRaw = $fRaw / 1000.0;
-                $fRef = $iCalib[$position + 1];
-                $fRef = $fRef / 1000.0;
-                $this->_calraw[] = $fRaw;
-                $this->_calref[] = $fRef;
-                $position = $position + 2;
-            }
-        } else {
-            // Recorder-encoded format, including encoding
-            $iCalib = YAPI::_decodeWords($this->_calibrationParam);
-            // In case of unknown format, calibrated value will be provided by the device
-            if (sizeof($iCalib) < 2) {
-                $this->_caltyp = -1;
-                return 0;
-            }
-            // Save variable format (scale for scalar, or decimal exponent)
-            $this->_offset = 0;
-            $this->_scale = 1;
-            $this->_decexp = 1.0;
-            $position = $iCalib[0];
-            while ($position > 0) {
-                $this->_decexp = $this->_decexp * 10;
-                $position = $position - 1;
-            }
-            // Shortcut when there is no calibration parameter
-            if (sizeof($iCalib) == 2) {
-                $this->_caltyp = 0;
-                return 0;
-            }
-            $this->_caltyp = $iCalib[2];
-            $this->_calhdl = YAPI::_getCalibrationHandler($this->_caltyp);
-            // parse calibration points
-            if ($this->_caltyp <= 10) {
-                $maxpos = $this->_caltyp;
-            } else {
-                if ($this->_caltyp <= 20) {
-                    $maxpos = $this->_caltyp - 10;
-                } else {
-                    $maxpos = 5;
-                }
-            }
-            $maxpos = 3 + 2 * $maxpos;
-            if ($maxpos > sizeof($iCalib)) {
-                $maxpos = sizeof($iCalib);
-            }
-            while (sizeof($this->_calpar) > 0) {
-                array_pop($this->_calpar);
-            };
-            while (sizeof($this->_calraw) > 0) {
-                array_pop($this->_calraw);
-            };
-            while (sizeof($this->_calref) > 0) {
-                array_pop($this->_calref);
-            };
-            $position = 3;
-            while ($position + 1 < $maxpos) {
-                $iRaw = $iCalib[$position];
-                $iRef = $iCalib[$position + 1];
-                $this->_calpar[] = $iRaw;
-                $this->_calpar[] = $iRef;
-                $this->_calraw[] = YAPI::_decimalToDouble($iRaw);
-                $this->_calref[] = YAPI::_decimalToDouble($iRef);
-                $position = $position + 2;
-            }
+        // Parse calibration parameters only if they have changed
+        if ($this->_cal == null || !($this->_cal->src == $calibStr)) {
+            $this->_parseCalibStr($calibStr);
         }
         return 0;
     }
@@ -680,10 +558,11 @@ class YSensor extends YFunction
      */
     public function isSensorReady(): bool
     {
-        if (!($this->isOnline())) {
-            return false;
-        }
-        if (!($this->_sensorState == 0)) {
+        try {
+            if ($this->get_sensorState() != 0) {
+                return false;
+            }
+        } catch (Exception $ex) {
             return false;
         }
         return true;
@@ -711,6 +590,116 @@ class YSensor extends YFunction
         $hwid = $serial . '.dataLogger';
         $logger = YDataLogger::FindDataLogger($hwid);
         return $logger;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function _parseCalibStr(string $calibStr): int
+    {
+        $iCalib = [];           // intArr;
+        // $caltyp                 is a int;
+        // $calhdl                 is a yCalibrationHandler;
+        // $maxpos                 is a int;
+        // $position               is a int;
+        $calpar = [];           // intArr;
+        $calraw = [];           // floatArr;
+        $calref = [];           // floatArr;
+        // $fRaw                   is a float;
+        // $fRef                   is a float;
+        // $iRaw                   is a int;
+        // $iRef                   is a int;
+        if (YAPI::Ystrpos($calibStr,',') >= 0) {
+            // Plain text format
+            $iCalib = YAPI::_decodeFloats($calibStr);
+            $caltyp = intVal($iCalib[0] / 1000);
+            if ($caltyp < YOCTO_CALIB_TYPE_OFS) {
+                // Unknown calibration type: calibrated value will be provided by the device
+                $this->_cal = null;
+                return YAPI::SUCCESS;
+            }
+            $calhdl = YAPI::_getCalibrationHandler($caltyp);
+            if (!(!is_null($calhdl))) {
+                // Unknown calibration type: calibrated value will be provided by the device
+                $this->_cal = null;
+                return YAPI::SUCCESS;
+            }
+            // New 32 bits text format
+            $maxpos = sizeof($iCalib);
+            while (sizeof($calpar) > 0) {
+                array_pop($calpar);
+            };
+            $position = 1;
+            while ($position < $maxpos) {
+                $calpar[] = $iCalib[$position];
+                $position = $position + 1;
+            }
+            while (sizeof($calraw) > 0) {
+                array_pop($calraw);
+            };
+            while (sizeof($calref) > 0) {
+                array_pop($calref);
+            };
+            $position = 1;
+            while ($position + 1 < $maxpos) {
+                $fRaw = $iCalib[$position];
+                $fRaw = $fRaw / 1000.0;
+                $fRef = $iCalib[$position + 1];
+                $fRef = $fRef / 1000.0;
+                $calraw[] = $fRaw;
+                $calref[] = $fRef;
+                $position = $position + 2;
+            }
+        } else {
+            // Old recorder-encoded format, including encoding
+            $iCalib = YAPI::_decodeWords($calibStr);
+            if (sizeof($iCalib) <= 2) {
+                // Unknown calibration type: calibrated value will be provided by the device
+                $this->_cal = null;
+                return YAPI::SUCCESS;
+            }
+            $caltyp = $iCalib[2];
+            $calhdl = YAPI::_getCalibrationHandler($caltyp);
+            if (!(!is_null($calhdl))) {
+                // Unknown calibration type: calibrated value will be provided by the device
+                $this->_cal = null;
+                return YAPI::SUCCESS;
+            }
+            if ($caltyp <= 10) {
+                $maxpos = $caltyp;
+            } else {
+                if ($caltyp <= 20) {
+                    $maxpos = $caltyp - 10;
+                } else {
+                    $maxpos = 5;
+                }
+            }
+            $maxpos = 3 + 2 * $maxpos;
+            if ($maxpos > sizeof($iCalib)) {
+                $maxpos = sizeof($iCalib);
+            }
+            while (sizeof($calpar) > 0) {
+                array_pop($calpar);
+            };
+            while (sizeof($calraw) > 0) {
+                array_pop($calraw);
+            };
+            while (sizeof($calref) > 0) {
+                array_pop($calref);
+            };
+            $position = 3;
+            while ($position + 1 < $maxpos) {
+                $iRaw = $iCalib[$position];
+                $iRef = $iCalib[$position + 1];
+                $calpar[] = $iRaw;
+                $calpar[] = $iRef;
+                $calraw[] = YAPI::_decimalToDouble($iRaw);
+                $calref[] = YAPI::_decimalToDouble($iRef);
+                $position = $position + 2;
+            }
+        }
+        $this->_cal = new YCalibCtx($calibStr, $calhdl, $caltyp, $calpar, $calraw, $calref);
+        return YAPI::SUCCESS;
     }
 
     /**
@@ -870,14 +859,13 @@ class YSensor extends YFunction
             array_pop($refValues);
         };
         // Load function parameters if not yet loaded
-        if (($this->_scale == 0) || ($this->_cacheExpiration <= YAPI::GetTickCount())) {
+        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
             if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
                 return YAPI::DEVICE_NOT_FOUND;
             }
         }
-        if ($this->_caltyp < 0) {
-            $this->_throw(YAPI::NOT_SUPPORTED, 'Calibration parameters format mismatch. Please upgrade your library or firmware.');
-            return YAPI::NOT_SUPPORTED;
+        if ($this->_cal == null) {
+            return YAPI::SUCCESS;
         }
         while (sizeof($rawValues) > 0) {
             array_pop($rawValues);
@@ -885,11 +873,11 @@ class YSensor extends YFunction
         while (sizeof($refValues) > 0) {
             array_pop($refValues);
         };
-        foreach ($this->_calraw as $each) {
-            $rawValues[] = $each;
+        foreach ($this->_cal->raw as $ii_0) {
+            $rawValues[] = $ii_0;
         }
-        foreach ($this->_calref as $each) {
-            $refValues[] = $each;
+        foreach ($this->_cal->cal as $ii_1) {
+            $refValues[] = $ii_1;
         }
         return YAPI::SUCCESS;
     }
@@ -911,18 +899,7 @@ class YSensor extends YFunction
         if ($npt == 0) {
             return '0';
         }
-        // Load function parameters if not yet loaded
-        if ($this->_scale == 0) {
-            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
-                return YAPI::INVALID_STRING;
-            }
-        }
-        // Detect old firmware
-        if (($this->_caltyp < 0) || ($this->_scale < 0)) {
-            $this->_throw(YAPI::NOT_SUPPORTED, 'Calibration parameters format mismatch. Please upgrade your library or firmware.');
-            return '0';
-        }
-        // 32-bit fixed-point encoding
+        // Encode using newer 32-bit fixed-point method
         $res = sprintf('%d', YOCTO_CALIB_TYPE_OFS);
         $idx = 0;
         while ($idx < $npt) {
@@ -937,19 +914,13 @@ class YSensor extends YFunction
      */
     public function _applyCalibration(float $rawValue): float
     {
+        if ($this->_cal == null) {
+            return $rawValue;
+        }
         if ($rawValue == self::CURRENTVALUE_INVALID) {
             return self::CURRENTVALUE_INVALID;
         }
-        if ($this->_caltyp == 0) {
-            return $rawValue;
-        }
-        if ($this->_caltyp < 0) {
-            return self::CURRENTVALUE_INVALID;
-        }
-        if (!(!is_null($this->_calhdl))) {
-            return self::CURRENTVALUE_INVALID;
-        }
-        return call_user_func($this->_calhdl, $rawValue, $this->_caltyp, $this->_calpar, $this->_calraw, $this->_calref);
+        return call_user_func($this->_cal->hdl, $rawValue, $this->_cal->typ, $this->_cal->par, $this->_cal->raw, $this->_cal->cal);
     }
 
     /**
@@ -973,10 +944,10 @@ class YSensor extends YFunction
         if ($duration > 0) {
             $startTime = $timestamp - $duration;
         } else {
-            $startTime = $this->_prevTimedReport;
+            $startTime = $this->_prevTR;
         }
         $endTime = $timestamp;
-        $this->_prevTimedReport = $endTime;
+        $this->_prevTR = $endTime;
         if ($startTime == 0) {
             $startTime = $endTime;
         }
@@ -993,20 +964,18 @@ class YSensor extends YFunction
                 $poww = $poww * 0x100;
                 $i = $i + 1;
             }
-            if ((($byteVal) & 0x80) != 0) {
+            if (($byteVal & 0x80) != 0) {
                 $avgRaw = $avgRaw - $poww;
             }
             $avgVal = $avgRaw / 1000.0;
-            if ($this->_caltyp != 0) {
-                if (!is_null($this->_calhdl)) {
-                    $avgVal = call_user_func($this->_calhdl, $avgVal, $this->_caltyp, $this->_calpar, $this->_calraw, $this->_calref);
-                }
+            if (!($this->_cal == null)) {
+                $avgVal = call_user_func($this->_cal->hdl, $avgVal, $this->_cal->typ, $this->_cal->par, $this->_cal->raw, $this->_cal->cal);
             }
             $minVal = $avgVal;
             $maxVal = $avgVal;
         } else {
             // averaged report: avg,avg-min,max-avg
-            $sublen = 1 + (($report[1]) & 3);
+            $sublen = 1 + ($report[1] & 3);
             $poww = 1;
             $avgRaw = 0;
             $byteVal = 0;
@@ -1018,10 +987,10 @@ class YSensor extends YFunction
                 $i = $i + 1;
                 $sublen = $sublen - 1;
             }
-            if ((($byteVal) & 0x80) != 0) {
+            if (($byteVal & 0x80) != 0) {
                 $avgRaw = $avgRaw - $poww;
             }
-            $sublen = 1 + ((($report[1]) >> 2) & 3);
+            $sublen = 1 + (($report[1] >> 2) & 3);
             $poww = 1;
             $difRaw = 0;
             while (($sublen > 0) && ($i < sizeof($report))) {
@@ -1032,7 +1001,7 @@ class YSensor extends YFunction
                 $sublen = $sublen - 1;
             }
             $minRaw = $avgRaw - $difRaw;
-            $sublen = 1 + ((($report[1]) >> 4) & 3);
+            $sublen = 1 + (($report[1] >> 4) & 3);
             $poww = 1;
             $difRaw = 0;
             while (($sublen > 0) && ($i < sizeof($report))) {
@@ -1046,12 +1015,10 @@ class YSensor extends YFunction
             $avgVal = $avgRaw / 1000.0;
             $minVal = $minRaw / 1000.0;
             $maxVal = $maxRaw / 1000.0;
-            if ($this->_caltyp != 0) {
-                if (!is_null($this->_calhdl)) {
-                    $avgVal = call_user_func($this->_calhdl, $avgVal, $this->_caltyp, $this->_calpar, $this->_calraw, $this->_calref);
-                    $minVal = call_user_func($this->_calhdl, $minVal, $this->_caltyp, $this->_calpar, $this->_calraw, $this->_calref);
-                    $maxVal = call_user_func($this->_calhdl, $maxVal, $this->_caltyp, $this->_calpar, $this->_calraw, $this->_calref);
-                }
+            if (!($this->_cal == null)) {
+                $avgVal = call_user_func($this->_cal->hdl, $avgVal, $this->_cal->typ, $this->_cal->par, $this->_cal->raw, $this->_cal->cal);
+                $minVal = call_user_func($this->_cal->hdl, $minVal, $this->_cal->typ, $this->_cal->par, $this->_cal->raw, $this->_cal->cal);
+                $maxVal = call_user_func($this->_cal->hdl, $maxVal, $this->_cal->typ, $this->_cal->par, $this->_cal->raw, $this->_cal->cal);
             }
         }
         return new YMeasure($startTime, $endTime, $minVal, $avgVal, $maxVal);
@@ -1064,10 +1031,8 @@ class YSensor extends YFunction
     {
         // $val                    is a float;
         $val = $w;
-        if ($this->_caltyp != 0) {
-            if (!is_null($this->_calhdl)) {
-                $val = call_user_func($this->_calhdl, $val, $this->_caltyp, $this->_calpar, $this->_calraw, $this->_calref);
-            }
+        if (!($this->_cal == null)) {
+            $val = call_user_func($this->_cal->hdl, $val, $this->_cal->typ, $this->_cal->par, $this->_cal->raw, $this->_cal->cal);
         }
         return $val;
     }
@@ -1079,10 +1044,8 @@ class YSensor extends YFunction
     {
         // $val                    is a float;
         $val = $dw;
-        if ($this->_caltyp != 0) {
-            if (!is_null($this->_calhdl)) {
-                $val = call_user_func($this->_calhdl, $val, $this->_caltyp, $this->_calpar, $this->_calraw, $this->_calref);
-            }
+        if (!($this->_cal == null)) {
+            $val = call_user_func($this->_cal->hdl, $val, $this->_cal->typ, $this->_cal->par, $this->_cal->raw, $this->_cal->cal);
         }
         return $val;
     }

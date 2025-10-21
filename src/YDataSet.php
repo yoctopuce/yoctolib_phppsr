@@ -137,33 +137,33 @@ class YDataSet
         $summaryStopMs = YAPI::MIN_DOUBLE;
 
         // Parse complete streams
-        foreach ($this->_streams as $each) {
-            $streamStartTimeMs = round($each->get_realStartTimeUTC() * 1000);
-            $streamDuration = $each->get_realDuration();
+        foreach ($this->_streams as $ii_0) {
+            $streamStartTimeMs = round($ii_0->get_realStartTimeUTC() * 1000);
+            $streamDuration = $ii_0->get_realDuration();
             $streamEndTimeMs = $streamStartTimeMs + round($streamDuration * 1000);
             if (($streamStartTimeMs >= $this->_startTimeMs) && (($this->_endTimeMs == 0) || ($streamEndTimeMs <= $this->_endTimeMs))) {
                 // stream that are completely inside the dataset
-                $previewMinVal = $each->get_minValue();
-                $previewAvgVal = $each->get_averageValue();
-                $previewMaxVal = $each->get_maxValue();
+                $previewMinVal = $ii_0->get_minValue();
+                $previewAvgVal = $ii_0->get_averageValue();
+                $previewMaxVal = $ii_0->get_maxValue();
                 $previewStartMs = $streamStartTimeMs;
                 $previewStopMs = $streamEndTimeMs;
                 $previewDuration = $streamDuration;
             } else {
                 // stream that are partially in the dataset
                 // we need to parse data to filter value outside the dataset
-                if (!($each->_wasLoaded())) {
-                    $url = $each->_get_url();
+                if (!($ii_0->_wasLoaded())) {
+                    $url = $ii_0->_get_url();
                     $data = $this->_parent->_download($url);
-                    $each->_parseStream($data);
+                    $ii_0->_parseStream($data);
                 }
-                $dataRows = $each->get_dataRows();
+                $dataRows = $ii_0->get_dataRows();
                 if (sizeof($dataRows) == 0) {
                     return $this->get_progress();
                 }
                 $tim = $streamStartTimeMs;
-                $fitv = round($each->get_firstDataSamplesInterval() * 1000);
-                $itv = round($each->get_dataSamplesInterval() * 1000);
+                $fitv = round($ii_0->get_firstDataSamplesInterval() * 1000);
+                $itv = round($ii_0->get_dataSamplesInterval() * 1000);
                 $nCols = sizeof($dataRows[0]);
                 $minCol = 0;
                 if ($nCols > 2) {
@@ -317,16 +317,16 @@ class YDataSet
         }
 
         $firstMeasure = true;
-        foreach ($dataRows as $each) {
+        foreach ($dataRows as $ii_0) {
             if ($firstMeasure) {
                 $end_ = $tim + $fitv;
                 $firstMeasure = false;
             } else {
                 $end_ = $tim + $itv;
             }
-            $avgv = $each[$avgCol];
+            $avgv = $ii_0[$avgCol];
             if (($end_ > $this->_startTimeMs) && (($this->_endTimeMs == 0) || ($tim < $this->_endTimeMs)) && !(is_nan($avgv))) {
-                $this->_measures[] = new YMeasure($tim / 1000, $end_ / 1000, $each[$minCol], $avgv, $each[$maxCol]);
+                $this->_measures[] = new YMeasure($tim / 1000, $end_ / 1000, $ii_0[$minCol], $avgv, $ii_0[$maxCol]);
             }
             $tim = $end_;
         }
@@ -493,7 +493,7 @@ class YDataSet
         if ($this->_progress >= sizeof($this->_streams)) {
             return 100;
         }
-        return intVal((1 + (1 + $this->_progress) * 98) / ((1 + sizeof($this->_streams))));
+        return intVal((1 + (1 + $this->_progress) * 98) / (1 + sizeof($this->_streams)));
     }
 
     /**
@@ -610,9 +610,9 @@ class YDataSet
 
         $startUtcMs = $measure->get_startTimeUTC() * 1000;
         $stream = null;
-        foreach ($this->_streams as $each) {
-            if (round($each->get_realStartTimeUTC() *1000) == $startUtcMs) {
-                $stream = $each;
+        foreach ($this->_streams as $ii_0) {
+            if (round($ii_0->get_realStartTimeUTC() *1000) == $startUtcMs) {
+                $stream = $ii_0;
             }
         }
         if ($stream == null) {
@@ -640,10 +640,10 @@ class YDataSet
             $maxCol = 0;
         }
 
-        foreach ($dataRows as $each) {
+        foreach ($dataRows as $ii_1) {
             $end_ = $tim + $itv;
             if (($end_ > $this->_startTimeMs) && (($this->_endTimeMs == 0) || ($tim < $this->_endTimeMs))) {
-                $measures[] = new YMeasure($tim / 1000.0, $end_ / 1000.0, $each[$minCol], $each[$avgCol], $each[$maxCol]);
+                $measures[] = new YMeasure($tim / 1000.0, $end_ / 1000.0, $ii_1[$minCol], $ii_1[$avgCol], $ii_1[$maxCol]);
             }
             $tim = $end_;
         }

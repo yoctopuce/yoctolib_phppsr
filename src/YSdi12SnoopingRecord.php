@@ -18,7 +18,7 @@ class YSdi12SnoopingRecord
 
     //--- (end of generated code: YSdi12SnoopingRecord attributes)
 
-    function __construct(string $str_func)
+    function __construct(string $str_json)
     {
         //--- (generated code: YSdi12SnoopingRecord constructor)
         //--- (end of generated code: YSdi12SnoopingRecord constructor)

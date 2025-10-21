@@ -230,8 +230,8 @@ class YRfidReader extends YFunction
         };
         if (strlen($json) > 3) {
             $jsonList = $this->_json_get_array($json);
-            foreach ($jsonList as $each) {
-                $taglist[] = $this->_json_get_string($each);
+            foreach ($jsonList as $ii_0) {
+                $taglist[] = $this->_json_get_string($ii_0);
             }
         }
         return $taglist;
@@ -352,8 +352,8 @@ class YRfidReader extends YFunction
         $binRes = YAPI::_hexStrToBin($this->_json_get_key($json, 'bitmap'));
         $idx = 0;
         while ($idx < $nBlocks) {
-            $val = ord($binRes[(($idx) >> 3)]);
-            $isLocked = ((($val) & (1 << (($idx) & 7))) != 0);
+            $val = ord($binRes[($idx >> 3)]);
+            $isLocked = (($val & (1 << ($idx & 7))) != 0);
             $res[] = $isLocked;
             $idx = $idx + 1;
         }
@@ -401,8 +401,8 @@ class YRfidReader extends YFunction
         $binRes = YAPI::_hexStrToBin($this->_json_get_key($json, 'bitmap'));
         $idx = 0;
         while ($idx < $nBlocks) {
-            $val = ord($binRes[(($idx) >> 3)]);
-            $isLocked = ((($val) & (1 << (($idx) & 7))) != 0);
+            $val = ord($binRes[($idx >> 3)]);
+            $isLocked = (($val & (1 << ($idx & 7))) != 0);
             $res[] = $isLocked;
             $idx = $idx + 1;
         }
@@ -677,7 +677,7 @@ class YRfidReader extends YFunction
         // $idx                    is a int;
         // $hexb                   is a int;
         $bufflen = mb_strlen($hexString);
-        $bufflen = (($bufflen) >> 1);
+        $bufflen = ($bufflen >> 1);
         if ($bufflen <= 16) {
             // short data, use an URL-based command
             $optstr = $options->imm_getParams();
@@ -999,7 +999,7 @@ class YRfidReader extends YFunction
         // $evtData                is a str;
         // detect possible power cycle of the reader to clear event pointer
         $cbPos = intVal($cbVal);
-        $cbPos = intVal(($cbPos) / (1000));
+        $cbPos = intVal($cbPos / 1000);
         $cbDPos = (($cbPos - $this->_prevCbPos) & 0x7ffff);
         $this->_prevCbPos = $cbPos;
         if ($cbDPos > 16384) {
