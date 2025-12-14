@@ -338,6 +338,28 @@ class YFunction
     }
 
     /**
+     * @throws YAPI_Exception on error
+     */
+    public function _is_valid_pass(string $passwd): bool
+    {
+        // $tmp                    is a str;
+        if (strlen($passwd) > YAPI_HASH_BUF_SIZE) {
+            $tmp = sprintf('Password too long (max %d chars) :%s', YAPI_HASH_BUF_SIZE, $passwd);
+            $this->_throw(YAPI::INVALID_ARGUMENT, $tmp);
+            return false;
+        }
+        if (YAPI::Ystrpos($passwd,'@') >=0) {
+            $this->_throw(YAPI::INVALID_ARGUMENT, 'Character @ is not allowed in password');
+            return false;
+        }
+        if (YAPI::Ystrpos($passwd,'/') >=0) {
+            $this->_throw(YAPI::INVALID_ARGUMENT, 'Character / is not allowed in password');
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * @throws YAPI_Exception
      */
     public function logicalName(): string

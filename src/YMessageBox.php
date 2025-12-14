@@ -381,7 +381,7 @@ class YMessageBox extends YFunction
         // $suffixlen              is a int;
         // copied form the YCellular class
         // quote dangerous characters used in AT commands
-        $cmdLen = mb_strlen($cmd);
+        $cmdLen = strlen($cmd);
         $chrPos = YAPI::Ystrpos($cmd,'#');
         while ($chrPos >= 0) {
             $cmd = sprintf('%s%c23%s', substr($cmd, 0, $chrPos), 37,
@@ -411,7 +411,7 @@ class YMessageBox extends YFunction
             $buff = $this->_download($cmd);
             $bufflen = strlen($buff);
             $buffstr = YAPI::Ybin2str($buff);
-            $buffstrlen = mb_strlen($buffstr);
+            $buffstrlen = strlen($buffstr);
             $idx = $bufflen - 1;
             while (($idx > 0) && (ord($buff[$idx]) != 64) && (ord($buff[$idx]) != 10) && (ord($buff[$idx]) != 13)) {
                 $idx = $idx - 1;
@@ -716,7 +716,7 @@ class YMessageBox extends YFunction
             $i = $i + 1;
         }
         $resstr = YAPI::Ybin2str($resbin);
-        if (mb_strlen($resstr) > $reslen) {
+        if (strlen($resstr) > $reslen) {
             $resstr = substr($resstr, 0, $reslen);
         }
         return $resstr;
@@ -858,13 +858,13 @@ class YMessageBox extends YFunction
                     } else {
                         $sig = $sms->get_concatSignature();
                         $i = 0;
-                        while (($i < $nsig) && (mb_strlen($sig) > 0)) {
+                        while (($i < $nsig) && (strlen($sig) > 0)) {
                             if ($signatures[$i] == $sig) {
                                 $sig = '';
                             }
                             $i = $i + 1;
                         }
-                        if (mb_strlen($sig) > 0) {
+                        if (strlen($sig) > 0) {
                             $signatures[] = $sig;
                             $nsig = $nsig + 1;
                         }
@@ -891,13 +891,13 @@ class YMessageBox extends YFunction
                     } else {
                         $sig = $sms->get_concatSignature();
                         $i = 0;
-                        while (($i < $nsig) && (mb_strlen($sig) > 0)) {
+                        while (($i < $nsig) && (strlen($sig) > 0)) {
                             if ($signatures[$i] == $sig) {
                                 $sig = '';
                             }
                             $i = $i + 1;
                         }
-                        if (mb_strlen($sig) > 0) {
+                        if (strlen($sig) > 0) {
                             $signatures[] = $sig;
                             $nsig = $nsig + 1;
                         }

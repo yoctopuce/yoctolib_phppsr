@@ -825,7 +825,7 @@ class YCellular extends YFunction
         // $idx                    is a int;
         // $suffixlen              is a int;
         // quote dangerous characters used in AT commands
-        $cmdLen = mb_strlen($cmd);
+        $cmdLen = strlen($cmd);
         $chrPos = YAPI::Ystrpos($cmd,'#');
         while ($chrPos >= 0) {
             $cmd = sprintf('%s%c23%s', substr($cmd, 0, $chrPos), 37,
@@ -855,7 +855,7 @@ class YCellular extends YFunction
             $buff = $this->_download($cmd);
             $bufflen = strlen($buff);
             $buffstr = YAPI::Ybin2str($buff);
-            $buffstrlen = mb_strlen($buffstr);
+            $buffstrlen = strlen($buffstr);
             $idx = $bufflen - 1;
             while (($idx > 0) && (ord($buff[$idx]) != 64) && (ord($buff[$idx]) != 10) && (ord($buff[$idx]) != 13)) {
                 $idx = $idx - 1;
@@ -892,7 +892,7 @@ class YCellular extends YFunction
         $res = [];              // strArr;
 
         $cops = $this->_AT('+COPS=?');
-        $slen = mb_strlen($cops);
+        $slen = strlen($cops);
         while (sizeof($res) > 0) {
             array_pop($res);
         };
@@ -954,7 +954,7 @@ class YCellular extends YFunction
             $mncs = substr($mncs, 0, 2);
         }
         if (substr($mncs, 0, 1) == '0') {
-            $mncs = substr($mncs, 1, mb_strlen($mncs)-1);
+            $mncs = substr($mncs, 1, strlen($mncs)-1);
         }
         $mnc = intVal($mncs);
         $recs = explode('#', $moni);
@@ -963,7 +963,7 @@ class YCellular extends YFunction
             array_pop($res);
         };
         foreach ($recs as $ii_0) {
-            $llen = mb_strlen($ii_0) - 2;
+            $llen = strlen($ii_0) - 2;
             if ($llen >= 44) {
                 if (substr($ii_0, 41, 3) == 'dbm') {
                     $lac = hexdec(substr($ii_0, 16, 4));

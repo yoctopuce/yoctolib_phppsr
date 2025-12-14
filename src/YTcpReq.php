@@ -137,7 +137,7 @@ class YTcpReq
     }
 
 
-    function process(string &$errmsg = ''): int
+    function process(?string &$errmsg = ''): int
     {
         if ($this->eof()) {
             if ($this->errorType != YAPI::SUCCESS) {

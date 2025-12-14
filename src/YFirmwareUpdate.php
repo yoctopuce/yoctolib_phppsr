@@ -166,7 +166,7 @@ class YFirmwareUpdate
         // $err                    is a str;
         // $leng                   is a int;
         $err = YAPI::Ybin2str($this->_settings);
-        $leng = mb_strlen($err);
+        $leng = strlen($err);
         if (($leng >= 6) && ('error:' == substr($err, 0, 6))) {
             $this->_progress = -1;
             $this->_progress_msg = substr($err, 6, $leng - 6);

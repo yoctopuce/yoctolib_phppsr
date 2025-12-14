@@ -659,7 +659,7 @@ class YModule extends YFunction
         // $modpos                 is a int;
         $cleanHwId = $func;
         $modpos = YAPI::Ystrpos($func,'.module');
-        if ($modpos != (mb_strlen($func) - 7)) {
+        if ($modpos != (strlen($func) - 7)) {
             $cleanHwId = $func . '.module';
         }
         $obj = YFunction::_FindFromCache('Module', $cleanHwId);
@@ -969,7 +969,7 @@ class YModule extends YFunction
                 $url = sprintf('api/%s/sensorType',$ii_0);
                 $t_type = YAPI::Ybin2str($this->_download($url));
                 if ($t_type == 'RES_NTC' || $t_type == 'RES_LINEAR') {
-                    $pageid = substr($ii_0, 11, mb_strlen($ii_0) - 11);
+                    $pageid = substr($ii_0, 11, strlen($ii_0) - 11);
                     if ($pageid == '') {
                         $pageid = '1';
                     }
@@ -992,8 +992,8 @@ class YModule extends YFunction
             $sep = '';
             foreach ($filelist as $ii_1) {
                 $name = $this->_json_get_key($ii_1, 'name');
-                if ((mb_strlen($name) > 0) && !($name == 'startupConf.json')) {
-                    if (substr($name, mb_strlen($name)-1, 1) == '/') {
+                if ((strlen($name) > 0) && !($name == 'startupConf.json')) {
+                    if (substr($name, strlen($name)-1, 1) == '/') {
                         $file_data = '';
                     } else {
                         $file_data_bin = $this->_download($this->_escapeAttr($name));
@@ -1210,7 +1210,7 @@ class YModule extends YFunction
         if ($cparams == '' || $cparams == '0') {
             return 1;
         }
-        if ((mb_strlen($cparams) < 2) || (YAPI::Ystrpos($cparams,'.') >= 0)) {
+        if ((strlen($cparams) < 2) || (YAPI::Ystrpos($cparams,'.') >= 0)) {
             return 0;
         } else {
             return 2;
@@ -1516,7 +1516,7 @@ class YModule extends YFunction
         foreach ($old_dslist as $ii_0) {
             $each_str = $this->_json_get_string($ii_0);
             // split json path and attr
-            $leng = mb_strlen($each_str);
+            $leng = strlen($each_str);
             $eqpos = YAPI::Ystrpos($each_str,'=');
             if (($eqpos < 0) || ($leng == 0)) {
                 $this->_throw(YAPI::INVALID_ARGUMENT, 'Invalid settings');
@@ -1526,7 +1526,7 @@ class YModule extends YFunction
             $eqpos = $eqpos + 1;
             $value = substr($each_str, $eqpos, $leng - $eqpos);
             $old_jpath[] = $jpath;
-            $old_jpath_len[] = mb_strlen($jpath);
+            $old_jpath_len[] = strlen($jpath);
             $old_val_arr[] = $value;
             if ($jpath == 'module/serialNumber') {
                 $old_serial = $value;
@@ -1550,7 +1550,7 @@ class YModule extends YFunction
             // remove quotes
             $each_str = $this->_json_get_string($ii_1);
             // split json path and attr
-            $leng = mb_strlen($each_str);
+            $leng = strlen($each_str);
             $eqpos = YAPI::Ystrpos($each_str,'=');
             if (($eqpos < 0) || ($leng == 0)) {
                 $this->_throw(YAPI::INVALID_ARGUMENT, 'Invalid settings');
@@ -1560,13 +1560,13 @@ class YModule extends YFunction
             $eqpos = $eqpos + 1;
             $value = substr($each_str, $eqpos, $leng - $eqpos);
             $new_jpath[] = $jpath;
-            $new_jpath_len[] = mb_strlen($jpath);
+            $new_jpath_len[] = strlen($jpath);
             $new_val_arr[] = $value;
         }
         $i = 0;
         while ($i < sizeof($new_jpath)) {
             $njpath = $new_jpath[$i];
-            $leng = mb_strlen($njpath);
+            $leng = strlen($njpath);
             $cpos = YAPI::Ystrpos($njpath,'/');
             if (($cpos < 0) || ($leng == 0)) {
                 continue;

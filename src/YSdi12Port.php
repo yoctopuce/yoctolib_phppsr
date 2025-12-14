@@ -716,7 +716,7 @@ class YSdi12Port extends YFunction
         $databin = $this->_download(sprintf('rxcnt.bin?pos=%d', $this->_rxptr));
         $availPosStr = YAPI::Ybin2str($databin);
         $atPos = YAPI::Ystrpos($availPosStr,'@');
-        $res = intVal(substr($availPosStr, $atPos+1, mb_strlen($availPosStr)-$atPos-1));
+        $res = intVal(substr($availPosStr, $atPos+1, strlen($availPosStr)-$atPos-1));
         return $res;
     }
 
@@ -741,7 +741,7 @@ class YSdi12Port extends YFunction
         $msgarr = [];           // binArr;
         // $msglen                 is a int;
         // $res                    is a str;
-        if (mb_strlen($query) <= 80) {
+        if (strlen($query) <= 80) {
             // fast query
             $url = sprintf('rxmsg.json?len=1&maxw=%d&cmd=!%s', $maxWait, $this->_escapeAttr($query));
         } else {
@@ -789,7 +789,7 @@ class YSdi12Port extends YFunction
         $msgarr = [];           // binArr;
         // $msglen                 is a int;
         // $res                    is a str;
-        if (mb_strlen($hexString) <= 80) {
+        if (strlen($hexString) <= 80) {
             // fast query
             $url = sprintf('rxmsg.json?len=1&maxw=%d&cmd=$%s', $maxWait, $hexString);
         } else {
@@ -983,7 +983,7 @@ class YSdi12Port extends YFunction
         // $idx                    is a int;
         // $hexb                   is a int;
         // $res                    is a int;
-        $bufflen = mb_strlen($hexString);
+        $bufflen = strlen($hexString);
         if ($bufflen < 100) {
             return $this->sendCommand(sprintf('$%s',$hexString));
         }
@@ -1069,7 +1069,8 @@ class YSdi12Port extends YFunction
         $reqlen = 1024;
         $buff = $this->readBin($reqlen);
         $bufflen = strlen($buff);
-        if ($this->_rxptr == $currpos+$bufflen) {
+        if (($bufflen > 0) && ($this->_rxptr == $currpos+$bufflen)) {
+            // up to 1024 bytes in buffer, all in direction Rx
             $res = ord($buff[0]);
             $this->_rxptr = $currpos+1;
             $this->_rxbuffptr = $currpos;
@@ -1081,7 +1082,8 @@ class YSdi12Port extends YFunction
         $reqlen = 16;
         $buff = $this->readBin($reqlen);
         $bufflen = strlen($buff);
-        if ($this->_rxptr == $currpos+$bufflen) {
+        if (($bufflen > 0) && ($this->_rxptr == $currpos+$bufflen)) {
+            // up to 16 bytes in buffer, all in direction Rx
             $res = ord($buff[0]);
             $this->_rxptr = $currpos+1;
             $this->_rxbuffptr = $currpos;
@@ -1308,7 +1310,7 @@ class YSdi12Port extends YFunction
         $cmdChar  = '';
 
         $pattern = $sensorAddr;
-        if (mb_strlen($cmd) > 0) {
+        if (strlen($cmd) > 0) {
             $cmdChar = substr($cmd, 0, 1);
         }
         if ($sensorAddr == '?') {
@@ -1391,7 +1393,7 @@ class YSdi12Port extends YFunction
         $i = 0 ;
         while ($i < 10) {
             $res = $this->querySdi12($i,'!',500);
-            if (mb_strlen($res) >= 1) {
+            if (strlen($res) >= 1) {
                 $idSens[] = $res;
             }
             $i = $i+1;
@@ -1401,14 +1403,14 @@ class YSdi12Port extends YFunction
         $i = 0;
         while ($i<26) {
             $res = $this->querySdi12(substr($lettreMin, $i, 1),'!',500);
-            if (mb_strlen($res) >= 1) {
+            if (strlen($res) >= 1) {
                 $idSens[] = $res;
             }
             $i = $i +1;
         }
         while ($i<26) {
             $res = $this->querySdi12(substr($lettreMaj, $i, 1),'!',500);
-            if (mb_strlen($res) >= 1) {
+            if (strlen($res) >= 1) {
                 $idSens[] = $res;
             }
             $i = $i +1;

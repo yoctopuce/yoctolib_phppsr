@@ -676,7 +676,7 @@ class YRfidReader extends YFunction
         // $buff                   is a bin;
         // $idx                    is a int;
         // $hexb                   is a int;
-        $bufflen = mb_strlen($hexString);
+        $bufflen = strlen($hexString);
         $bufflen = ($bufflen >> 1);
         if ($bufflen <= 16) {
             // short data, use an URL-based command
@@ -1021,7 +1021,7 @@ class YRfidReader extends YFunction
             // first element of array is the new position preceeded by '@'
             $arrPos = 1;
             $lenStr = $eventArr[0];
-            $lenStr = substr($lenStr, 1, mb_strlen($lenStr)-1);
+            $lenStr = substr($lenStr, 1, strlen($lenStr)-1);
             // update processed event position pointer
             $this->_eventPos = intVal($lenStr);
         } else {
@@ -1036,14 +1036,14 @@ class YRfidReader extends YFunction
             $arrPos = 0;
             $arrLen = $arrLen - 1;
             $lenStr = $eventArr[$arrLen];
-            $lenStr = substr($lenStr, 1, mb_strlen($lenStr)-1);
+            $lenStr = substr($lenStr, 1, strlen($lenStr)-1);
             // update processed event position pointer
             $this->_eventPos = intVal($lenStr);
         }
         // now generate callbacks for each real event
         while ($arrPos < $arrLen) {
             $eventStr = $eventArr[$arrPos];
-            $eventLen = mb_strlen($eventStr);
+            $eventLen = strlen($eventStr);
             $typePos = YAPI::Ystrpos($eventStr,':')+1;
             if (($eventLen >= 14) && ($typePos > 10)) {
                 $hexStamp = substr($eventStr, 0, 8);

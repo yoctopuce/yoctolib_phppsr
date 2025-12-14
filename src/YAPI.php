@@ -1857,7 +1857,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "2.1.9553";
+        return "2.1.10736";
     }
 
     /**
@@ -1941,7 +1941,7 @@ class YAPI
      *
      * On failure returns a negative error code.
      */
-    public static function InitAPI(int $mode = YAPI::DETECT_NONE, string &$errmsg = ''): int
+    public static function InitAPI(int $mode = YAPI::DETECT_NONE, ?string &$errmsg = ''): int
     {
         if (is_null(self::$_hubs)) {
             self::_init();
@@ -2175,7 +2175,7 @@ class YAPI
      *
      * On failure returns a negative error code.
      */
-    public static function RegisterHub(string $url, string &$errmsg = ''): int
+    public static function RegisterHub(string $url, ?string &$errmsg = ''): int
     {
         if (is_null(self::$_hubs)) {
             self::_init();
@@ -2193,6 +2193,7 @@ class YAPI
             return YAPI::SUCCESS;
         }
         $url_detail = self::_parseRegisteredURL($url);
+        $errmsg = '';
         if ($url_detail['proto'] == "wss" || $url_detail['proto'] == "ws") {
             $errmsg = "Websocket is not available in PHP";
             return YAPI::NOT_SUPPORTED;
@@ -2264,7 +2265,7 @@ class YAPI
      *
      * On failure returns a negative error code.
      */
-    public static function PreregisterHub(string $url, string &$errmsg = ''): int
+    public static function PreregisterHub(string $url, ?string &$errmsg = ''): int
     {
         if (is_null(self::$_hubs)) {
             self::_init();
@@ -2363,7 +2364,7 @@ class YAPI
      *
      * On failure returns a negative error code.
      */
-    public static function TestHub(string $url, int $mstimeout, string &$errmsg = ''): int
+    public static function TestHub(string $url, int $mstimeout, ?string &$errmsg = ''): int
     {
         if ($url == 'net') {
             $errmsg = "Invalid URL";
@@ -2418,7 +2419,7 @@ class YAPI
      * @param string $errmsg
      * @return int
      */
-    static public function _forwardHTTPreq(string $proto, string $host, string $relurl, $cbdata, string &$errmsg): int
+    static public function _forwardHTTPreq(string $proto, string $host, string $relurl, $cbdata, ?string &$errmsg): int
     {
         $errno = 0;
         $errstr = '';
@@ -2570,7 +2571,7 @@ class YAPI
      *
      * On failure, throws an exception or returns a negative error code.
      */
-    public static function ForwardHTTPCallback(string $url, string &$errmsg = ""): int
+    public static function ForwardHTTPCallback(string $url, ?string &$errmsg = ""): int
     {
         $url_detail = self::_parseRegisteredURL('callback');
         if (isset(self::$_hubs[$url_detail['rooturl']])) {
@@ -2615,7 +2616,7 @@ class YAPI
      *
      * On failure returns a negative error code.
      */
-    public static function UpdateDeviceList(string &$errmsg = ''): int
+    public static function UpdateDeviceList(?string &$errmsg = ''): int
     {
         $yreq = self::_updateDeviceList_internal(false, true);
         if ($yreq->errorType != YAPI::SUCCESS) {
@@ -2642,7 +2643,7 @@ class YAPI
      *
      * On failure returns a negative error code.
      */
-    public static function HandleEvents(string &$errmsg = ''): int
+    public static function HandleEvents(?string &$errmsg = ''): int
     {
         // monitor hubs for events
         /** @noinspection PhpStatementHasEmptyBodyInspection */
@@ -2699,7 +2700,7 @@ class YAPI
      *
      * On failure returns a negative error code.
      */
-    public static function Sleep(float $ms_duration, string &$errmsg = ''): int
+    public static function Sleep(float $ms_duration, ?string &$errmsg = ''): int
     {
         $end = YAPI::GetTickCount() + $ms_duration;
         self::HandleEvents($errmsg);

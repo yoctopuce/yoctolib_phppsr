@@ -388,7 +388,7 @@ class YColorSensor extends YFunction
 
     /**
      * Returns the current autogain parameters of the sensor as a character string.
-     * The returned parameter format is: "Min < Channel < Max:Saturation".
+     * The returned parameter format is: "Min &lt; Channel &lt; Max:Saturation".
      *
      * @return string  a string corresponding to the current autogain parameters of the sensor as a character string
      *
@@ -408,19 +408,6 @@ class YColorSensor extends YFunction
     }
 
     /**
-     * Sets the sensor's autogain parameters using a character string.
-     * The parameter format is: "Min < Channel < Max:Saturation".
-     * Spaces in the string are important and must be respected.
-     * The Min and Max values define the lower and upper raw thresholds used to adjust the gain.
-     * The channel name must be specified as a string, among the available channels: "F1" to "VIS".
-     * The measured value corresponds to the signal read on the selected channel.
-     * If the measured value exceeds the Max value, the gain decreases.
-     * If the measured value is below the Min value, the gain increases.
-     * The Saturation parameter defines the system behavior when saturation is detected:
-     * - If saturation is enabled, the gain is automatically reduced when saturation occurs.
-     * - If saturation is disabled, the gain remains unchanged even if saturation is detected.
-     * This mechanism keeps the signal within an optimal range, preventing saturation or insufficient amplification.
-     * This method can only be used when the sensor is in autogain mode.
      * Remember to call the saveToFlash() method of the module if the modification must be kept.
      *
      * @param string $newval : a string
@@ -738,6 +725,33 @@ class YColorSensor extends YFunction
             YFunction::_AddToCache('ColorSensor', $func, $obj);
         }
         return $obj;
+    }
+
+    /**
+     * Changes the sensor automatic gain control settings.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     * @param string $channel : reference channel to use for automated gain control.
+     * @param int $minRaw : lower threshold for the measured raw value, below which the gain is
+     *         automatically increased as long as possible.
+     * @param int $maxRaw : high threshold for the measured raw value, over which the gain is
+     *         automatically decreased as long as possible.
+     * @param boolean $noSatur : enables gain reduction in case of sensor saturation.
+     *
+     * @return int  YAPI::SUCCESS if the operation completes successfully.
+     *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function configureAutoGain(string $channel, int $minRaw, int $maxRaw, bool $noSatur): int
+    {
+        // $opt                    is a string;
+        if ($noSatur) {
+            $opt = 'nosat';
+        } else {
+            $opt = '';
+        }
+
+        return $this->set_autoGain(sprintf('%d < %s < %d:%s', $minRaw, $channel, $maxRaw, $opt));
     }
 
     /**

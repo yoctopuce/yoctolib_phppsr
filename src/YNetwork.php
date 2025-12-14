@@ -535,8 +535,8 @@ class YNetwork extends YFunction
      */
     public function set_userPassword(string $newval): int
     {
-        if (strlen($newval) > YAPI::HASH_BUF_SIZE) {
-            return $this->_throw(YAPI::INVALID_ARGUMENT, 'Password too long :'.$newval);
+        if (!$this->_is_valid_pass($newval)) {
+            return YAPI::INVALID_ARGUMENT;
         }
         $rest_val = $newval;
         return $this->_setAttr("userPassword", $rest_val);
@@ -580,8 +580,8 @@ class YNetwork extends YFunction
      */
     public function set_adminPassword(string $newval): int
     {
-        if (strlen($newval) > YAPI::HASH_BUF_SIZE) {
-            return $this->_throw(YAPI::INVALID_ARGUMENT, 'Password too long :'.$newval);
+        if (!$this->_is_valid_pass($newval)) {
+            return YAPI::INVALID_ARGUMENT;
         }
         $rest_val = $newval;
         return $this->_setAttr("adminPassword", $rest_val);

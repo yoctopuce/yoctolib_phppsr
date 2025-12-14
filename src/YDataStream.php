@@ -381,7 +381,7 @@ class YDataStream
      */
     public function get_startTimeUTC(): float
     {
-        return intval(round($this->_startTime));
+        return round($this->_startTime);
     }
 
     /**

@@ -172,7 +172,7 @@ class YTcpHub
         ]);
     }
 
-    function verfiyStreamAddr(bool $fullTest = true, string &$errmsg = ''): int
+    function verfiyStreamAddr(bool $fullTest = true, ?string &$errmsg = ''): int
     {
         if ($this->streamaddr == 'tcp://CALLBACK') {
 

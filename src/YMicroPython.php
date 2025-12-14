@@ -569,7 +569,7 @@ class YMicroPython extends YFunction
         // $arrPos                 is a int;
         // $logMsg                 is a str;
         // detect possible power cycle of the reader to clear event pointer
-        $cbPos = hexdec(substr($cbVal, 1, mb_strlen($cbVal)-1));
+        $cbPos = hexdec(substr($cbVal, 1, strlen($cbVal)-1));
         $cbDPos = (($cbPos - $this->_prevCbPos) & 0xfffff);
         $this->_prevCbPos = $cbPos;
         if ($cbDPos > 65536) {
@@ -597,7 +597,7 @@ class YMicroPython extends YFunction
             $endPos = $endPos - 1;
         }
         if (!($endPos > 0)) return $this->_throw(YAPI::IO_ERROR,'fail to download micropython logs',YAPI::IO_ERROR);
-        $lenStr = substr($contentStr, $endPos+1, mb_strlen($contentStr)-($endPos+1));
+        $lenStr = substr($contentStr, $endPos+1, strlen($contentStr)-($endPos+1));
         // update processed event position pointer
         $this->_logPos = intVal($lenStr);
         if ($this->_isFirstCb) {

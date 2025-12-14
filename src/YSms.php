@@ -477,7 +477,7 @@ class YSms
         // $newdata                is a bin;
         // $newdatalen             is a int;
         // $i                      is a int;
-        if (mb_strlen($val) == 0) {
+        if (strlen($val) == 0) {
             return YAPI::SUCCESS;
         }
         if ($this->_alphab == 0) {
@@ -779,7 +779,7 @@ class YSms
             }
             // remove padding digit if needed
             if ((ord($addr[$ofs+$siz]) >> 4) == 15) {
-                $res = substr($res, 0, mb_strlen($res)-1);
+                $res = substr($res, 0, strlen($res)-1);
             }
             return $res;
         }
@@ -797,7 +797,7 @@ class YSms
         // $expasc                 is a bin;
         // $v1                     is a int;
         // $v2                     is a int;
-        $explen = mb_strlen($exp);
+        $explen = strlen($exp);
         if ($explen == 0) {
             $res = '';
             return $res;
@@ -827,7 +827,7 @@ class YSms
         if (substr($exp, 4, 1) == '-' || substr($exp, 4, 1) == '/') {
             // ignore century
             $exp = substr($exp, 2, $explen-2);
-            $explen = mb_strlen($exp);
+            $explen = strlen($exp);
         }
         $expasc = YAPI::Ystr2bin($exp);
         $res = (7 > 0 ? pack('C',array_fill(0, 7, 0)) : '');
@@ -932,10 +932,10 @@ class YSms
             $byt = (10*(($byt & 15))) + (($byt >> 4));
             $hh = sprintf('%d', ($byt >> 2));
             $ss = sprintf('%d', 15*(($byt & 3)));
-            if (mb_strlen($hh)<2) {
+            if (strlen($hh)<2) {
                 $hh = sprintf('0%s', $hh);
             }
-            if (mb_strlen($ss)<2) {
+            if (strlen($ss)<2) {
                 $ss = sprintf('0%s', $ss);
             }
             $res = sprintf('%s%s%s:%s', $res, $sign, $hh, $ss);

@@ -393,7 +393,7 @@ class YTemperature extends YSensor
         };
 
         $id = $this->get_functionId();
-        $id = substr($id, 11, mb_strlen($id) - 11);
+        $id = substr($id, 11, strlen($id) - 11);
         if ($id == '') {
             $id = '1';
         }

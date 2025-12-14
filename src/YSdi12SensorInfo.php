@@ -222,9 +222,9 @@ class YSdi12SensorInfo
     {
         // $errmsg                 is a str;
 
-        if (mb_strlen($infoStr) > 1) {
+        if (strlen($infoStr) > 1) {
             if (substr($infoStr, 0, 2) == 'ER') {
-                $errmsg = substr($infoStr, 2, mb_strlen($infoStr)-2);
+                $errmsg = substr($infoStr, 2, strlen($infoStr)-2);
                 $this->_addr = $errmsg;
                 $this->_proto = $errmsg;
                 $this->_mfg = $errmsg;
@@ -238,7 +238,7 @@ class YSdi12SensorInfo
                 $this->_mfg = substr($infoStr, 3, 8);
                 $this->_model = substr($infoStr, 11, 6);
                 $this->_ver = substr($infoStr, 17, 3);
-                $this->_sn = substr($infoStr, 20, mb_strlen($infoStr)-20);
+                $this->_sn = substr($infoStr, 20, strlen($infoStr)-20);
                 $this->_isValid = true;
             }
         }
@@ -266,8 +266,8 @@ class YSdi12SensorInfo
         $size = 4;
         while ($k < 10) {
             $infoNbVal = $this->_sdi12Port->querySdi12($this->_addr, sprintf('IM%d', $k), 5000);
-            if (mb_strlen($infoNbVal) > 1) {
-                $value = substr($infoNbVal, 4, mb_strlen($infoNbVal)-4);
+            if (strlen($infoNbVal) > 1) {
+                $value = substr($infoNbVal, 4, strlen($infoNbVal)-4);
                 $nbVal = intVal($value);
                 if ($nbVal != 0) {
                     while (sizeof($val) > 0) {

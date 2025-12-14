@@ -169,14 +169,14 @@ class YArithmeticSensor extends YSensor
         // $diags                  is a str;
         // $resval                 is a float;
         $id = $this->get_functionId();
-        $id = substr($id, 16, mb_strlen($id) - 16);
+        $id = substr($id, 16, strlen($id) - 16);
         $fname = sprintf('arithmExpr%s.txt', $id);
 
         $content = sprintf('// %s'."\n".'%s', $descr, $expr);
         $data = $this->_uploadEx($fname, YAPI::Ystr2bin($content));
         $diags = YAPI::Ybin2str($data);
         if (!(substr($diags, 0, 8) == 'Result: ')) return $this->_throw(YAPI::INVALID_ARGUMENT,$diags,YAPI::INVALID_DOUBLE);
-        $resval = floatval(substr($diags, 8, mb_strlen($diags)-8));
+        $resval = floatval(substr($diags, 8, strlen($diags)-8));
         return $resval;
     }
 
@@ -196,13 +196,13 @@ class YArithmeticSensor extends YSensor
         // $content                is a str;
         // $idx                    is a int;
         $id = $this->get_functionId();
-        $id = substr($id, 16, mb_strlen($id) - 16);
+        $id = substr($id, 16, strlen($id) - 16);
         $fname = sprintf('arithmExpr%s.txt', $id);
 
         $content = YAPI::Ybin2str($this->_download($fname));
         $idx = YAPI::Ystrpos($content,''."\n".'');
         if ($idx > 0) {
-            $content = substr($content, $idx+1, mb_strlen($content)-($idx+1));
+            $content = substr($content, $idx+1, strlen($content)-($idx+1));
         }
         return $content;
     }

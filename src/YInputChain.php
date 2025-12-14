@@ -630,14 +630,14 @@ class YInputChain extends YFunction
         // last element of array is the new position preceeded by '@'
         $arrLen = $arrLen - 1;
         $lenStr = $eventArr[$arrLen];
-        $lenStr = substr($lenStr, 1, mb_strlen($lenStr)-1);
+        $lenStr = substr($lenStr, 1, strlen($lenStr)-1);
         // update processed event position pointer
         $this->_eventPos = intVal($lenStr);
         // now generate callbacks for each event received
         $arrPos = 0;
         while ($arrPos < $arrLen) {
             $eventStr = $eventArr[$arrPos];
-            $eventLen = mb_strlen($eventStr);
+            $eventLen = strlen($eventStr);
             if ($eventLen >= 1) {
                 $hexStamp = substr($eventStr, 0, 8);
                 $evtStamp = hexdec($hexStamp);
@@ -649,7 +649,7 @@ class YInputChain extends YFunction
                     $evtData = '';
                     $evtChange = '';
                     if ($dataPos > 10) {
-                        $evtData = substr($eventStr, $dataPos, mb_strlen($eventStr)-$dataPos);
+                        $evtData = substr($eventStr, $dataPos, strlen($eventStr)-$dataPos);
                         if (YAPI::Ystrpos('1234567',$evtType) >= 0) {
                             $chainIdx = intVal($evtType) - 1;
                             $evtChange = $this->_strXor($evtData, $this->_eventChains[$chainIdx]);
@@ -676,8 +676,8 @@ class YInputChain extends YFunction
         // $digitA                 is a int;
         // $digitB                 is a int;
         // make sure the result has the same length as first argument
-        $lenA = mb_strlen($a);
-        $lenB = mb_strlen($b);
+        $lenA = strlen($a);
+        $lenB = strlen($b);
         if ($lenA > $lenB) {
             $res = substr($a, 0, $lenA-$lenB);
             $a = substr($a, $lenA-$lenB, $lenB);
@@ -706,7 +706,7 @@ class YInputChain extends YFunction
         $res = [];              // intArr;
         // $idx                    is a int;
         // $digit                  is a int;
-        $hexlen = mb_strlen($hexstr);
+        $hexlen = strlen($hexstr);
         while (sizeof($res) > 0) {
             array_pop($res);
         };

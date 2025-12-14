@@ -698,7 +698,7 @@ class YI2cPort extends YFunction
         $databin = $this->_download(sprintf('rxcnt.bin?pos=%d', $this->_rxptr));
         $availPosStr = YAPI::Ybin2str($databin);
         $atPos = YAPI::Ystrpos($availPosStr,'@');
-        $res = intVal(substr($availPosStr, $atPos+1, mb_strlen($availPosStr)-$atPos-1));
+        $res = intVal(substr($availPosStr, $atPos+1, strlen($availPosStr)-$atPos-1));
         return $res;
     }
 
@@ -723,7 +723,7 @@ class YI2cPort extends YFunction
         $msgarr = [];           // binArr;
         // $msglen                 is a int;
         // $res                    is a str;
-        if (mb_strlen($query) <= 80) {
+        if (strlen($query) <= 80) {
             // fast query
             $url = sprintf('rxmsg.json?len=1&maxw=%d&cmd=!%s', $maxWait, $this->_escapeAttr($query));
         } else {
@@ -771,7 +771,7 @@ class YI2cPort extends YFunction
         $msgarr = [];           // binArr;
         // $msglen                 is a int;
         // $res                    is a str;
-        if (mb_strlen($hexString) <= 80) {
+        if (strlen($hexString) <= 80) {
             // fast query
             $url = sprintf('rxmsg.json?len=1&maxw=%d&cmd=$%s', $maxWait, $hexString);
         } else {
@@ -878,7 +878,7 @@ class YI2cPort extends YFunction
         }
 
         $reply = $this->queryLine($msg,1000);
-        if (!(mb_strlen($reply) > 0)) return $this->_throw(YAPI::IO_ERROR,'No response from I2C device',YAPI::IO_ERROR);
+        if (!(strlen($reply) > 0)) return $this->_throw(YAPI::IO_ERROR,'No response from I2C device',YAPI::IO_ERROR);
         $idx = YAPI::Ystrpos($reply,'[N]!');
         if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'No I2C ACK received',YAPI::IO_ERROR);
         $idx = YAPI::Ystrpos($reply,'!');
@@ -915,7 +915,7 @@ class YI2cPort extends YFunction
         }
 
         $reply = $this->queryLine($msg,1000);
-        if (!(mb_strlen($reply) > 0)) return $this->_throw(YAPI::IO_ERROR,'No response from I2C device',YAPI::IO_ERROR);
+        if (!(strlen($reply) > 0)) return $this->_throw(YAPI::IO_ERROR,'No response from I2C device',YAPI::IO_ERROR);
         $idx = YAPI::Ystrpos($reply,'[N]!');
         if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'No I2C ACK received',YAPI::IO_ERROR);
         $idx = YAPI::Ystrpos($reply,'!');
@@ -972,12 +972,12 @@ class YI2cPort extends YFunction
         }
 
         $reply = $this->queryLine($msg,1000);
-        if (!(mb_strlen($reply) > 0)) return $this->_throw(YAPI::IO_ERROR,'No response from I2C device',$rcvbytes);
+        if (!(strlen($reply) > 0)) return $this->_throw(YAPI::IO_ERROR,'No response from I2C device',$rcvbytes);
         $idx = YAPI::Ystrpos($reply,'[N]!');
         if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'No I2C ACK received',$rcvbytes);
         $idx = YAPI::Ystrpos($reply,'!');
         if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'I2C protocol error',$rcvbytes);
-        $reply = substr($reply, mb_strlen($reply)-2*$rcvCount, 2*$rcvCount);
+        $reply = substr($reply, strlen($reply)-2*$rcvCount, 2*$rcvCount);
         $rcvbytes = YAPI::_hexStrToBin($reply);
         return $rcvbytes;
     }
@@ -1034,12 +1034,12 @@ class YI2cPort extends YFunction
         }
 
         $reply = $this->queryLine($msg,1000);
-        if (!(mb_strlen($reply) > 0)) return $this->_throw(YAPI::IO_ERROR,'No response from I2C device',$res);
+        if (!(strlen($reply) > 0)) return $this->_throw(YAPI::IO_ERROR,'No response from I2C device',$res);
         $idx = YAPI::Ystrpos($reply,'[N]!');
         if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'No I2C ACK received',$res);
         $idx = YAPI::Ystrpos($reply,'!');
         if (!($idx < 0)) return $this->_throw(YAPI::IO_ERROR,'I2C protocol error',$res);
-        $reply = substr($reply, mb_strlen($reply)-2*$rcvCount, 2*$rcvCount);
+        $reply = substr($reply, strlen($reply)-2*$rcvCount, 2*$rcvCount);
         $rcvbytes = YAPI::_hexStrToBin($reply);
         while (sizeof($res) > 0) {
             array_pop($res);
@@ -1126,7 +1126,7 @@ class YI2cPort extends YFunction
     {
         // $bufflen                is a int;
         // $buff                   is a bin;
-        $bufflen = mb_strlen($codes);
+        $bufflen = strlen($codes);
         if ($bufflen < 100) {
             return $this->sendCommand(sprintf('!%s',$codes));
         }
@@ -1167,7 +1167,7 @@ class YI2cPort extends YFunction
     {
         // $bufflen                is a int;
         // $buff                   is a bin;
-        $bufflen = mb_strlen($hexString);
+        $bufflen = strlen($hexString);
         if ($bufflen < 100) {
             return $this->sendCommand(sprintf('+%s',$hexString));
         }
