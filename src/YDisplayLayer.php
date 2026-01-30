@@ -11,6 +11,9 @@ namespace Yoctopuce\YoctoAPI;
  */
 class YDisplayLayer
 {
+    const NO_INK                         = -1;
+    const BG_INK                         = -2;
+    const FG_INK                         = -3;
     const ALIGN_TOP_LEFT                 = 0;
     const ALIGN_CENTER_LEFT              = 1;
     const ALIGN_BASELINE_LEFT            = 2;
@@ -30,6 +33,8 @@ class YDisplayLayer
     //--- (end of generated code: YDisplayLayer declaration)
 
     //--- (generated code: YDisplayLayer attributes)
+    protected int $_polyPrevX = 0;                            // int
+    protected int $_polyPrevY = 0;                            // int
 
     //--- (end of generated code: YDisplayLayer attributes)
     protected YDisplay $_display;
@@ -121,8 +126,11 @@ class YDisplayLayer
     }
 
     /**
-     * Selects the pen color for all subsequent drawing functions,
-     * including text drawing. The pen color is provided as an RGB value.
+     * Selects the color to be used for all subsequent drawing functions,
+     * for filling as well as for line and text drawing.
+     * To select a different fill and outline color, use
+     * selectFillColor and selectLineColor.
+     * The pen color is provided as an RGB value.
      * For grayscale or monochrome displays, the value is
      * automatically converted to the proper range.
      *
@@ -140,7 +148,10 @@ class YDisplayLayer
 
     /**
      * Selects the pen gray level for all subsequent drawing functions,
-     * including text drawing. The gray level is provided as a number between
+     * for filling as well as for line and text drawing.
+     * To select a different fill and outline color, use
+     * selectFillColor and selectLineColor.
+     * The gray level is provided as a number between
      * 0 (black) and 255 (white, or whichever the lightest color is).
      * For monochrome displays (without gray levels), any value
      * lower than 128 is rendered as black, and any value equal
@@ -175,20 +186,99 @@ class YDisplayLayer
     }
 
     /**
-     * Enables or disables anti-aliasing for drawing oblique lines and circles.
-     * Anti-aliasing provides a smoother aspect when looked from far enough,
-     * but it can add fuzziness when the display is looked from very close.
-     * At the end of the day, it is your personal choice.
-     * Anti-aliasing is enabled by default on grayscale and color displays,
-     * but you can disable it if you prefer. This setting has no effect
-     * on monochrome displays.
+     * Selects the color to be used for filling rectangular bars,
+     * discs and polygons. The color is provided as an RGB value.
+     * For grayscale or monochrome displays, the value is
+     * automatically converted to the proper range.
+     * You can also use the constants FG_INK to use the
+     * default drawing colour, BG_INK to use the default
+     * background colour, and NO_INK to disable filling.
      *
-     * @param boolean $mode : true to enable anti-aliasing, false to
-     *         disable it.
+     * @param int $color : the desired drawing color, as a 24-bit RGB value,
+     *         or one of the constants NO_INK, FG_INK
+     *         or BG_INK
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
      * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function selectFillColor(int $color): int
+    {
+        // $r                      is a int;
+        // $g                      is a int;
+        // $b                      is a int;
+        if ($color==-1) {
+            return $this->command_push('f_');
+        }
+        if ($color==-2) {
+            return $this->command_push('f-');
+        }
+        if ($color==-3) {
+            return $this->command_push('f.');
+        }
+        $r = (($color >> 20) & 15);
+        $g = (($color >> 12) & 15);
+        $b = (($color >> 4) & 15);
+        return $this->command_push(sprintf('f%x%x%x',$r,$g,$b));
+    }
+
+    /**
+     * Selects the color to be used for drawing the outline of rectangular
+     * bars, discs and polygons, as well as for drawing lines and text.
+     * The color is provided as an RGB value.
+     * For grayscale or monochrome displays, the value is
+     * automatically converted to the proper range.
+     * You can also use the constants FG_INK to use the
+     * default drawing colour, BG_INK to use the default
+     * background colour, and NO_INK to disable outline drawing.
+     *
+     * @param int $color : the desired drawing color, as a 24-bit RGB value,
+     *         or one of the constants NO_INK, FG_INK
+     *         or BG_INK
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function selectLineColor(int $color): int
+    {
+        // $r                      is a int;
+        // $g                      is a int;
+        // $b                      is a int;
+        if ($color==-1) {
+            return $this->command_push('l_');
+        }
+        if ($color==-2) {
+            return $this->command_push('l-');
+        }
+        if ($color==-3) {
+            return $this->command_push('l*');
+        }
+        $r = (($color >> 20) & 15);
+        $g = (($color >> 12) & 15);
+        $b = (($color >> 4) & 15);
+        return $this->command_push(sprintf('l%x%x%x',$r,$g,$b));
+    }
+
+    /**
+     * Selects the line width for drawing the outline of rectangular
+     * bars, discs and polygons, as well as for drawing lines.
+     *
+     * @param int $width : the desired line width, in pixels
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function selectLineWidth(int $width): int
+    {
+        return $this->command_push(sprintf('t%d',$width));
+    }
+
+    /**
      * @throws YAPI_Exception on error
      */
     public function setAntialiasingMode(bool $mode): int
@@ -331,10 +421,10 @@ class YDisplayLayer
     }
 
     /**
-     * Draws a GIF image at the specified position. The GIF image must have been previously
-     * uploaded to the device built-in memory. If you experience problems using an image
-     * file, check the device logs for any error message such as missing image file or bad
-     * image file format.
+     * Draws an image previously uploaded to the device filesystem, at the specified position.
+     * At present time, GIF images are the only supported image format. If you experience
+     * problems using an image file, check the device logs for any error message such as
+     * missing image file or bad image file format.
      *
      * @param int $x : the distance from left of layer to the left of the image, in pixels
      * @param int $y : the distance from top of layer to the top of the image, in pixels
@@ -379,6 +469,27 @@ class YDisplayLayer
     }
 
     /**
+     * Draws a GIF image provided as a binary buffer at the specified position.
+     * If the image drawing must be included in an animation sequence, save it
+     * in the device filesystem first and use drawImage instead.
+     *
+     * @param int $x : the distance from left of layer to the left of the image, in pixels
+     * @param int $y : the distance from top of layer to the top of the image, in pixels
+     * @param string $gifimage : a binary object with the content of a GIF file
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function drawGIF(int $x, int $y, string $gifimage): int
+    {
+        // $destname               is a str;
+        $destname = sprintf('layer%d:G,-1@%d,%d',$this->_id,$x,$y);
+        return $this->_display->upload($destname,$gifimage);
+    }
+
+    /**
      * Moves the drawing pointer of this layer to the specified position.
      *
      * @param int $x : the distance from left of layer, in pixels
@@ -410,6 +521,61 @@ class YDisplayLayer
     public function lineTo(int $x, int $y): int
     {
         return $this->command_flush(sprintf('-%d,%d',$x,$y));
+    }
+
+    /**
+     * Starts drawing a polygon with the first corner at the specified position.
+     *
+     * @param int $x : the distance from left of layer, in pixels
+     * @param int $y : the distance from top of layer, in pixels
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function polygonStart(int $x, int $y): int
+    {
+        $this->_polyPrevX = $x;
+        $this->_polyPrevY = $y;
+        return $this->command_push(sprintf('[%d,%d',$x,$y));
+    }
+
+    /**
+     * Adds a point to the currently open polygon, previously opened using
+     * polygonStart.
+     *
+     * @param int $x : the distance from left of layer to the new point, in pixels
+     * @param int $y : the distance from top of layer to the new point, in pixels
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function polygonAdd(int $x, int $y): int
+    {
+        // $dx                     is a int;
+        // $dy                     is a int;
+        $dx = $x - $this->_polyPrevX;
+        $dy = $y - $this->_polyPrevY;
+        $this->_polyPrevX = $x;
+        $this->_polyPrevY = $y;
+        return $this->command_flush(sprintf(';%d,%d',$dx,$dy));
+    }
+
+    /**
+     * Close the currently open polygon, fill its content the fill color currently
+     * selected for the layer, and draw its outline using the selected line color.
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function polygonEnd(): int
+    {
+        return $this->command_flush(']');
     }
 
     /**

@@ -1857,7 +1857,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "2.1.10736";
+        return "2.1.11632";
     }
 
     /**
@@ -2200,13 +2200,17 @@ class YAPI
         }
         // Test hub
         $tcphub = new YTcpHub($url_detail, true);
+        $timeout = YAPI::GetTickCount() + $tcphub->get_networkTimeout();
         $res = $tcphub->verfiyStreamAddr(true, $errmsg);
         if ($res < 0) {
             return YAPI::IO_ERROR;
         }
-
-        $timeout = YAPI::GetTickCount() + $tcphub->get_networkTimeout();
-        $tcpreq = new YTcpReq($tcphub, "GET /api/module.json", false, '', $tcphub->get_networkTimeout());
+        $tickCount = (int)YAPI::GetTickCount();
+        if ($tickCount >= $timeout) {
+            $errmsg = 'Timeout waiting for device reply';
+            return YAPI::TIMEOUT;
+        }
+        $tcpreq = new YTcpReq($tcphub, "GET /api/module.json", false, '', $tickCount);
         if ($tcpreq->process($errmsg) != YAPI::SUCCESS) {
             return $tcpreq->errorType;
         }
@@ -2383,6 +2387,8 @@ class YAPI
         }
         // Test hub
         $tcphub = new YTcpHub($url_detail, false);
+        $timeout = YAPI::GetTickCount() + $mstimeout;
+        $tcphub->set_networkTimeout($mstimeout);
         $res = $tcphub->verfiyStreamAddr(false, $errmsg);
         if ($res < 0) {
             return YAPI::IO_ERROR;
@@ -2390,8 +2396,12 @@ class YAPI
         if ($tcphub->streamaddr == 'tcp://CALLBACK') {
             return YAPI::SUCCESS;
         }
-        $tcpreq = new YTcpReq($tcphub, "GET /api/module.json", false, '', $mstimeout);
-        $timeout = YAPI::GetTickCount() + $mstimeout;
+        $tickCount = (int)YAPI::GetTickCount();
+        if ($tickCount >= $timeout) {
+            $errmsg = 'Timeout waiting for device reply';
+            return YAPI::TIMEOUT;
+        }
+        $tcpreq = new YTcpReq($tcphub, "GET /api/module.json", false, '', $mstimeout - $tickCount);
         do {
             if ($tcpreq->process($errmsg) != YAPI::SUCCESS) {
                 return $tcpreq->errorType;
@@ -2667,10 +2677,14 @@ class YAPI
                     /** @var YSensor $ysensor */
                     $ysensor = $evt[0];
                     // event object is an array of bytes (encoded timed report)
-                    $dev = YAPI::getDevice($ysensor->get_module()->get_serialNumber());
-                    if (!is_null($dev)) {
-                        $report = $ysensor->_decodeTimedReport($evt[1], $evt[2], $evt[3]);
-                        $ysensor->_invokeTimedReportCallback($report);
+                    try {
+                        $dev = YAPI::getDevice($ysensor->get_module()->get_serialNumber());
+                        if (!is_null($dev)) {
+                            $report = $ysensor->_decodeTimedReport($evt[1], $evt[2], $evt[3]);
+                            $ysensor->_invokeTimedReportCallback($report);
+                        }
+                    } catch (YAPI_Exception $ignore) {
+                        // module is offline
                     }
                 }
             }

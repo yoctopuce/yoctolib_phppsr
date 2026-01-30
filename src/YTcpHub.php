@@ -167,9 +167,13 @@ class YTcpHub
         if (YAPI::$_yapiContext->_sslCertPath != '') {
             $ssl_options['cafile'] = YAPI::$_yapiContext->_sslCertPath;
         }
-        return stream_context_create([
-            'ssl' => $ssl_options
-        ]);
+        $arr = [
+            'ssl' => $ssl_options,
+            'http' => [
+                'timeout' => $this->get_networkTimeout()/1000
+            ]
+        ];
+        return stream_context_create($arr);
     }
 
     function verfiyStreamAddr(bool $fullTest = true, ?string &$errmsg = ''): int
