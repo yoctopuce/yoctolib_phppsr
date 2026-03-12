@@ -15,6 +15,7 @@ class YSms
     protected ?YMessageBox $_mbox = null;                         // YMessageBox
     protected int $_slot = 0;                            // int
     protected bool $_deliv = false;                        // bool
+    protected bool $_isnew = false;                        // bool
     protected string $_smsc = '';                           // str
     protected int $_mref = 0;                            // int
     protected string $_orig = '';                           // str
@@ -70,9 +71,9 @@ class YSms
     /**
      * @throws YAPI_Exception on error
      */
-    public function get_sender(): string
+    public function get_protocolId(): int
     {
-        return $this->_orig;
+        return $this->_pid;
     }
 
     /**
@@ -86,9 +87,9 @@ class YSms
     /**
      * @throws YAPI_Exception on error
      */
-    public function get_protocolId(): int
+    public function isNew(): bool
     {
-        return $this->_pid;
+        return $this->_isnew;
     }
 
     /**
@@ -123,15 +124,7 @@ class YSms
      */
     public function get_dcs(): int
     {
-        return (($this->_mclass) | ((($this->_alphab) << 2)));
-    }
-
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public function get_timestamp(): string
-    {
-        return $this->_stamp;
+        return (($this->_mclass) | (($this->_alphab) << 2));
     }
 
     /**
@@ -156,9 +149,40 @@ class YSms
     }
 
     /**
-     * Returns the content of the message.
+     * Returns true iff the message is a "Flash" SMS (class 0 message). Flash messages
+     * are displayed on the handset immediately and usually not saved on the SIM card.
      *
-     * @return string   a string with the content of the message.
+     * @return boolean  a boolean.
+     */
+    public function isFlashMessage(): bool
+    {
+        return $this->get_msgClass() == 0;
+    }
+
+    /**
+     * Returns the reported message timestamp.
+     *
+     * @return string  the timestamp as a text string.
+     */
+    public function get_timestamp(): string
+    {
+        return $this->_stamp;
+    }
+
+    /**
+     * Returns the reported message sender.
+     *
+     * @return string  a text string.
+     */
+    public function get_sender(): string
+    {
+        return $this->_orig;
+    }
+
+    /**
+     * Returns the content of the message as a text string.
+     *
+     * @return string  a string with the content of the message.
      */
     public function get_textData(): string
     {
@@ -185,7 +209,9 @@ class YSms
     }
 
     /**
-     * @throws YAPI_Exception on error
+     * Returns the content of the message, as a list of integer unicode values.
+     *
+     * @return Integer[]  a list of integers.
      */
     public function get_unicodeData(): array
     {
@@ -311,6 +337,15 @@ class YSms
     /**
      * @throws YAPI_Exception on error
      */
+    public function set_new(bool $val): int
+    {
+        $this->_isnew = $val;
+        return YAPI::SUCCESS;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function set_smsc(string $val): int
     {
         $this->_smsc = $val;
@@ -387,7 +422,7 @@ class YSms
      */
     public function set_dcs(int $val): int
     {
-        $this->_alphab = ((($val >> 2)) & 3);
+        $this->_alphab = (($val >> 2) & 3);
         $this->_mclass = ($val & (16+3));
         $this->_npdu = 0;
         return YAPI::SUCCESS;
@@ -461,7 +496,7 @@ class YSms
     }
 
     /**
-     * Add a regular text to the SMS. This function support messages
+     * Adds regular text to the SMS. This function support messages
      * of more than 160 characters. ISO-latin accented characters
      * are supported. For messages with special unicode characters such as asian
      * characters and emoticons, use the  addUnicodeData method.
@@ -528,10 +563,10 @@ class YSms
     }
 
     /**
-     * Add a unicode text to the SMS. This function support messages
+     * Adds unicode characters to the SMS. This function support messages
      * of more than 160 characters, using SMS concatenation.
      *
-     * @param Integer[] $val : an array of special unicode characters
+     * @param Integer[] $val : a list of unicode characters provided as integers
      *
      * @return int  YAPI::SUCCESS when the call succeeds.
      */
@@ -571,11 +606,11 @@ class YSms
             $uni = $val[$i];
             if ($uni >= 65536) {
                 $surrogate = $uni - 65536;
-                $uni = ((($surrogate >> 10) & 1023)) + 55296;
+                $uni = (($surrogate >> 10) & 1023) + 55296;
                 $udata[$udatalen] = pack('C', ($uni >> 8));
                 $udata[$udatalen+1] = pack('C', ($uni & 255));
                 $udatalen = $udatalen + 2;
-                $uni = (($surrogate & 1023)) + 56320;
+                $uni = ($surrogate & 1023) + 56320;
             }
             $udata[$udatalen] = pack('C', ($uni >> 8));
             $udata[$udatalen+1] = pack('C', ($uni & 255));
@@ -758,7 +793,7 @@ class YSms
                 } else {
                     $byt = ord($addr[$ofs+$rpos]);
                     $rpos = $rpos + 1;
-                    $gsm7[$i] = pack('C', ($carry | ((($byt << $nbits)) & 127)));
+                    $gsm7[$i] = pack('C', ($carry | (($byt << $nbits) & 127)));
                     $carry = ($byt >> (7 - $nbits));
                     $nbits = $nbits + 1;
                 }
@@ -1022,7 +1057,7 @@ class YSms
                     $nbits = 7;
                 } else {
                     $thi_b = ord($this->_udata[$i]);
-                    $res[$wpos] = pack('C', ($carry | ((($thi_b << $nbits)) & 255)));
+                    $res[$wpos] = pack('C', ($carry | (($thi_b << $nbits) & 255)));
                     $wpos = $wpos + 1;
                     $nbits = $nbits - 1;
                     $carry = ($thi_b >> (7 - $nbits));
@@ -1282,8 +1317,8 @@ class YSms
             $rpos = $rpos + 1;
             $this->_dest = $this->decodeAddress($pdu, $rpos, $addrlen);
             $this->_orig = '';
-            if ((($pdutyp & 16)) != 0) {
-                if ((($pdutyp & 8)) != 0) {
+            if (($pdutyp & 16) != 0) {
+                if (($pdutyp & 8) != 0) {
                     $tslen = 7;
                 } else {
                     $tslen= 1;
@@ -1292,12 +1327,12 @@ class YSms
                 $tslen = 0;
             }
         }
-        $rpos = $rpos + ((($addrlen+3) >> 1));
+        $rpos = $rpos + (($addrlen+3) >> 1);
         $this->_pid = ord($pdu[$rpos]);
         $rpos = $rpos + 1;
         $dcs = ord($pdu[$rpos]);
         $rpos = $rpos + 1;
-        $this->_alphab = ((($dcs >> 2)) & 3);
+        $this->_alphab = (($dcs >> 2) & 3);
         $this->_mclass = ($dcs & (16+3));
         $this->_stamp = $this->decodeTimeStamp($pdu, $rpos, $tslen);
         $rpos = $rpos + $tslen;
@@ -1347,7 +1382,7 @@ class YSms
                 } else {
                     $thi_b = ord($pdu[$rpos]);
                     $rpos = $rpos + 1;
-                    $this->_udata[$i] = pack('C', ($carry | ((($thi_b << $nbits)) & 127)));
+                    $this->_udata[$i] = pack('C', ($carry | (($thi_b << $nbits) & 127)));
                     $carry = ($thi_b >> (7 - $nbits));
                     $nbits = $nbits + 1;
                 }
@@ -1384,20 +1419,27 @@ class YSms
         if ($this->_npdu == 0) {
             $this->generatePdu();
         }
-        if ($this->_npdu == 1) {
-            return $this->_mbox->_upload('sendSMS', $this->_pdu);
+        if ($this->_npdu > 1) {
+            // send multiple PDUs using recursive call
+            $retcode = YAPI::SUCCESS;
+            $i = 0;
+            while (($i < $this->_npdu) && ($retcode == YAPI::SUCCESS)) {
+                $pdu = $this->_parts[$i];
+                $retcode= $pdu->send();
+                $i = $i + 1;
+            }
+            return $retcode;
         }
-        $retcode = YAPI::SUCCESS;
-        $i = 0;
-        while (($i < $this->_npdu) && ($retcode == YAPI::SUCCESS)) {
-            $pdu = $this->_parts[$i];
-            $retcode= $pdu->send();
-            $i = $i + 1;
-        }
-        return $retcode;
+        // send a single PDU
+        return $this->_mbox->sendPDU($this->_pdu);
     }
 
     /**
+     * Delete the SMS from the SIM card.
+     *
+     * @return int  YAPI::SUCCESS when the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
      * @throws YAPI_Exception on error
      */
     public function deleteFromSIM(): int

@@ -10,9 +10,11 @@ namespace Yoctopuce\YoctoAPI;
  */
 class YCounter extends YSensor
 {
+    const COMMAND_INVALID = YAPI::INVALID_STRING;
     //--- (end of YCounter declaration)
 
     //--- (YCounter attributes)
+    protected string $_command = self::COMMAND_INVALID;        // Text
 
     //--- (end of YCounter attributes)
 
@@ -26,6 +28,40 @@ class YCounter extends YSensor
     }
 
     //--- (YCounter implementation)
+
+    function _parseAttr(string $name, mixed $val): int
+    {
+        switch ($name) {
+        case 'command':
+            $this->_command = $val;
+            return 1;
+        }
+        return parent::_parseAttr($name, $val);
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function get_command(): string
+    {
+        // $res                    is a string;
+        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
+            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
+                return self::COMMAND_INVALID;
+            }
+        }
+        $res = $this->_command;
+        return $res;
+    }
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function set_command(string $newval): int
+    {
+        $rest_val = $newval;
+        return $this->_setAttr("command", $rest_val);
+    }
 
     /**
      * Retrieves a counter for a given identifier.
@@ -65,6 +101,43 @@ class YCounter extends YSensor
         }
         return $obj;
     }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function sendCommand(string $command): int
+    {
+        return $this->set_command($command);
+    }
+
+    /**
+     * Reset the counter to zero.
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function zero(): int
+    {
+        return $this->sendCommand('Z');
+    }
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function command(): string
+{
+    return $this->get_command();
+}
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setCommand(string $newval): int
+{
+    return $this->set_command($newval);
+}
 
     /**
      * Continues the enumeration of gcounters started using yFirstCounter().

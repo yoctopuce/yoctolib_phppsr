@@ -34,9 +34,9 @@ class YDisplay extends YFunction
     const DISPLAYWIDTH_INVALID = YAPI::INVALID_UINT;
     const DISPLAYHEIGHT_INVALID = YAPI::INVALID_UINT;
     const DISPLAYTYPE_MONO = 0;
-    const DISPLAYTYPE_GRAY = 1;
-    const DISPLAYTYPE_RGB = 2;
-    const DISPLAYTYPE_EPAPER = 3;
+    const DISPLAYTYPE_EPAPER_BW = 1;
+    const DISPLAYTYPE_EPAPER_BWR = 2;
+    const DISPLAYTYPE_EPAPER_BWRY = 3;
     const DISPLAYTYPE_INVALID = -1;
     const LAYERWIDTH_INVALID = YAPI::INVALID_UINT;
     const LAYERHEIGHT_INVALID = YAPI::INVALID_UINT;
@@ -404,11 +404,11 @@ class YDisplay extends YFunction
     }
 
     /**
-     * Returns the display type: monochrome, gray levels or full color.
+     * Returns the display type: monochrome OLED, black and white ePaper, color ePaper, etc.
      *
-     * @return int  a value among YDisplay::DISPLAYTYPE_MONO, YDisplay::DISPLAYTYPE_GRAY,
-     * YDisplay::DISPLAYTYPE_RGB and YDisplay::DISPLAYTYPE_EPAPER corresponding to the display type:
-     * monochrome, gray levels or full color
+     * @return int  a value among YDisplay::DISPLAYTYPE_MONO, YDisplay::DISPLAYTYPE_EPAPER_BW,
+     * YDisplay::DISPLAYTYPE_EPAPER_BWR and YDisplay::DISPLAYTYPE_EPAPER_BWRY corresponding to the display
+     * type: monochrome OLED, black and white ePaper, color ePaper, etc
      *
      * On failure, throws an exception or returns YDisplay::DISPLAYTYPE_INVALID.
      * @throws YAPI_Exception on error
@@ -847,7 +847,6 @@ class YDisplay extends YFunction
         // $srcx                   is a int;
         // $srcy                   is a int;
         // $srci                   is a int;
-        // $incx                   is a int;
         // $pixmap                 is a bin;
         // $pixcount               is a int;
         // $pixval                 is a int;
@@ -935,7 +934,6 @@ class YDisplay extends YFunction
         $pixmap = ($pixcount > 0 ? pack('C',array_fill(0, $pixcount, 0)) : '');
         $srcx = 0;
         $srcy = 0;
-        $incx = intVal(8 / $zipbits);
         $srcval = 0;
         while ($srcpos < $zipsize) {
             // load next compression pattern byte
@@ -947,11 +945,15 @@ class YDisplay extends YFunction
                 if (($srcpat & 128) != 0) {
                     $srcval = ord($zipmap[$srcpos]);
                     $srcpos = $srcpos + 1;
+                    if ($zipbits > 1) {
+                        $srcval = ($srcval << 8) + ord($zipmap[$srcpos]);
+                        $srcpos = $srcpos + 1;
+                    }
                 }
                 $srcpat = ($srcpat << 1);
                 $pixpos = $srcy * $zipwidth + $srcx;
-                // produce 8 pixels (or 4, if bitmap uses 2 bits per pixel)
-                $srci = 8 - $zipbits;
+                // produce 8 pixels
+                $srci = 7 * $zipbits;
                 while ($srci >= 0) {
                     $pixval = (($srcval >> $srci) & $zipmask);
                     $pixmap[$pixpos] = pack('C', $pixval);
@@ -961,7 +963,7 @@ class YDisplay extends YFunction
                 $srcy = $srcy + 1;
                 if ($srcy >= $zipheight) {
                     $srcy = 0;
-                    $srcx = $srcx + $incx;
+                    $srcx = $srcx + 8;
                     // drop last bytes if image is not a multiple of 8
                     if ($srcx >= $zipwidth) {
                         $srcbit = 0;

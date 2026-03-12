@@ -59,7 +59,7 @@ class YHub
             return $hub != null ? 1 : 0;
         }
         if ($attrName == "connectionState") {
-            if ($hub == null){
+            if ($hub == null) {
                 return YHub::UNREGISTERED;
             }
             return $hub->getConnectionState();

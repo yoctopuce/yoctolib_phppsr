@@ -170,7 +170,7 @@ class YTcpHub
         $arr = [
             'ssl' => $ssl_options,
             'http' => [
-                'timeout' => $this->get_networkTimeout()/1000
+                'timeout' => $this->get_networkTimeout() / 1000
             ]
         ];
         return stream_context_create($arr);
@@ -199,7 +199,7 @@ class YTcpHub
             $useragent = strtolower($_SERVER['HTTP_USER_AGENT']);
             $patern = 'yoctohub';
             if (substr($useragent, 0, 10) != 'virtualhub' && substr($useragent, 0, strlen($patern)) != $patern) {
-                $errmsg = "no user agent provided:[".$useragent."]";
+                $errmsg = "no user agent provided:[" . $useragent . "]";
                 $this->callbackCache = array();
                 return YAPI::IO_ERROR;
             }

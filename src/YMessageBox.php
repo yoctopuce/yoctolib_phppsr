@@ -27,6 +27,7 @@ class YMessageBox extends YFunction
     protected int $_pduReceived = self::PDURECEIVED_INVALID;    // UInt31
     protected string $_obey = self::OBEY_INVALID;           // Text
     protected string $_command = self::COMMAND_INVALID;        // Text
+    protected mixed $_smsCallback = null;                         // YSmsCallback
     protected int $_nextMsgRef = 0;                            // int
     protected string $_prevBitmapStr = '';                           // str
     protected array $_pdus = [];                           // YSmsArr
@@ -332,7 +333,6 @@ class YMessageBox extends YFunction
     {
         // $retry                  is a int;
         // $idx                    is a int;
-        // $res                    is a str;
         // $bitmapStr              is a str;
         // $int_res                is a int;
         // $newBitmap              is a bin;
@@ -345,8 +345,8 @@ class YMessageBox extends YFunction
             $newBitmap = YAPI::_hexStrToBin($bitmapStr);
             $idx = ($slot >> 3);
             if ($idx < strlen($newBitmap)) {
-                $bitVal = (1 << (($slot & 7)));
-                if (((ord($newBitmap[$idx]) & $bitVal)) != 0) {
+                $bitVal = (1 << ($slot & 7));
+                if ((ord($newBitmap[$idx]) & $bitVal) != 0) {
                     $this->_prevBitmapStr = '';
                     $int_res = $this->set_command(sprintf('DS%d',$slot));
                     if ($int_res < 0) {
@@ -358,7 +358,7 @@ class YMessageBox extends YFunction
             } else {
                 return YAPI::INVALID_ARGUMENT;
             }
-            $res = $this->_AT('');
+            $this->_download('at.txt?cmd=');
             $retry = $retry - 1;
         }
         return YAPI::IO_ERROR;
@@ -367,68 +367,49 @@ class YMessageBox extends YFunction
     /**
      * @throws YAPI_Exception on error
      */
-    public function _AT(string $cmd): string
+    public function sendPDU(string $pdu): int
     {
-        // $chrPos                 is a int;
-        // $cmdLen                 is a int;
-        // $waitMore               is a int;
-        // $res                    is a str;
+        // $i                      is a int;
         // $buff                   is a bin;
         // $bufflen                is a int;
         // $buffstr                is a str;
-        // $buffstrlen             is a int;
-        // $idx                    is a int;
-        // $suffixlen              is a int;
-        // copied form the YCellular class
-        // quote dangerous characters used in AT commands
-        $cmdLen = strlen($cmd);
-        $chrPos = YAPI::Ystrpos($cmd,'#');
-        while ($chrPos >= 0) {
-            $cmd = sprintf('%s%c23%s', substr($cmd, 0, $chrPos), 37,
-            substr($cmd, $chrPos+1, $cmdLen-$chrPos-1));
-            $cmdLen = $cmdLen + 2;
-            $chrPos = YAPI::Ystrpos($cmd,'#');
+        // $res                    is a str;
+        // $waitMore               is a int;
+        // $cmd                    is a str;
+
+        $buff = $this->_uploadEx('sendSMS', $pdu);
+        if (strlen($buff) < 2) {
+            return YAPI::SUCCESS;
         }
-        $chrPos = YAPI::Ystrpos($cmd,'+');
-        while ($chrPos >= 0) {
-            $cmd = sprintf('%s%c2B%s', substr($cmd, 0, $chrPos), 37,
-            substr($cmd, $chrPos+1, $cmdLen-$chrPos-1));
-            $cmdLen = $cmdLen + 2;
-            $chrPos = YAPI::Ystrpos($cmd,'+');
+        if (ord($buff[0]) != 64) {
+            return YAPI::SUCCESS;
         }
-        $chrPos = YAPI::Ystrpos($cmd,'=');
-        while ($chrPos >= 0) {
-            $cmd = sprintf('%s%c3D%s', substr($cmd, 0, $chrPos), 37,
-            substr($cmd, $chrPos+1, $cmdLen-$chrPos-1));
-            $cmdLen = $cmdLen + 2;
-            $chrPos = YAPI::Ystrpos($cmd,'=');
-        }
-        $cmd = sprintf('at.txt?cmd=%s',$cmd);
-        $res = sprintf('');
-        // max 2 minutes (each iteration may take up to 5 seconds if waiting)
-        $waitMore = 24;
+        // new firmware provides a way to check result of SMS send command
+        $res = '';
+        $bufflen = strlen($buff);
+        $buffstr = YAPI::Ybin2str($buff);
+        $i = 0;
+        $waitMore = 10;
         while ($waitMore > 0) {
+            $cmd = sprintf('at.txt?cmd=%s', substr($buffstr, $i, $bufflen - $i));
             $buff = $this->_download($cmd);
             $bufflen = strlen($buff);
             $buffstr = YAPI::Ybin2str($buff);
-            $buffstrlen = strlen($buffstr);
-            $idx = $bufflen - 1;
-            while (($idx > 0) && (ord($buff[$idx]) != 64) && (ord($buff[$idx]) != 10) && (ord($buff[$idx]) != 13)) {
-                $idx = $idx - 1;
+            $i = $bufflen - 1;
+            while (($i > 0) && (ord($buff[$i]) != 64) && (ord($buff[$i]) != 10) && (ord($buff[$i]) != 13)) {
+                $i = $i - 1;
             }
-            if (ord($buff[$idx]) == 64) {
+            if (($i >= 0) && (ord($buff[$i]) == 64)) {
                 // continuation detected
-                $suffixlen = $bufflen - $idx;
-                $cmd = sprintf('at.txt?cmd=%s', substr($buffstr, $buffstrlen - $suffixlen, $suffixlen));
-                $buffstr = substr($buffstr, 0, $buffstrlen - $suffixlen);
                 $waitMore = $waitMore - 1;
             } else {
                 // request complete
                 $waitMore = 0;
             }
-            $res = sprintf('%s%s', $res, $buffstr);
+            $res = sprintf('%s%s', $res, substr($buffstr, 0, $i));
         }
-        return $res;
+        if (!(YAPI::Ystrpos($res,'OK') >= 0)) return $this->_throw(YAPI::NOT_SUPPORTED,'Failed to send SMS',YAPI::NOT_SUPPORTED);
+        return YAPI::SUCCESS;
     }
 
     /**
@@ -440,12 +421,18 @@ class YMessageBox extends YFunction
         $arrPdu = [];           // binArr;
         // $hexPdu                 is a str;
         // $sms                    is a YSms;
-
-        $binPdu = $this->_download(sprintf('sms.json?pos=%d&len=1', $slot));
-        $arrPdu = $this->_json_get_array($binPdu);
-        $hexPdu = $this->_decode_json_string($arrPdu[0]);
         $sms = new YSms($this);
         $sms->set_slot($slot);
+
+        $binPdu = $this->_download(sprintf('sms.json?pos=%d&len=1', $slot));
+        if (strlen($binPdu)<8) {
+            // Retry in case SIM was busy
+            YAPI::Sleep(250);
+            $binPdu = $this->_download(sprintf('sms.json?pos=%d&len=1', $slot));
+            if (!(strlen($binPdu)>=8)) return $this->_throw(YAPI::IO_ERROR,'unable to retrieve SMS',$sms);
+        }
+        $arrPdu = $this->_json_get_array($binPdu);
+        $hexPdu = $this->_decode_json_string($arrPdu[0]);
         $sms->parsePdu(YAPI::_hexStrToBin($hexPdu));
         return $sms;
     }
@@ -807,18 +794,17 @@ class YMessageBox extends YFunction
     public function checkNewMessages(): int
     {
         // $bitmapStr              is a str;
-        // $prevBitmap             is a bin;
         // $newBitmap              is a bin;
         // $slot                   is a int;
         // $nslots                 is a int;
         // $pduIdx                 is a int;
         // $idx                    is a int;
         // $bitVal                 is a int;
-        // $prevBit                is a int;
         // $i                      is a int;
         // $nsig                   is a int;
         // $cnt                    is a int;
         // $sig                    is a str;
+        // $isnew                  is a bool;
         $newArr = [];           // YSmsArr;
         $newMsg = [];           // YSmsArr;
         $newAgg = [];           // YSmsArr;
@@ -829,9 +815,8 @@ class YMessageBox extends YFunction
         if ($bitmapStr == $this->_prevBitmapStr) {
             return YAPI::SUCCESS;
         }
-        $prevBitmap = YAPI::_hexStrToBin($this->_prevBitmapStr);
-        $newBitmap = YAPI::_hexStrToBin($bitmapStr);
         $this->_prevBitmapStr = $bitmapStr;
+        $newBitmap = YAPI::_hexStrToBin($bitmapStr);
         $nslots = 8*strlen($newBitmap);
         while (sizeof($newArr) > 0) {
             array_pop($newArr);
@@ -850,8 +835,10 @@ class YMessageBox extends YFunction
             $slot = $sms->get_slot();
             $idx = ($slot >> 3);
             if ($idx < strlen($newBitmap)) {
-                $bitVal = (1 << (($slot & 7)));
-                if (((ord($newBitmap[$idx]) & $bitVal)) != 0) {
+                $bitVal = (1 << ($slot & 7));
+                if ((ord($newBitmap[$idx]) & $bitVal) != 0) {
+                    $newBitmap[$idx] = pack('C', (ord($newBitmap[$idx]) ^ $bitVal));
+                    $sms->set_new(false);
                     $newArr[] = $sms;
                     if ($sms->get_concatCount() == 0) {
                         $newMsg[] = $sms;
@@ -877,30 +864,25 @@ class YMessageBox extends YFunction
         $slot = 0;
         while ($slot < $nslots) {
             $idx = ($slot >> 3);
-            $bitVal = (1 << (($slot & 7)));
-            $prevBit = 0;
-            if ($idx < strlen($prevBitmap)) {
-                $prevBit = (ord($prevBitmap[$idx]) & $bitVal);
-            }
-            if (((ord($newBitmap[$idx]) & $bitVal)) != 0) {
-                if ($prevBit == 0) {
-                    $sms = $this->fetchPdu($slot);
-                    $newArr[] = $sms;
-                    if ($sms->get_concatCount() == 0) {
-                        $newMsg[] = $sms;
-                    } else {
-                        $sig = $sms->get_concatSignature();
-                        $i = 0;
-                        while (($i < $nsig) && (strlen($sig) > 0)) {
-                            if ($signatures[$i] == $sig) {
-                                $sig = '';
-                            }
-                            $i = $i + 1;
+            $bitVal = (1 << ($slot & 7));
+            if ((ord($newBitmap[$idx]) & $bitVal) != 0) {
+                $sms = $this->fetchPdu($slot);
+                $sms->set_new(true);
+                $newArr[] = $sms;
+                if ($sms->get_concatCount() == 0) {
+                    $newMsg[] = $sms;
+                } else {
+                    $sig = $sms->get_concatSignature();
+                    $i = 0;
+                    while (($i < $nsig) && (strlen($sig) > 0)) {
+                        if ($signatures[$i] == $sig) {
+                            $sig = '';
                         }
-                        if (strlen($sig) > 0) {
-                            $signatures[] = $sig;
-                            $nsig = $nsig + 1;
-                        }
+                        $i = $i + 1;
+                    }
+                    if (strlen($sig) > 0) {
+                        $signatures[] = $sig;
+                        $nsig = $nsig + 1;
                     }
                 }
             }
@@ -916,6 +898,7 @@ class YMessageBox extends YFunction
             $sig = $signatures[$i];
             $cnt = 0;
             $pduIdx = 0;
+            $isnew = true;
             while ($pduIdx < sizeof($this->_pdus)) {
                 $sms = $this->_pdus[$pduIdx];
                 if ($sms->get_concatCount() > 0) {
@@ -926,6 +909,7 @@ class YMessageBox extends YFunction
                                 array_pop($newAgg);
                             };
                         }
+                        $isnew = $sms->isNew();
                         $newAgg[] = $sms;
                     }
                 }
@@ -934,6 +918,7 @@ class YMessageBox extends YFunction
             if (($cnt > 0) && (sizeof($newAgg) == $cnt)) {
                 $sms = new YSms($this);
                 $sms->set_parts($newAgg);
+                $sms->set_new($isnew);
                 $newMsg[] = $sms;
             }
             $i = $i + 1;
@@ -1057,6 +1042,58 @@ class YMessageBox extends YFunction
     {
         $this->checkNewMessages();
         return $this->_messages;
+    }
+
+    /**
+     * Registers a callback function to be called each time that a new SMS is received.
+     * The callback is invoked only during the execution of ySleep or yHandleEvents.
+     * This provides control over the time when the callback is triggered.
+     * For good responsiveness, remember to call one of these two functions periodically.
+     * To unregister a callback, pass a null pointer as argument.
+     *
+     * @param callable $callback : the callback function to call, or a null pointer.
+     *         The callback function should take four arguments:
+     *         the YMessageBox object that emitted the event, and
+     *         the YSms object containing the received message.
+     *         On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function registerSmsCallback(mixed $callback): int
+    {
+        $this->_smsCallback = null;
+        if (!is_null($callback)) {
+            $this->registerValueCallback('yInternalEventCallback');
+        } else {
+            $this->registerValueCallback(null);
+        }
+        $this->_smsCallback = $callback;
+        return 0;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function _internalEventHandler(string $cbVal): int
+    {
+        // $arrLen                 is a int;
+        // $arrPos                 is a int;
+        $messages = [];         // YSmsArr;
+        // $sms                    is a YSms;
+
+        $messages = $this->get_messages();
+        // invoke callback for all new messages
+        $arrLen = sizeof($messages);
+        $arrPos = 0;
+        while ($arrPos < $arrLen) {
+            $sms = $messages[$arrPos];
+            if ($sms->isNew()) {
+                if (!is_null($this->_smsCallback)) {
+                    call_user_func($this->_smsCallback, $this, $sms);
+                }
+            }
+            $arrPos = $arrPos + 1;
+        }
+        return YAPI::SUCCESS;
     }
 
     /**

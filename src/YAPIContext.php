@@ -30,6 +30,7 @@ class YAPIContext
     {
         return "";
     }
+
     private function AddUdevRule_internal(bool $force): string
     {
         return "error: Not supported in PHP";
@@ -404,7 +405,6 @@ class YAPIContext
     {
         return YAPI::getTcpHubFromRef($hubref);
     }
-
 
 
 }

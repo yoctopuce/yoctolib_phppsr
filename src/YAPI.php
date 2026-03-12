@@ -355,6 +355,14 @@ class YAPI
                                 YAPI::addRefreshEvent($fun);
                             }
                         }
+                        if (self::$_firstArrival && !is_null(self::$_arrivalCallback)) {
+                            // call callback on first RegisterDeviceArrival call
+                            $module = YModule::FindModule($serial . '.module');
+                            // force (re)loading the module object with up-to-date information
+                            // this will also ensure we have a valid serialNumber in cache on unplug
+                            $module->load(YAPI::$defaultCacheValidity);
+                            self::$_pendingCallbacks[] = ['event' => '+', 'serial' => $serial, 'module' => $module];
+                        }
                     }
                     if (isset($devinfo['index'])) {
                         $devydx = $devinfo['index'];
@@ -364,13 +372,17 @@ class YAPI
                         // Add new device
                         new YDevice($rooturl, $devinfo, $loadval["services"]["yellowPages"]);
                         if (!is_null(self::$_arrivalCallback)) {
-                            self::$_pendingCallbacks[] = "+$serial";
+                            $module = YModule::FindModule($serial . ".module");
+                            // force (re)loading the module object with up-to-date information
+                            // this will also ensure we have a valid serialNumber in cache on unplug
+                            $module->load(YAPI::$defaultCacheValidity);
+                            self::$_pendingCallbacks[] = ['event' => '+', 'serial' => $serial, 'module' => $module];
                         }
                     } elseif ($currdev->getLogicalName() != $devinfo['logicalName']) {
                         // Reindex device from its own data
                         $currdev->refresh();
                         if (!is_null(self::$_namechgCallback)) {
-                            self::$_pendingCallbacks[] = "/$serial";
+                            self::$_pendingCallbacks[] = ['event' => '/', 'serial' => $serial, 'module' => YModule::FindModule($serial . ".module")];
                         }
                     } elseif (isset($refresh[$serial]) || $currdev->getRootUrl() != $rooturl ||
                         $currdev->getBeacon() != $devinfo['beacon']) {
@@ -404,27 +416,30 @@ class YAPI
         if ($bool_invokecallbacks) {
             $nbevents = sizeof(self::$_pendingCallbacks);
             for ($i = 0; $i < $nbevents; $i++) {
+                /** @var array $evt */
                 $evt = self::$_pendingCallbacks[$i];
-                $serial = substr($evt, 1);
-                switch (substr($evt, 0, 1)) {
+                $serial = $evt['serial'];
+                switch (substr($evt['event'], 0, 1)) {
                     case '+':
                         if (!is_null(self::$_arrivalCallback)) {
                             $cb = self::$_arrivalCallback;
-                            $cb(YModule::FindModule($serial . ".module"));
+                            $cb($evt['module']);
                         }
                         break;
                     case '/':
                         if (!is_null(self::$_namechgCallback)) {
                             $cb = self::$_namechgCallback;
-                            $cb(YModule::FindModule($serial . ".module"));
+                            $cb($evt['module']);
                         }
                         break;
                     case '-':
                         if (!is_null(self::$_removalCallback)) {
                             $cb = self::$_removalCallback;
-                            $cb(YModule::FindModule($serial . ".module"));
+                            $cb($evt['module']);
                         }
-                        self::forgetDevice(self::$_devs[$serial]);
+                        if (isset(self::$_devs[$serial])) {
+                            self::forgetDevice(self::$_devs[$serial]);
+                        }
                         break;
                 }
             }
@@ -629,7 +644,7 @@ class YAPI
                                     if ($parts[2] == '0') {
                                         YAPI::_unplugDevice($parts[1]);
                                     }
-                                    // no break on purpose
+                                // no break on purpose
                                 case 4: // function name change
                                 case 8: // function name change (ydx)
                                     $hub->devListExpires = 0;
@@ -882,10 +897,10 @@ class YAPI
     public static function _unplugDevice(string $serial): void
     {
         if (!is_null(self::$_removalCallback)) {
-            self::$_pendingCallbacks[] = "-{$serial}";
-        } else {
-            self::forgetDevice(self::$_devs[$serial]);
+            self::$_pendingCallbacks[] = ['event' => '-', 'serial' => $serial, 'module' => YModule::FindModule($serial . ".module")];
         }
+        self::forgetDevice(self::$_devs[$serial]);
+
     }
 
 
@@ -1857,7 +1872,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "2.1.11632";
+        return "2.1.12413";
     }
 
     /**

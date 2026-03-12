@@ -62,11 +62,5 @@ class YFileRecord
     }
 
     //--- (end of generated code: YFileRecord implementation)
-
-    function contentEquals(string $bin_content): bool
-    {
-        return ($this->_size == strlen($bin_content) &&
-            $this->_crc == crc32($bin_content));
-    }
 }
 
