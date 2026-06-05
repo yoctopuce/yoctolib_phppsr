@@ -125,6 +125,14 @@ class YRfidStatus
     const INVALID_SIZE                   = -154;
     const BAD_PASSWORD_FORMAT            = -155;
     const RADIO_IS_OFF                   = -156;
+    const NOT_AVAILABLE_ON_THIS_TAG      = -157;
+    const PASSWORD_FEATURE_NOT_SUPPORTED = -158;
+    const BAD_PASSWORD_LENGTH            = -159 ;
+    const BAD_PASSWORD_TYPE              = -160;
+    const BAD_PASSWORD                   = -161;
+    const PASSWORD_REQUIRED              = -162;
+    const MULTIWRITE_NOT_SUPPORTED       = -163;
+    const MULTIREAD_NOT_SUPPORTED        = -164;
     //--- (end of generated code: YRfidStatus declaration)
 
     //--- (generated code: YRfidStatus attributes)
@@ -297,7 +305,7 @@ class YRfidStatus
                 $errMsg = 'Block / byte is already locked and thus cannot be locked again.';
             }
             if ($errCode == self::BLOCK_LOCKED) {
-                $errMsg = 'Block / byte is locked and its content cannot be changed';
+                $errMsg = 'Block / byte is either locked and its content cannot be changed or operation might require a password.';
             }
             if ($errCode == self::BLOCK_NOT_SUCESSFULLY_PROGRAMMED) {
                 $errMsg = 'Block was not successfully programmed';
@@ -556,6 +564,30 @@ class YRfidStatus
             }
             if ($errCode == self::RADIO_IS_OFF) {
                 $errMsg = 'Radio is OFF (refreshRate=0).';
+            }
+            if ($errCode == self::NOT_AVAILABLE_ON_THIS_TAG) {
+                $errMsg = 'Tag does not provide $this feature.';
+            }
+            if ($errCode == self::PASSWORD_FEATURE_NOT_SUPPORTED) {
+                $errMsg = 'Password feature not supported $this tag.';
+            }
+            if ($errCode == self::BAD_PASSWORD_LENGTH) {
+                $errMsg = 'Incorrect password length';
+            }
+            if ($errCode == self::BAD_PASSWORD_TYPE) {
+                $errMsg = 'Bad password type.';
+            }
+            if ($errCode == self::BAD_PASSWORD) {
+                $errMsg = 'Bad password.';
+            }
+            if ($errCode == self::PASSWORD_REQUIRED) {
+                $errMsg = 'Operation requires a password';
+            }
+            if ($errCode == self::MULTIWRITE_NOT_SUPPORTED) {
+                $errMsg = 'Multi block write unavailable on $this tag.';
+            }
+            if ($errCode == self::MULTIREAD_NOT_SUPPORTED) {
+                $errMsg = 'Multi block read unavailable on $this tag.';
             }
             if ($errBlk >= 0) {
                 $errMsg = sprintf('%s (block %d)', $errMsg, $errBlk);

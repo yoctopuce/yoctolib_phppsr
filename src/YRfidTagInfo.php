@@ -20,6 +20,12 @@ class YRfidTagInfo
     const IEC_14443_NTAG_215             = 8;
     const IEC_14443_NTAG_216             = 9;
     const IEC_14443_NTAG_424_DNA         = 10;
+    const IEC_15693_ST25DV               = 11;
+    const IEC_15693_ST25TV               = 12;
+    const IEC_15693_TAGIT_HFI            = 13;
+    const IEC_15693_MB89R                = 14 ;
+    const IEC_15693_ICODE_DNA            = 15;
+    const IEC_15693_ICODE_SLI            = 16;
     //--- (end of generated code: YRfidTagInfo declaration)
 
     //--- (generated code: YRfidTagInfo attributes)
@@ -166,6 +172,25 @@ class YRfidTagInfo
         if ($tagType == self::IEC_14443_NTAG_424_DNA) {
             $typeStr = 'NTAG 424 DNA';
         }
+        if ($tagType == self::IEC_15693_ST25DV) {
+            $typeStr = 'ST25DVxx';
+        }
+        if ($tagType == self::IEC_15693_ST25TV) {
+            $typeStr = 'ST25TVxx';
+        }
+        if ($tagType == self::IEC_15693_TAGIT_HFI) {
+            $typeStr = 'TI TAGIT HFI';
+        }
+        if ($tagType == self::IEC_15693_MB89R) {
+            $typeStr = 'MB89Rxx';
+        }
+        if ($tagType == self::IEC_15693_ICODE_DNA) {
+            $typeStr = 'ICODE DNA';
+        }
+        if ($tagType == self::IEC_15693_ICODE_SLI) {
+            $typeStr = 'ICODE SLI';
+        }
+
         $this->_tagId = $tagId;
         $this->_tagType = $tagType;
         $this->_typeStr = $typeStr;

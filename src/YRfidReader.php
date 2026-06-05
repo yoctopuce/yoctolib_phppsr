@@ -281,7 +281,11 @@ class YRfidReader extends YFunction
      * Changes an RFID tag configuration to prevents any further write to
      * the selected blocks. This operation is definitive and irreversible.
      * Depending on the tag type and block index, adjascent blocks may become
-     * read-only as well, based on the locking granularity.
+     * read-only as well, based on the locking granularity.  Note that some tags
+     * may allow only a few blocks to be locked, for instance ST25DVxxx  tags
+     * allows a lock on block 0 and 1 only.
+     *
+     *
      *
      * @param string $tagId : identifier of the tag to use
      * @param int $firstBlock : first block to lock
@@ -774,6 +778,120 @@ class YRfidReader extends YFunction
             $res = $status->get_yapiError();
         }
         return $res;
+    }
+
+    /**
+     * Reads a byte from the Tag configuration (ISO 15693 ST25DVxx only).
+     * This function is actually a call to the 0xA0 RFID command and is specific to
+     * ST25DVxx tags. Check ST25DVxx datasheet for more information about
+     * the data organisation of ST25DVxx tags configuration.
+     *
+     * @param string $tagId : identifier of the tag to use
+     * @param int $addr  : offset of the byte in the tag configuation
+     *
+     * @param YRfidOptions $options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param YRfidStatus $status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return int  the requested byte value (0...255)
+     *
+     * On failure, throws an exception or returns a negative error code. When it
+     * happens, you can get more information from the status object.
+     * @throws YAPI_Exception on error
+     */
+    public function tagGetConfigByte(string $tagId, int $addr, YRfidOptions $options, YRfidStatus &$status): int
+    {
+        // $optstr                 is a str;
+        // $url                    is a str;
+        // $json                   is a bin;
+        // $res                    is a int;
+        $optstr = $options->imm_getParams();
+        $url = sprintf('rfid.json?a=gcfg&t=%s&b=%d%s',$tagId,$addr, $optstr);
+
+        $json = $this->_download($url);
+        $this->_chkerror($tagId, $json, $status);
+        if ($status->get_yapiError() == YAPI::SUCCESS) {
+            $res = intVal($this->_json_get_key($json, 'res'));
+        } else {
+            $res = $status->get_yapiError();
+        }
+        return $res;
+    }
+
+    /**
+     * Changes a byte in the tag's configuration (ISO 15693 ST25DVxx only).
+     * Warning: modifing the tag configation may alter its behavior in a non-reversible way.
+     * This operation requires the CONFIG_PWD password to be set in the options,
+     * default value is "0000000000000000" (16 zeros). This function is actually
+     * a call to the 0xA1 RFID command and is specific to ST25DVxx tags. Check
+     * ST25DVxx datasheet for more information about the data organisation
+     * of ST25DVxx tags configuration.
+     *
+     * @param string $tagId : identifier of the tag to use
+     * @param int $addr  : address of the byte to write
+     * @param int $value : the value to write (0...255)
+     * @param YRfidOptions $options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param YRfidStatus $status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code. When it
+     * happens, you can get more information from the status object.
+     * @throws YAPI_Exception on error
+     */
+    public function tagSetConfigByte(string $tagId, int $addr, int $value, YRfidOptions $options, YRfidStatus &$status): int
+    {
+        // $optstr                 is a str;
+        // $url                    is a str;
+        // $json                   is a bin;
+        $optstr = $options->imm_getParams();
+        $url = sprintf('rfid.json?a=scfg&t=%s&b=%d&v=%d%s',$tagId,$addr,$value,$optstr);
+
+        $json = $this->_download($url);
+        return $this->_chkerror($tagId, $json, $status);
+    }
+
+    /**
+     * Set a password that will be required to access the tag  (ISO 15693 ST25DVxx only).
+     * The password must be a string of characters representing 8 bytes in hexadecimal.
+     * There are several types of password for the same tag; please consult your tags
+     * documentation to understand their respective applications. Once the password
+     * has been configured, operations requiring this password must be initiated with
+     * the password defined in the KeyType and HexKey fields of the
+     * options parameter for the operations in question. It is not necessarily
+     * required to consistently provide the same password for every operation during the
+     * same session with a tag.
+     *
+     * @param string $tagId : identifier of the tag to use
+     * @param int $passwordType  : type of password to be set (YRfidOptions.ST25D_CONFIG_PWD,YRfidOptions.ST25D_PWD1,YRfidOptions.ST25D_PWD2..)
+     * @param string $password : the password (16 characters hex string encoding 8 bytes)
+     * @param YRfidOptions $options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param YRfidStatus $status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code. When it
+     * happens, you can get more information from the status object.
+     * @throws YAPI_Exception on error
+     */
+    public function tagSetPassword(string $tagId, int $passwordType, string $password, YRfidOptions $options, YRfidStatus &$status): int
+    {
+        // $optstr                 is a str;
+        // $url                    is a str;
+        // $json                   is a bin;
+        $optstr = $options->imm_getParams();
+        $url = sprintf('rfid.json?a=spwd&t=%s&b=%d&p=%s%s',$tagId,$passwordType,$password,$optstr);
+
+        $json = $this->_download($url);
+        return $this->_chkerror($tagId, $json, $status);
     }
 
     /**

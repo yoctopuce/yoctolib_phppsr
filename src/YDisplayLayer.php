@@ -33,14 +33,14 @@ class YDisplayLayer
     //--- (end of generated code: YDisplayLayer declaration)
 
     //--- (generated code: YDisplayLayer attributes)
+    protected string $_cmdbuff = '';                           // str
+    protected bool $_hidden = false;                        // bool
     protected int $_polyPrevX = 0;                            // int
     protected int $_polyPrevY = 0;                            // int
 
     //--- (end of generated code: YDisplayLayer attributes)
     protected YDisplay $_display;
     protected int $_id;
-    protected string $_cmdbuff;
-    protected bool $_hidden;
 
     function __construct(YDisplay $parent, int $id)
     {
@@ -52,45 +52,74 @@ class YDisplayLayer
         $this->_hidden = false;
     }
 
-    // internal function to flush any pending command for this layer
+    //--- (generated code: YDisplayLayer implementation)
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function must_be_flushed(): bool
+    {
+        return strlen($this->_cmdbuff) > 0;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function resetHiddenFlag(): int
+    {
+        $this->_hidden = false;
+        return YAPI::SUCCESS;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
     public function flush_now(): int
     {
+        // $res                    is a int;
         $res = YAPI::SUCCESS;
-        if ($this->_cmdbuff != '') {
+        if (strlen($this->_cmdbuff) > 0) {
             $res = $this->_display->sendCommand($this->_cmdbuff);
             $this->_cmdbuff = '';
         }
         return $res;
     }
 
-    // internal function to send a state command for this layer
-    private function command_push(string $str_cmd): int
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function command_push(string $cmd): int
     {
+        // $res                    is a int;
         $res = YAPI::SUCCESS;
-
-        if (strlen($this->_cmdbuff) + strlen($str_cmd) >= 100) {
+        if (strlen($this->_cmdbuff) + strlen($cmd) >= 100) {
             // force flush before, to prevent overflow
-            $res = $this->flush_now();
+            $this->flush_now();
         }
-        if ($this->_cmdbuff == '') {
+        if (strlen($this->_cmdbuff) == 0) {
             // always prepend layer ID first
             $this->_cmdbuff = $this->_id;
         }
-        $this->_cmdbuff .= $str_cmd;
+        $this->_cmdbuff = $this->_cmdbuff . $cmd;
         return $res;
     }
 
-    // internal function to send a command for this layer
-    private function command_flush(string $str_cmd): int
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function command_flush(string $cmd): int
     {
-        $res = $this->command_push($str_cmd);
+        // $res                    is a int;
+
+        $res = $this->command_push($cmd);
         if ($this->_hidden) {
+            return $res;
+        }
+        if ($this->_display->isFrozen()) {
             return $res;
         }
         return $this->flush_now();
     }
-
-    //--- (generated code: YDisplayLayer implementation)
 
     /**
      * Reverts the layer to its initial state (fully transparent, default settings).
@@ -774,15 +803,6 @@ class YDisplayLayer
     public function get_layerHeight(): int
     {
         return $this->_display->get_layerHeight();
-    }
-
-    /**
-     * @throws YAPI_Exception on error
-     */
-    public function resetHiddenFlag(): int
-    {
-        $this->_hidden = false;
-        return YAPI::SUCCESS;
     }
 
     //--- (end of generated code: YDisplayLayer implementation)

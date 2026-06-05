@@ -427,6 +427,70 @@ class YColorLedCluster extends YFunction
     }
 
     /**
+     * Changes the color displayed by the last LED and shifts all currently displayed colors
+     * toward the beginning of the RGB LED string. The new color is encoded as follows: 0xRRGGBB.
+     *
+     * @param int $rgbValue :  new color.
+     *
+     * @return int  YAPI::SUCCESS when the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function shl_rgb(int $rgbValue): int
+    {
+        return $this->sendCommand(sprintf('<R%x',$rgbValue));
+    }
+
+    /**
+     * Changes the color displayed by the first LED and shifts all currently displayed colors
+     * toward the end of the RGB LED string. The new color is encoded as follows: 0xRRGGBB.
+     *
+     * @param int $rgbValue :  new color.
+     *
+     * @return int  YAPI::SUCCESS when the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function shr_rgb(int $rgbValue): int
+    {
+        return $this->sendCommand(sprintf('>R%x',$rgbValue));
+    }
+
+    /**
+     * Changes the color displayed by the last LED and shifts all currently displayed colors
+     * toward the beginning of the RGB LED string. The new color is encoded as follows: 0xHHSSLL.
+     *
+     * @param int $hslValue :  new color.
+     *
+     * @return int  YAPI::SUCCESS when the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function shl_hsl(int $hslValue): int
+    {
+        return $this->sendCommand(sprintf('<H%x',$hslValue));
+    }
+
+    /**
+     * Changes the color displayed by the first LED and shifts all currently displayed colors
+     * toward the end of the RGB LED string. The new color is encoded as follows: 0xHHSSLL.
+     *
+     * @param int $hslValue :  new color.
+     *
+     * @return int  YAPI::SUCCESS when the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function shr_hsl(int $hslValue): int
+    {
+        return $this->sendCommand(sprintf('>H%x',$hslValue));
+    }
+
+    /**
      * Adds an RGB transition to a sequence. A sequence is a transition list, which can
      * be executed in loop by a group of LEDs.  Sequences are persistent and are saved
      * in the device flash memory as soon as the saveBlinkSeq() method is called.

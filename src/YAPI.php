@@ -1872,7 +1872,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "2.1.12413";
+        return "2.1.14544";
     }
 
     /**

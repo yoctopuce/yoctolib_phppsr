@@ -10,10 +10,14 @@ namespace Yoctopuce\YoctoAPI;
  */
 class YCounter extends YSensor
 {
+    const DECIMALMODE_FALSE = 0;
+    const DECIMALMODE_TRUE = 1;
+    const DECIMALMODE_INVALID = -1;
     const COMMAND_INVALID = YAPI::INVALID_STRING;
     //--- (end of YCounter declaration)
 
     //--- (YCounter attributes)
+    protected int $_decimalMode = self::DECIMALMODE_INVALID;    // Bool
     protected string $_command = self::COMMAND_INVALID;        // Text
 
     //--- (end of YCounter attributes)
@@ -32,11 +36,53 @@ class YCounter extends YSensor
     function _parseAttr(string $name, mixed $val): int
     {
         switch ($name) {
+        case 'decimalMode':
+            $this->_decimalMode = intval($val);
+            return 1;
         case 'command':
             $this->_command = $val;
             return 1;
         }
         return parent::_parseAttr($name, $val);
+    }
+
+    /**
+     * Returns a value indicating if the senseur compute whole or fractional values.
+     *
+     * @return int  either YCounter::DECIMALMODE_FALSE or YCounter::DECIMALMODE_TRUE, according to a value
+     * indicating if the senseur compute whole or fractional values
+     *
+     * On failure, throws an exception or returns YCounter::DECIMALMODE_INVALID.
+     * @throws YAPI_Exception on error
+     */
+    public function get_decimalMode(): int
+    {
+        // $res                    is a enumBOOL;
+        if ($this->_cacheExpiration <= YAPI::GetTickCount()) {
+            if ($this->load(YAPI::$_yapiContext->GetCacheValidity()) != YAPI::SUCCESS) {
+                return self::DECIMALMODE_INVALID;
+            }
+        }
+        $res = $this->_decimalMode;
+        return $res;
+    }
+
+    /**
+     * Changes the sensor's operating mode so that it computes integer or decimal values.
+     * Remember to call the saveToFlash() method of the module if the modification must be kept.
+     *
+     * @param int $newval : either YCounter::DECIMALMODE_FALSE or YCounter::DECIMALMODE_TRUE, according to
+     * the sensor's operating mode so that it computes integer or decimal values
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function set_decimalMode(int $newval): int
+    {
+        $rest_val = strval($newval);
+        return $this->_setAttr("decimalMode", $rest_val);
     }
 
     /**
@@ -113,7 +159,10 @@ class YCounter extends YSensor
     /**
      * Reset the counter to zero.
      *
-     * @return int  YAPI::SUCCESS if the call succeeds.
+     * @return int  YAPI::SUCCESS if the call succeeds. Please note that this function only resets
+     *         the integer part of the counter. In CONTINUOUS mode, the decimal part is calculated
+     *         from the angle measured by the sensor. To set the decimal part of the sensor to zero,
+     *         the origin of the sensor must be changed with the YOrientation.zero().
      *
      * On failure, throws an exception or returns a negative error code.
      * @throws YAPI_Exception on error
@@ -122,6 +171,22 @@ class YCounter extends YSensor
     {
         return $this->sendCommand('Z');
     }
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function decimalMode(): int
+{
+    return $this->get_decimalMode();
+}
+
+    /**
+     * @throws YAPI_Exception
+     */
+    public function setDecimalMode(int $newval): int
+{
+    return $this->set_decimalMode($newval);
+}
 
     /**
      * @throws YAPI_Exception

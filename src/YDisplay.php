@@ -42,6 +42,11 @@ class YDisplay extends YFunction
     const LAYERHEIGHT_INVALID = YAPI::INVALID_UINT;
     const LAYERCOUNT_INVALID = YAPI::INVALID_UINT;
     const COMMAND_INVALID = YAPI::INVALID_STRING;
+    const DISPLAYSTATE_FAILURE           = 0;
+    const DISPLAYSTATE_OFF               = 1;
+    const DISPLAYSTATE_POWERING          = 2;
+    const DISPLAYSTATE_IDLE              = 3;
+    const DISPLAYSTATE_REFRESHING        = 4;
     //--- (end of generated code: YDisplay declaration)
 
     //--- (generated code: YDisplay attributes)
@@ -59,10 +64,11 @@ class YDisplay extends YFunction
     protected int $_layerCount = self::LAYERCOUNT_INVALID;     // UInt31
     protected string $_command = self::COMMAND_INVALID;        // Text
     protected array $_allDisplayLayers = [];                           // YDisplayLayerArr
+    protected float $_frozenUntil = 0;                            // u64
+    protected bool $_recording = false;                        // bool
+    protected string $_sequence = "";                           // str
 
     //--- (end of generated code: YDisplay attributes)
-    protected bool $_recording;
-    protected string $_sequence;
 
     function __construct(string $str_func)
     {
@@ -549,6 +555,57 @@ class YDisplay extends YFunction
     }
 
     /**
+     * @throws YAPI_Exception on error
+     */
+    public function sendCommand(string $cmd): int
+    {
+        if (!($this->_recording)) {
+            return $this->set_command($cmd);
+        }
+        $this->_sequence = sprintf('%s%s'."\n".'', $this->_sequence, $cmd);
+        return YAPI::SUCCESS;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function flushLayers(): int
+    {
+        foreach ($this->_allDisplayLayers as $ii_0) {
+            if ($ii_0->must_be_flushed()) {
+                $ii_0->flush_now();
+            }
+        }
+        return YAPI::SUCCESS;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function resetHiddenLayerFlags(): int
+    {
+        foreach ($this->_allDisplayLayers as $ii_0) {
+            $ii_0->resetHiddenFlag();
+        }
+        return YAPI::SUCCESS;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function isFrozen(): bool
+    {
+        if ($this->_frozenUntil == 0) {
+            return false;
+        }
+        if ($this->_frozenUntil <= YAPI::GetTickCount()) {
+            $this->_frozenUntil = 0;
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Clears the display screen and resets all display layers to their default state.
      * Using this function in a sequence will kill the sequence play-back. Don't use that
      * function to reset the display at sequence start-up.
@@ -581,6 +638,54 @@ class YDisplay extends YFunction
     }
 
     /**
+     * Returns the current state of an ePaper display, specifically to
+     * determine whether an update is in progress or whether a
+     * configuration issue has been detected. If a display configuration
+     * error has been detected, the error message can be retrieved.
+     *
+     * @param string $errmsg : a string passed by reference to receive the error message.
+     *
+     * @return int  a value among the enumeration YDisplay::DISPLAYSTATE
+     *         (YDisplay::DISPLAYSTATE_FAILURE, YDisplay::DISPLAYSTATE_OFF,
+     *         YDisplay::DISPLAYSTATE_POWERING, YDisplay::DISPLAYSTATE_IDLE,
+     *         YDisplay::DISPLAYSTATE_REFRESHING)
+     *         corresponding to the current display state.
+     */
+    public function get_ePaperState(string &$errmsg): int
+    {
+        // $json                   is a bin;
+        // $dispError              is a str;
+        // $dispState              is a int;
+
+        if ($this->get_displayType() == self::DISPLAYTYPE_MONO) {
+            $errmsg = 'Not an ePaper display';
+            return 0;
+        }
+        $json = $this->_download('disp.json');
+        if (strlen($json) == 0) {
+            $errmsg = $this->get_errorMessage();
+            return 0;
+        } else {
+            $dispError = $this->_json_get_string($this->_get_json_path($json, 'err'));
+            $errmsg = $dispError;
+            if (strlen($dispError) > 0) {
+                return 0;
+            }
+            $dispState = intVal($this->_json_get_key($json, 'state'));
+            if ($dispState > 10) {
+                return 4;
+            }
+            if ($dispState == 10) {
+                return 3;
+            }
+            if ($dispState > 0) {
+                return 2;
+            }
+        }
+        return 1;
+    }
+
+    /**
      * Disables screen refresh for a short period of time. The combination of
      * postponeRefresh and triggerRefresh can be used as an
      * alternative to double-buffering to avoid flickering during display updates.
@@ -594,6 +699,7 @@ class YDisplay extends YFunction
      */
     public function postponeRefresh(int $duration): int
     {
+        $this->_frozenUntil = YAPI::GetTickCount() + $duration;
         return $this->sendCommand(sprintf('H%d',$duration));
     }
 
@@ -609,6 +715,8 @@ class YDisplay extends YFunction
      */
     public function triggerRefresh(): int
     {
+        $this->_frozenUntil = 0;
+        $this->flushLayers();
         return $this->sendCommand('H0');
     }
 
@@ -738,6 +846,7 @@ class YDisplay extends YFunction
      */
     public function upload(string $pathname, string $content): int
     {
+        $this->flushLayers();
         return $this->_upload($pathname, $content);
     }
 
@@ -1213,27 +1322,4 @@ class YDisplay extends YFunction
 
     //--- (end of generated code: YDisplay implementation)
 
-    public function flushLayers():int
-    {
-        foreach ($this->_allDisplayLayers as $layer) {
-            $layer->flush_now();
-        }
-        return YAPI::SUCCESS;
-    }
-
-    public function resetHiddenLayerFlags():void
-    {
-        foreach ($this->_allDisplayLayers as $layer) {
-            $layer->resetHiddenFlag();
-        }
-    }
-
-    public function sendCommand(string $str_cmd): int
-    {
-        if (!$this->_recording) {
-            return $this->set_command($str_cmd);
-        }
-        $this->_sequence .= str_replace("\n", "\x0b", $str_cmd) . "\n";
-        return YAPI::SUCCESS;
-    }
 }

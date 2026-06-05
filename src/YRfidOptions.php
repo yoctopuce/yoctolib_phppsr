@@ -15,6 +15,13 @@ class YRfidOptions
     const NO_RFID_KEY                    = 0;
     const MIFARE_KEY_A                   = 1;
     const MIFARE_KEY_B                   = 2;
+    const ST25DV_CONFIG_PWD              = 3;
+    const ST25DV_PWD1                    = 4;
+    const ST25DV_PWD2                    = 5;
+    const ST25DV_PWD3                    = 6;
+    const ST25TV_CONFIG_PWD              = 7;
+    const ST25TV_PWD1                    = 8;
+    const ST25TV_PWD2                    = 9;
     //--- (end of generated code: YRfidOptions declaration)
 
     //--- (generated code: YRfidOptions attributes)
