@@ -1872,7 +1872,7 @@ class YAPI
      */
     public static function GetAPIVersion(): string
     {
-        return "2.1.14544";
+        return "2.1.14699";
     }
 
     /**
@@ -2036,7 +2036,7 @@ class YAPI
         self::$exceptionsDisabled = false;
     }
 
-    private static function _parseRegisteredURL(string $str_url): array
+    public static function _parseRegisteredURL(string $str_url): array
     {
         $res = [];
         $res['org_url'] = $str_url;

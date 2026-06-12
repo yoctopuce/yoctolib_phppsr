@@ -56,14 +56,12 @@ class YAPIContext
                 'capture_peer_cert_chain' => true
             )
         );
-        $url = str_replace('http://', 'tls://', $url);
-        $url = str_replace('https://', 'tls://', $url);
-        if (strpos($url, 'tls://') !== 0) {
-            $url = 'tls://' . $url;
-        }
+        $url_detail = YAPI::_parseRegisteredURL($url);
+
+        $baseurl = 'tls://' . $url_detail['host'] . ':' . $url_detail['port'] . $url_detail['subdomain'];
 
         $sslContext = @stream_context_create($contextOptions);
-        $resource = @stream_socket_client($url, $errno, $errstr, 10, STREAM_CLIENT_CONNECT, $sslContext);
+        $resource = @stream_socket_client($baseurl, $errno, $errstr, 10, STREAM_CLIENT_CONNECT, $sslContext);
         if ($resource) {
             $params = stream_context_get_params($resource);
             $ca = "";
