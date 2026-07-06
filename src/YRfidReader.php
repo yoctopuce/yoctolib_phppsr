@@ -746,6 +746,285 @@ class YRfidReader extends YFunction
     }
 
     /**
+     * Writes data provided as a binary object to an RFID tag, using NFC
+     * compatible encoding.
+     * The function will automatically create a NFC Capability Container,
+     * and encapsulate the content with the required NDEF header corresponding
+     * to the given content type.
+     *
+     * @param string $tagId : identifier of the tag to use
+     * @param string $ndefType : the content type, either "U" for a URL, or a
+     *         generic MIME type like "text/vcard"
+     * @param string $payload : the payload of the NDEF record
+     * @param YRfidOptions $options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param YRfidStatus $status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code. When it
+     * happens, you can get more information from the status object.
+     * @throws YAPI_Exception on error
+     */
+    public function tagWriteBinNFC(string $tagId, string $ndefType, string $payload, YRfidOptions $options, YRfidStatus &$status): int
+    {
+        // $tagInfo                is a YRfidTagInfo;
+        // $nfcType                is a int;
+        // $usableSize             is a int;
+        // $nfcBlocks              is a int;
+        // $ccLen                  is a int;
+        // $typeLen                is a int;
+        // $payloadLen             is a int;
+        // $srBit                  is a int;
+        // $ndefLen                is a int;
+        // $tlvHdrLen              is a int;
+        // $totalLen               is a int;
+        // $absPos                 is a int;
+        // $idx                    is a int;
+        // $binType                is a bin;
+        // $buff                   is a bin;
+
+        $tagInfo = $this->get_tagInfo($tagId, $status);
+        // for now, we only allow NFC Type 5 (T5T)
+        $nfcType = $tagInfo->get_tagNFCtype();
+        if (!($nfcType == 5)) return $this->_throw(YAPI::INVALID_ARGUMENT,'no NFC support for $this tag',YAPI::INVALID_ARGUMENT);
+        $usableSize = $tagInfo->get_tagUsableSize();
+        $ccLen = 4;
+        $nfcBlocks = intVal(($usableSize - $ccLen) / 8);
+        if ($nfcBlocks > 255) {
+            if ($nfcType == 5) {
+                $ccLen = 8;
+                $nfcBlocks = intVal(($usableSize - $ccLen) / 8);
+            } else {
+                $nfcBlocks = 255;
+            }
+        }
+        $binType = YAPI::Ystr2bin($ndefType);
+        $typeLen = strlen($binType);
+        $payloadLen = strlen($payload);
+        // compute the total length of the NDEF record
+        $ndefLen = 3 + $typeLen + $payloadLen;
+        $srBit = 0x10;
+        if ($payloadLen > 255) {
+            $ndefLen = $ndefLen + 3;
+            $srBit = 0;
+        }
+        // compute the total length of the TLV record
+        $tlvHdrLen = 2;
+        if ($ndefLen > 254) {
+            $tlvHdrLen = 4;
+        }
+        // make sure the content fits on the tag
+        if (!(($tlvHdrLen + $ndefLen + 1) <= (8 * $nfcBlocks))) return $this->_throw(YAPI::INVALID_ARGUMENT,'content is too large',YAPI::INVALID_ARGUMENT);
+        $totalLen = $ccLen + $tlvHdrLen + $ndefLen + 1;
+        $buff = ($totalLen > 0 ? pack('C',array_fill(0, $totalLen, 0)) : '');
+        // CC header
+        if ($ccLen == 4) {
+            $buff[0] = pack('C', 0xE1);
+            if ($nfcType == 5) {
+                $buff[1] = pack('C', 0x40);
+            } else {
+                $buff[1] = pack('C', 0x10);
+            }
+            $buff[2] = pack('C', $nfcBlocks);
+            $buff[3] = pack('C', 0x00);
+        } else {
+            $buff[0] = pack('C', 0xE2);
+            $buff[1] = pack('C', 0x40);
+            $buff[2] = pack('C', 0x00);
+            $buff[3] = pack('C', 0x01);
+            $buff[4] = pack('C', 0x00);
+            $buff[5] = pack('C', 0x00);
+            $buff[6] = pack('C', intVal($nfcBlocks / 256));
+            $buff[7] = pack('C', ($nfcBlocks & 255));
+        }
+        // TLV header
+        $buff[$ccLen] = pack('C', 3);
+        if ($tlvHdrLen == 2) {
+            $buff[$ccLen + 1] = pack('C', $ndefLen);
+        } else {
+            $buff[$ccLen + 1] = pack('C', 0xff);
+            $buff[$ccLen + 2] = pack('C', intVal($ndefLen / 256));
+            $buff[$ccLen + 3] = pack('C', ($ndefLen & 255));
+        }
+        $absPos = $ccLen + $tlvHdrLen;
+        // NDEF record
+        if ($typeLen <= 3) {
+            // NFC Forum type
+            $buff[$absPos] = pack('C', 0xC1 + $srBit);
+        } else {
+            // MIME type
+            $buff[$absPos] = pack('C', 0xC2 + $srBit);
+        }
+        if ($srBit > 0) {
+            $buff[$absPos + 1] = pack('C', $typeLen);
+            $buff[$absPos + 2] = pack('C', $payloadLen);
+            $absPos = $absPos + 3;
+        } else {
+            $buff[$absPos + 1] = pack('C', $typeLen);
+            $buff[$absPos + 2] = pack('C', 0);
+            $buff[$absPos + 3] = pack('C', 0);
+            $buff[$absPos + 4] = pack('C', intVal($payloadLen / 256));
+            $buff[$absPos + 5] = pack('C', ($payloadLen & 255));
+            $absPos = $absPos + 6;
+        }
+        $idx = 0;
+        while ($idx < $typeLen) {
+            $buff[$absPos + $idx] = pack('C', ord($binType[$idx]));
+            $idx = $idx + 1;
+        }
+        $absPos = $absPos + $typeLen;
+        $idx = 0;
+        while ($idx < $payloadLen) {
+            $buff[$absPos + $idx] = pack('C', ord($payload[$idx]));
+            $idx = $idx + 1;
+        }
+        $absPos = $absPos + $payloadLen;
+        // TLV trailer
+        $buff[$absPos] = pack('C', 0xfe);
+        $idx = $tagInfo->get_tagFirstBlock();
+        return $this->tagWriteBin($tagId, $idx, $buff, $options, $status);
+    }
+
+    /**
+     * Writes an URL to an RFID tag using NFC compatible encoding, so that
+     * mobile phones with NFC support automatically offer to open
+     * the URL when reading the tag.
+     *
+     * @param string $tagId : identifier of the tag to use
+     * @param string $url : the URL to write on the tag
+     * @param YRfidOptions $options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param YRfidStatus $status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code. When it
+     * happens, you can get more information from the status object.
+     * @throws YAPI_Exception on error
+     */
+    public function tagWriteUrlNFC(string $tagId, string $url, YRfidOptions $options, YRfidStatus &$status): int
+    {
+        // $prefix                 is a int;
+        // $binUrl                 is a bin;
+        $prefix = 0;
+        if (substr($url, 0, 8) == 'https://') {
+            $prefix = 4;
+            $url = substr($url, 8, strlen($url) - 8);
+        } else {
+            if (substr($url, 0, 8) == 'http://') {
+                $prefix = 3;
+                $url = substr($url, 7, strlen($url) - 7);
+            }
+        }
+        if (substr($url, 0, 8) == 'www.') {
+            $prefix = $prefix - 2;
+            $url = substr($url, 4, strlen($url) - 4);
+        }
+        $binUrl = YAPI::Ystr2bin('_' . $url);
+        $binUrl[0] = pack('C', $prefix);
+        return $this->tagWriteBinNFC($tagId, 'U', $binUrl, $options, $status);
+    }
+
+    /**
+     * Writes WiFi settings to an RFID tag using NFC compatible encoding, so that
+     * mobile phones with NFC support automatically offer to connect to this WiFi
+     * network.
+     *
+     * @param string $tagId : identifier of the tag to use
+     * @param string $ssid : the SSID of the WiFi network to connect to
+     * @param string $auth : the network authentication type (currently always "WPA2")
+     * @param string $secret : the network password
+     * @param YRfidOptions $options : an YRfidOptions object with the optional
+     *         command execution parameters, such as security key
+     *         if required
+     * @param YRfidStatus $status : an RfidStatus object that will contain
+     *         the detailled status of the operation
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code. When it
+     * happens, you can get more information from the status object.
+     * @throws YAPI_Exception on error
+     */
+    public function tagWriteWifiConfigNFC(string $tagId, string $ssid, string $auth, string $secret, YRfidOptions $options, YRfidStatus &$status): int
+    {
+        // $ssidBin                is a bin;
+        // $ssidLen                is a int;
+        // $secretBin              is a bin;
+        // $secretLen              is a int;
+        // $payloadLen             is a int;
+        // $payload                is a bin;
+        // $idx                    is a int;
+        $ssidBin = YAPI::Ystr2bin($ssid);
+        $ssidLen = strlen($ssidBin);
+        $secretBin = YAPI::Ystr2bin($secret);
+        $secretLen = strlen($secretBin);
+        $payloadLen = $ssidLen + $secretLen + 39;
+        $payload = ($payloadLen > 0 ? pack('C',array_fill(0, $payloadLen, 0)) : '');
+        // Credential header
+        $payload[0] = pack('C', 0x10);
+        $payload[1] = pack('C', 0x0e);
+        $payload[2] = pack('C', 0);
+        $payload[3] = pack('C', $payloadLen - 4);
+        // Network index
+        $payload[4] = pack('C', 0x10);
+        $payload[5] = pack('C', 0x26);
+        $payload[6] = pack('C', 0);
+        $payload[7] = pack('C', 1);
+        $payload[8] = pack('C', 1);
+        // SSID
+        $payload[9] = pack('C', 0x10);
+        $payload[10] = pack('C', 0x45);
+        $payload[11] = pack('C', 0);
+        $payload[12] = pack('C', $ssidLen);
+        $idx = 0;
+        while ($idx < $ssidLen) {
+            $payload[13 + $idx] = pack('C', ord($ssidBin[$idx]));
+            $idx = $idx + 1;
+        }
+        // Auth: WPA2-Personal
+        $payload[13 + $ssidLen] = pack('C', 0x10);
+        $payload[14 + $ssidLen] = pack('C', 0x03);
+        $payload[15 + $ssidLen] = pack('C', 0);
+        $payload[16 + $ssidLen] = pack('C', 2);
+        $payload[17 + $ssidLen] = pack('C', 0);
+        $payload[18 + $ssidLen] = pack('C', 32);
+        // Encryption: AES
+        $payload[19 + $ssidLen] = pack('C', 0x10);
+        $payload[20 + $ssidLen] = pack('C', 0x0f);
+        $payload[21 + $ssidLen] = pack('C', 0);
+        $payload[22 + $ssidLen] = pack('C', 2);
+        $payload[23 + $ssidLen] = pack('C', 0);
+        $payload[24 + $ssidLen] = pack('C', 8);
+        // Network key
+        $payload[25 + $ssidLen] = pack('C', 0x10);
+        $payload[26 + $ssidLen] = pack('C', 0x27);
+        $payload[27 + $ssidLen] = pack('C', 0);
+        $payload[28 + $ssidLen] = pack('C', $secretLen);
+        $idx = 0;
+        while ($idx < $secretLen) {
+            $payload[29 + $ssidLen + $idx] = pack('C', ord($secretBin[$idx]));
+            $idx = $idx + 1;
+        }
+        // MAC broadcast
+        $payload[29 + $ssidLen + $secretLen] = pack('C', 0x10);
+        $payload[30 + $ssidLen + $secretLen] = pack('C', 0x20);
+        $payload[31 + $ssidLen + $secretLen] = pack('C', 0);
+        $payload[32 + $ssidLen + $secretLen] = pack('C', 6);
+        $idx = 0;
+        while ($idx < 6) {
+            $payload[33 + $ssidLen + $secretLen + $idx] = pack('C', 0xff);
+            $idx = $idx + 1;
+        }
+        return $this->tagWriteBinNFC($tagId, 'application/vnd.wfa.wsc', $payload, $options, $status);
+    }
+
+    /**
      * Reads an RFID tag AFI byte (ISO 15693 only).
      *
      * @param string $tagId : identifier of the tag to use

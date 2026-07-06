@@ -32,6 +32,7 @@ class YRfidTagInfo
     protected string $_tagId = "";                           // str
     protected int $_tagType = 0;                            // int
     protected string $_typeStr = "";                           // str
+    protected int $_nfcType = 0;                            // int
     protected int $_size = 0;                            // int
     protected int $_usable = 0;                            // int
     protected int $_blksize = 0;                            // int
@@ -77,6 +78,17 @@ class YRfidTagInfo
     public function get_tagTypeStr(): string
     {
         return $this->_typeStr;
+    }
+
+    /**
+     * Returns the type of NFC type usable on the RFID tag, between 1 and 5.
+     * If no known NFC type is know for the RFID tag, returns zero.
+     *
+     * @return int  an integer corresponding to the RFID tag type
+     */
+    public function get_tagNFCtype(): int
+    {
+        return $this->_nfcType;
     }
 
     /**
@@ -141,6 +153,7 @@ class YRfidTagInfo
     public function imm_init(string $tagId, int $tagType, int $size, int $usable, int $blksize, int $fblk, int $lblk): void
     {
         // $typeStr                is a str;
+        // $nfcType                is a int;
         $typeStr = 'unknown';
         if ($tagType == self::IEC_15693) {
             $typeStr = 'IEC 15693';
@@ -190,9 +203,19 @@ class YRfidTagInfo
         if ($tagType == self::IEC_15693_ICODE_SLI) {
             $typeStr = 'ICODE SLI';
         }
-
+        $nfcType = 0;
+        if (($tagType == self::IEC_14443_MIFARE_ULTRALIGHT) || ($tagType == self::IEC_14443_MIFARE_CLASSIC1K) || ($tagType == self::IEC_14443_MIFARE_CLASSIC4K) || ($tagType == self::IEC_14443_NTAG_213) || ($tagType == self::IEC_14443_NTAG_215) || ($tagType == self::IEC_14443_NTAG_216) || ($tagType == self::IEC_14443_NTAG_424_DNA)) {
+            $nfcType = 2;
+        }
+        if ($tagType == self::IEC_14443_MIFARE_DESFIRE) {
+            $nfcType = 4;
+        }
+        if (($tagType == self::IEC_15693) || ($tagType == self::IEC_15693_ST25DV) || ($tagType == self::IEC_15693_ST25TV) || ($tagType == self::IEC_15693_TAGIT_HFI) || ($tagType == self::IEC_15693_MB89R) || ($tagType == self::IEC_15693_ICODE_DNA) || ($tagType == self::IEC_15693_ICODE_SLI)) {
+            $nfcType = 5;
+        }
         $this->_tagId = $tagId;
         $this->_tagType = $tagType;
+        $this->_nfcType = $nfcType;
         $this->_typeStr = $typeStr;
         $this->_size = $size;
         $this->_usable = $usable;
