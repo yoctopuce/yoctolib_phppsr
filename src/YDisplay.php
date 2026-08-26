@@ -42,11 +42,43 @@ class YDisplay extends YFunction
     const LAYERHEIGHT_INVALID = YAPI::INVALID_UINT;
     const LAYERCOUNT_INVALID = YAPI::INVALID_UINT;
     const COMMAND_INVALID = YAPI::INVALID_STRING;
+    const FASTREFRESH_WHENEVER_POSSIBLE  = 0;
+    const FASTREFRESH_WHENEVER_SUPPORTED = 1;
+    const FASTREFRESH_NEVER              = 2;
+    const FASTREFRESH_INVALID            = 3;
+    const REGENERATE_ON_REQUEST_ONLY     = 0;
+    const REGENERATE_EVERY_DAY           = 1;
+    const REGENERATE_EVERY_12H           = 2;
+    const REGENERATE_EVERY_6H            = 3;
+    const REGENERATE_EVERY_3H            = 4;
+    const REGENERATE_EVERY_2H            = 5;
+    const REGENERATE_EVERY_HOUR          = 6;
+    const REGENERATE_EVERY_30MIN         = 7;
+    const REGENERATE_EVERY_15MIN         = 8;
+    const REGENERATE_EVERY_480           = 9;
+    const REGENERATE_EVERY_432           = 10;
+    const REGENERATE_EVERY_360           = 11;
+    const REGENERATE_EVERY_288           = 12;
+    const REGENERATE_EVERY_240           = 13;
+    const REGENERATE_EVERY_192           = 14;
+    const REGENERATE_EVERY_144           = 15;
+    const REGENERATE_EVERY_96            = 16;
+    const REGENERATE_EVERY_48            = 17;
+    const REGENERATE_EVERY_36            = 18;
+    const REGENERATE_EVERY_24            = 19;
+    const REGENERATE_EVERY_12            = 20;
+    const REGENERATE_EVERY_10            = 21;
+    const REGENERATE_EVERY_8             = 22;
+    const REGENERATE_EVERY_6             = 23;
+    const REGENERATE_EVERY_4             = 24;
+    const REGENERATE_ALWAYS              = 25;
+    const REGENERATE_INVALID             = 26;
     const DISPLAYSTATE_FAILURE           = 0;
     const DISPLAYSTATE_OFF               = 1;
     const DISPLAYSTATE_POWERING          = 2;
     const DISPLAYSTATE_IDLE              = 3;
     const DISPLAYSTATE_REFRESHING        = 4;
+    const DISPLAYSTATE_INVALID           = 5;
     //--- (end of generated code: YDisplay declaration)
 
     //--- (generated code: YDisplay attributes)
@@ -188,12 +220,12 @@ class YDisplay extends YFunction
     }
 
     /**
-     * Changes the name of the sequence to play when the displayed is powered on.
+     * Changes the name of the sequence to play when the display is powered on.
      * Remember to call the saveToFlash() method of the module if the
      * modification must be kept.
      *
-     * @param string $newval : a string corresponding to the name of the sequence to play when the
-     * displayed is powered on
+     * @param string $newval : a string corresponding to the name of the sequence to play when the display
+     * is powered on
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
      *
@@ -290,7 +322,10 @@ class YDisplay extends YFunction
     }
 
     /**
-     * Returns the currently selected display orientation.
+     * Returns the currently selected display orientation. The orientation is defined as the side of the
+     * screen where the
+     * USB connector (for OLED displays) or the ribbon cable (for ePaper panels) is located when the
+     * display is up straight.
      *
      * @return int  a value among YDisplay::ORIENTATION_LEFT, YDisplay::ORIENTATION_UP,
      * YDisplay::ORIENTATION_RIGHT and YDisplay::ORIENTATION_DOWN corresponding to the currently selected
@@ -312,7 +347,9 @@ class YDisplay extends YFunction
     }
 
     /**
-     * Changes the display orientation. Remember to call the saveToFlash()
+     * Changes the display orientation. he orientation is defined as the side of the screen where the
+     * USB connector (for OLED displays) or the ribbon cable (for ePaper panels) is located when the
+     * display is up straight. Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
      * @param int $newval : a value among YDisplay::ORIENTATION_LEFT, YDisplay::ORIENTATION_UP,
@@ -326,7 +363,9 @@ class YDisplay extends YFunction
     public function set_orientation(int $newval): int
     {
         $rest_val = strval($newval);
-        return $this->_setAttr("orientation", $rest_val);
+        $res = $this->_setAttr("orientation", $rest_val);
+        $this->_clearLazyCache();
+        return $res;
     }
 
     /**
@@ -352,8 +391,7 @@ class YDisplay extends YFunction
     /**
      * Changes the model of display to match the connected display panel.
      * This function has no effect if the module does not support the selected
-     * display panel.
-     * Remember to call the saveToFlash()
+     * display panel. Remember to call the saveToFlash()
      * method of the module if the modification must be kept.
      *
      * @param string $newval : a string corresponding to the model of display to match the connected display panel
@@ -366,7 +404,9 @@ class YDisplay extends YFunction
     public function set_displayPanel(string $newval): int
     {
         $rest_val = $newval;
-        return $this->_setAttr("displayPanel", $rest_val);
+        $res = $this->_setAttr("displayPanel", $rest_val);
+        $this->_clearLazyCache();
+        return $res;
     }
 
     /**
@@ -410,11 +450,11 @@ class YDisplay extends YFunction
     }
 
     /**
-     * Returns the display type: monochrome OLED, black and white ePaper, color ePaper, etc.
+     * Returns the display type: monochrome OLED, black and white ePaper, color ePaper, and so on.
      *
      * @return int  a value among YDisplay::DISPLAYTYPE_MONO, YDisplay::DISPLAYTYPE_EPAPER_BW,
      * YDisplay::DISPLAYTYPE_EPAPER_BWR and YDisplay::DISPLAYTYPE_EPAPER_BWRY corresponding to the display
-     * type: monochrome OLED, black and white ePaper, color ePaper, etc
+     * type: monochrome OLED, black and white ePaper, color ePaper, and so on
      *
      * On failure, throws an exception or returns YDisplay::DISPLAYTYPE_INVALID.
      * @throws YAPI_Exception on error
@@ -606,8 +646,128 @@ class YDisplay extends YFunction
     }
 
     /**
+     * Returns the fast refresh usage policy in use (ePaper displays only).
+     * This setting is combined with the regenerate policy to determine when the screen
+     * should be updated using a fast update versus or regenerated using a slower,
+     * flickering full refresh.
+     *
+     * @return int  a value among the YDisplay::FASTREFRESH enumeration
+     *         (YDisplay::FASTREFRESH_WHENEVER_POSSIBLE,
+     *         YDisplay::FASTREFRESH_WHENEVER_SUPPORTED,
+     *         YDisplay::FASTREFRESH_NEVER).
+     *
+     * On failure, throws an exception or returns YDisplay::FASTREFRESH_INVALID.
+     * @throws YAPI_Exception on error
+     */
+    public function get_fastRefreshPolicy(): int
+    {
+        // $combined               is a int;
+        // $fmod                   is a int;
+        $combined = $this->get_brightness();
+        if ($combined < 0) {
+            return self::FASTREFRESH_INVALID;
+        }
+        $fmod = intVal($combined / 25);
+        if ($fmod >= 2) {
+            $fmod = $fmod - 2;
+        }
+        return $fmod;
+    }
+
+    /**
+     * Returns the display regeneration minimal frequency (ePaper displays only).
+     * This setting is combined with the fast refresh usage policy to determine
+     * when the screen should be updated using a fast update versus or regenerated
+     * using a slower, flickering full refresh. To change the display regeneration minimal
+     * frequency, use methode set_fastRefreshPolicy().
+     *
+     * @return int  a value among the YDisplay::REGENERATE enumeration
+     *         (YDisplay::REGENERATE_ON_REQUEST_ONLY,
+     *         YDisplay::REGENERATE_EVERY_DAY, YDisplay::REGENERATE_EVERY_12H,
+     *         YDisplay::REGENERATE_EVERY_6H, YDisplay::REGENERATE_EVERY_3H,
+     *         YDisplay::REGENERATE_EVERY_2H, YDisplay::REGENERATE_EVERY_HOUR,
+     *         YDisplay::REGENERATE_EVERY_30MIN, YDisplay::REGENERATE_EVERY_15MIN,
+     *         YDisplay::REGENERATE_EVERY_480, YDisplay::REGENERATE_EVERY_432,
+     *         YDisplay::REGENERATE_EVERY_360, YDisplay::REGENERATE_EVERY_288,
+     *         YDisplay::REGENERATE_EVERY_240, YDisplay::REGENERATE_EVERY_192,
+     *         YDisplay::REGENERATE_EVERY_144, YDisplay::REGENERATE_EVERY_96,
+     *         YDisplay::REGENERATE_EVERY_48, YDisplay::REGENERATE_EVERY_36,
+     *         YDisplay::REGENERATE_EVERY_24, YDisplay::REGENERATE_EVERY_12,
+     *         YDisplay::REGENERATE_EVERY_10, YDisplay::REGENERATE_EVERY_8,
+     *         YDisplay::REGENERATE_EVERY_6, YDisplay::REGENERATE_EVERY_4,
+     *         YDisplay::REGENERATE_ALWAYS).
+     *
+     * On failure, throws an exception or returns YDisplay::REGENERATE_INVALID.
+     * @throws YAPI_Exception on error
+     */
+    public function get_regeneratePolicy(): int
+    {
+        // $combined               is a int;
+        // $fval                   is a int;
+        $combined= $this->get_brightness();
+        if ($combined < 0) {
+            return self::REGENERATE_INVALID;
+        }
+        if ($combined >= 100) {
+            $fval = 25;
+        } else {
+            $fval = ($combined % 25);
+        }
+        return $fval;
+    }
+
+    /**
+     * Changes the fast refresh usage policy and display regeneration minimal frequency
+     * (ePaper displays only). These settings jointly determine when the screen should be
+     * updated using a fast update versus or regenerated using a slower, flickering full
+     * refresh.
+     *
+     * @param fastRefresh : a value among the YDisplay::FASTREFRESH enumeration
+     *         (YDisplay::FASTREFRESH_WHENEVER_POSSIBLE,
+     *         YDisplay::FASTREFRESH_WHENEVER_SUPPORTED,
+     *         YDisplay::FASTREFRESH_NEVER),
+     *         corresponding to the policy for using fast refresh.
+     * @param regenerate : a value among the enumeration YRefFrame.REGENERATE
+     *         (YDisplay::REGENERATE_ON_REQUEST_ONLY,
+     *         YDisplay::REGENERATE_EVERY_DAY, YDisplay::REGENERATE_EVERY_12H,
+     *         YDisplay::REGENERATE_EVERY_6H, YDisplay::REGENERATE_EVERY_3H,
+     *         YDisplay::REGENERATE_EVERY_2H, YDisplay::REGENERATE_EVERY_HOUR,
+     *         YDisplay::REGENERATE_EVERY_30MIN, YDisplay::REGENERATE_EVERY_15MIN,
+     *         YDisplay::REGENERATE_EVERY_480, YDisplay::REGENERATE_EVERY_432,
+     *         YDisplay::REGENERATE_EVERY_360, YDisplay::REGENERATE_EVERY_288,
+     *         YDisplay::REGENERATE_EVERY_240, YDisplay::REGENERATE_EVERY_192,
+     *         YDisplay::REGENERATE_EVERY_144, YDisplay::REGENERATE_EVERY_96,
+     *         YDisplay::REGENERATE_EVERY_48, YDisplay::REGENERATE_EVERY_36,
+     *         YDisplay::REGENERATE_EVERY_24, YDisplay::REGENERATE_EVERY_12,
+     *         YDisplay::REGENERATE_EVERY_10, YDisplay::REGENERATE_EVERY_8,
+     *         YDisplay::REGENERATE_EVERY_6, YDisplay::REGENERATE_EVERY_4,
+     *         YDisplay::REGENERATE_ALWAYS),
+     *         corresponding to the display minimal regeneration frequency.
+     *
+     * Remember to call the saveToFlash()
+     * method of the module if the modification must be kept.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function set_fastRefreshPolicy(int $fastRefresh, int $regenerate): int
+    {
+        // $combined               is a int;
+        // $fmod                   is a int;
+        // $fval                   is a int;
+        $fmod = $fastRefresh;
+        $fval = $regenerate;
+        if (($fval == 25) || ($fmod == 2)) {
+            $combined = 100;
+        } else {
+            $combined = 50 + $fmod * 25 + $fval;
+        }
+        return $this->set_brightness($combined);
+    }
+
+    /**
      * Clears the display screen and resets all display layers to their default state.
-     * Using this function in a sequence will kill the sequence play-back. Don't use that
+     * Using this function in a sequence will kill the sequence play-back. Do not use that
      * function to reset the display at sequence start-up.
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
@@ -704,7 +864,7 @@ class YDisplay extends YFunction
     }
 
     /**
-     * Trigger an immediate screen refresh. The combination of
+     * Triggers an immediate screen refresh. The combination of
      * postponeRefresh and triggerRefresh can be used as an
      * alternative to double-buffering to avoid flickering during display updates.
      *
@@ -1117,6 +1277,215 @@ class YDisplay extends YFunction
             $srcpos = $srcpos + 1;
         }
         return $rotmap;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function gifEncode(string $pixmap, array $palette, int $w, bool $shortHdr): string
+    {
+        // $minCodeSize            is a int;
+        // $LZW_CLRCODE            is a int;
+        // $LZW_ENDCODE            is a int;
+        // $LZW_1STCODE            is a int;
+        // $codeSize               is a int;
+        // $maxCode                is a int;
+        $codes = [];            // intArr;
+        // $nCodes                 is a int;
+        // $pixmapSize             is a int;
+        // $dataStream             is a bin;
+        // $blockStart             is a int;
+        // $blockEnd               is a int;
+        // $prevCode               is a int;
+        // $pixPos                 is a int;
+        // $wrBits                 is a int;
+        // $wrBitCnt               is a int;
+        // $outPos                 is a int;
+        // $nextVal                is a int;
+        // $i                      is a int;
+        // $hdrSize                is a int;
+        // $res                    is a bin;
+        // $h                      is a int;
+
+        if (sizeof($palette) > 8) {
+            $this->_throw(YAPI::INVALID_ARGUMENT, 'Palette should have no more than 8 colors');
+            $res = '';
+            return $res;
+        }
+        if (sizeof($palette) <= 4) {
+            $minCodeSize = 2;
+        } else {
+            $minCodeSize = 3;
+        }
+        $LZW_CLRCODE = (1 << $minCodeSize);
+        $LZW_ENDCODE = $LZW_CLRCODE + 1;
+        $LZW_1STCODE = $LZW_ENDCODE + 1;
+        $codeSize = $minCodeSize + 1;
+        $maxCode = (1 << $codeSize) - 1 - $LZW_1STCODE;
+        while (sizeof($codes) > 0) {
+            array_pop($codes);
+        };
+        $nCodes = 0;
+        $pixmapSize = strlen($pixmap);
+        $dataStream = (intVal((2 * $pixmapSize) / 3) + 8 > 0 ? pack('C',array_fill(0, intVal((2 * $pixmapSize) / 3) + 8, 0)) : '');
+        $outPos = 0;
+        $wrBits = $LZW_CLRCODE;
+        $wrBitCnt = 3;
+        // prefetch first byte
+        $prevCode = ord($pixmap[0]);
+        $pixPos = 1;
+        while ($pixPos < $pixmapSize + 3) {
+            $blockStart = $outPos;
+            $outPos = $blockStart + 1;
+            $blockEnd = $blockStart + 256;
+            // flush any carry-over output byte from previous data sub-block
+            while ($wrBitCnt >= 8) {
+                $dataStream[$outPos] = pack('C', ($wrBits & 0xff));
+                $outPos = $outPos + 1;
+                $wrBits = ($wrBits >> 8);
+                $wrBitCnt = $wrBitCnt - 8;
+            }
+            while (($outPos < $blockEnd) && ($pixPos < $pixmapSize)) {
+                // search for an existing code matching the running input segment
+                // printf("[%d] ", rdBits >> 12);
+                $nextVal = ($prevCode | (ord($pixmap[$pixPos]) << 12));
+                $pixPos = $pixPos + 1;
+                if ($prevCode < $LZW_1STCODE) {
+                    $i = 0;
+                } else {
+                    $i = $prevCode - $LZW_ENDCODE;
+                }
+                while (($i < $nCodes) && ($codes[$i] != $nextVal)) {
+                    $i = $i + 1;
+                }
+                if ($i >= $nCodes) {
+                    // not found, emit prevCode and create new code
+                    $wrBits = ($wrBits | ($prevCode << $wrBitCnt));
+                    $wrBitCnt = $wrBitCnt + $codeSize;
+                    if ($nCodes <= $maxCode) {
+                        //fprintf(stderr, "#%d: #%d + %d\n", nextCode, nextVal & 63, nextVal >> 6);
+                        $codes[] = $nextVal;
+                        $nCodes = $nCodes + 1;
+                    } else {
+                        $codeSize = $codeSize + 1;
+                        if ($codeSize <= 12) {
+                            //fprintf(stderr, "#%d: #%d + %d\n", nextCode, nextVal & 63, nextVal >> 6);
+                            $codes[] = $nextVal;
+                            $nCodes = $nCodes + 1;
+                        } else {
+                            $wrBits = ($wrBits | ($LZW_CLRCODE << $wrBitCnt));
+                            $wrBitCnt = $wrBitCnt + $codeSize;
+                            while (sizeof($codes) > 0) {
+                                array_pop($codes);
+                            };
+                            $nCodes = 0;
+                            $codeSize = $minCodeSize + 1;
+                        }
+                        $maxCode = (1 << $codeSize) - 1 - $LZW_1STCODE;
+                    }
+                    // flush one (or two) codes to output stream
+                    while (($wrBitCnt >= 8) && ($outPos < $blockEnd)) {
+                        $dataStream[$outPos] = pack('C', ($wrBits & 0xff));
+                        $outPos = $outPos + 1;
+                        $wrBits = ($wrBits >> 8);
+                        $wrBitCnt = $wrBitCnt - 8;
+                    }
+                    $prevCode = ($nextVal >> 12);
+                } else {
+                    $prevCode = $i + $LZW_1STCODE;
+                }
+            }
+            if ($pixPos >= $pixmapSize) {
+                if (($outPos < $blockEnd) && ($pixPos == $pixmapSize)) {
+                    // append code for last run
+                    $wrBits = ($wrBits | ($prevCode << $wrBitCnt));
+                    $wrBitCnt = $wrBitCnt + $codeSize;
+                    while (($wrBitCnt >= 8) && ($outPos < $blockEnd)) {
+                        $dataStream[$outPos] = pack('C', ($wrBits & 0xff));
+                        $outPos = $outPos + 1;
+                        $wrBits = ($wrBits >> 8);
+                        $wrBitCnt = $wrBitCnt - 8;
+                    }
+                    $pixPos = $pixPos + 1;
+                }
+                if (($outPos < $blockEnd) && ($pixPos == $pixmapSize + 1)) {
+                    // append end code
+                    $wrBits = ($wrBits | ($LZW_ENDCODE << $wrBitCnt));
+                    $wrBitCnt = $wrBitCnt + $codeSize;
+                    while (($wrBitCnt >= 8) && ($outPos < $blockEnd)) {
+                        $dataStream[$outPos] = pack('C', ($wrBits & 0xff));
+                        $outPos = $outPos + 1;
+                        $wrBits = ($wrBits >> 8);
+                        $wrBitCnt = $wrBitCnt - 8;
+                    }
+                    $pixPos = $pixPos + 1;
+                }
+                if (($outPos < $blockEnd) && ($pixPos == $pixmapSize + 2)) {
+                    // flush last 0-7 bits
+                    if ($wrBitCnt > 0) {
+                        $dataStream[$outPos] = pack('C', ($wrBits & 0xff));
+                        $outPos = $outPos + 1;
+                        $wrBitCnt = 0;
+                    }
+                    $pixPos = $pixPos + 1;
+                }
+            }
+            $dataStream[$blockStart] = pack('C', $outPos - ($blockStart + 1));
+        }
+        $blockEnd = $outPos;
+        // Now write final buffer
+        $hdrSize = 24 + $LZW_CLRCODE * 3;
+        $res = ($hdrSize + $outPos + 2 > 0 ? pack('C',array_fill(0, $hdrSize + $outPos + 2, 0)) : '');
+        // GIF89a header
+        $res[0x00] = pack('C', 0x47);
+        $res[0x01] = pack('C', 0x49);
+        $res[0x02] = pack('C', 0x46);
+        $res[0x03] = pack('C', 0x38);
+        $res[0x04] = pack('C', 0x39);
+        $res[0x05] = pack('C', 0x61);
+        // Logical screen descriptor
+        $h = intVal(strlen($pixmap) / $w);
+        $res[0x06] = pack('C', ($w & 0xff));
+        $res[0x07] = pack('C', ($w >> 8));
+        $res[0x08] = pack('C', ($h & 0xff));
+        $res[0x09] = pack('C', ($h >> 8));
+        $res[0x0a] = pack('C', 0xf0 + $minCodeSize - 1);
+        $res[0x0b] = pack('C', 0);
+        $res[0x0c] = pack('C', 0);
+        // Palette
+        $outPos = 0x0d;
+        $i = 0;
+        while ($i < $LZW_CLRCODE) {
+            if ($i < sizeof($palette)) {
+                $wrBits = $palette[$i];
+                $res[$outPos] = pack('C', (($wrBits >> 16) & 0xff));
+                $res[$outPos + 1] = pack('C', (($wrBits >> 8) & 0xff));
+                $res[$outPos + 2] = pack('C', ($wrBits & 0xff));
+            }
+            $outPos = $outPos + 3;
+            $i = $i + 1;
+        }
+        // Image descriptor
+        $res[$outPos] = pack('C', 0x2c);
+        $res[$outPos + 5] = pack('C', ($w & 0xff));
+        $res[$outPos + 6] = pack('C', ($w >> 8));
+        $res[$outPos + 7] = pack('C', ($h & 0xff));
+        $res[$outPos + 8] = pack('C', ($h >> 8));
+        $outPos = $outPos + 10;
+        // Prepare to append Image data
+        $res[$outPos] = pack('C', $minCodeSize);
+        $i = 0;
+        while ($i < $blockEnd) {
+            $outPos = $outPos + 1;
+            $res[$outPos] = pack('C', ord($dataStream[$i]));
+            $i = $i + 1;
+        }
+        // Append zero-block and trailer
+        $outPos = $outPos + 1;
+        $res[$outPos] = pack('C', 0);
+        $outPos = $outPos + 1;
+        $res[$outPos] = pack('C', 0x3b);
+        return $res;
     }
 
     /**

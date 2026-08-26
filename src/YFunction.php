@@ -970,6 +970,13 @@ class YFunction
         }
     }
 
+    // Internal method to force reloading even lazy attributes (eg. displayWidth, etc)
+    public function _clearLazyCache(): void
+    {
+        $this->clearCache();
+        $this->_cacheExpiration = 0;
+    }
+
     /**
      * Gets the YModule object for the device on which the function is located.
      * If the function cannot be located on any module, the returned instance of

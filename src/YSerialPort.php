@@ -58,6 +58,11 @@ class YSerialPort extends YFunction
     protected int $_rxbuffptr = 0;                            // int
     protected int $_eventPos = 0;                            // int
     protected mixed $_eventCallback = null;                         // YSnoopingCallback
+    protected string $_xyproto = "";                           // str
+    protected string $_xyfname = "";                           // str
+    protected string $_xyfdata = "";                           // bin
+    protected int $_xytotal = 0;                            // int
+    protected int $_xysent = 0;                            // int
 
     //--- (end of generated code: YSerialPort attributes)
 
@@ -1462,22 +1467,26 @@ class YSerialPort extends YFunction
             // first simulated event, use it only to initialize reference values
             $this->_eventPos = 0;
         }
-
-        $url = sprintf('rxmsg.json?pos=%d&maxw=0&t=0', $this->_eventPos);
-        $msgbin = $this->_download($url);
-        $msgarr = $this->_json_get_array($msgbin);
-        $msglen = sizeof($msgarr);
-        if ($msglen == 0) {
-            return YAPI::SUCCESS;
-        }
-        // last element of array is the new position
-        $msglen = $msglen - 1;
-        if (!(!is_null($this->_eventCallback))) {
-            // first simulated event, use it only to initialize reference values
+        try {
+            $url = sprintf('rxmsg.json?pos=%d&maxw=0&t=0', $this->_eventPos);
+            $msgbin = $this->_download($url);
+            $msgarr = $this->_json_get_array($msgbin);
+            $msglen = sizeof($msgarr);
+            if ($msglen == 0) {
+                return YAPI::SUCCESS;
+            }
+            // last element of array is the new position
+            $msglen = $msglen - 1;
+            if (!(!is_null($this->_eventCallback))) {
+                // first simulated event, use it only to initialize reference values
+                $this->_eventPos = $this->_decode_json_int($msgarr[$msglen]);
+                return YAPI::SUCCESS;
+            }
             $this->_eventPos = $this->_decode_json_int($msgarr[$msglen]);
-            return YAPI::SUCCESS;
+        } catch (Exception $ex) {
+            return YAPI::IO_ERROR;
         }
-        $this->_eventPos = $this->_decode_json_int($msgarr[$msglen]);
+
         $idx = 0;
         while ($idx < $msglen) {
             call_user_func($this->_eventCallback, $this, new YSnoopingRecord(YAPI::Ybin2str($msgarr[$idx])));
@@ -2055,6 +2064,216 @@ class YSerialPort extends YFunction
             $regpos = $regpos + 1;
         }
         return $res;
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function _xymodemQueue(string $proto, string $fname, string $buff, int $timeoutSec): int
+    {
+        if (strlen($this->_xyproto) > 0) {
+            $this->_throw(YAPI::DEVICE_BUSY, 'file transfer already in progress');
+            return YAPI::DEVICE_BUSY;
+        }
+        $this->_xyproto = $proto;
+        $this->_xyfname = $fname;
+        $this->_xyfdata = $buff;
+        $this->_xytotal = strlen($buff);
+        $this->_xysent = 0;
+        return $this->_xymodemProcess($timeoutSec);
+    }
+
+    /**
+     * @throws YAPI_Exception on error
+     */
+    public function _xymodemProcess(int $timeoutSec): int
+    {
+        // $proto                  is a str;
+        // $blksize                is a int;
+        // $cnt                    is a int;
+        // $datablock              is a bin;
+        // $namesuffix             is a str;
+        // $fullproto              is a str;
+        // $json                   is a bin;
+        // $jsonStr                is a str;
+        // $errStr                 is a str;
+        // $sentBytes              is a int;
+        // $empty                  is a bin;
+        $proto = $this->_xyproto;
+        if (strlen($proto) == 0) {
+            $this->_throw(YAPI::INVALID_ARGUMENT, 'no file transfer in progress');
+            return YAPI::INVALID_ARGUMENT;
+        }
+        // create a data block up to 1k
+        $blksize = $this->_xytotal - $this->_xysent;
+        if ($blksize > 1024) {
+            $blksize = 1024;
+        }
+        $datablock = ($blksize > 0 ? pack('C',array_fill(0, $blksize, 0)) : '');
+        $cnt = 0;
+        while ($cnt < $blksize) {
+            $datablock[$cnt] = pack('C', ord($this->_xyfdata[$this->_xysent + $cnt]));
+            $cnt = $cnt + 1;
+        }
+        $namesuffix = '';
+        if ($this->_xysent == 0) {
+            if (substr($proto, 0, 6) == 'ymodem') {
+                $namesuffix = sprintf(':%s', $this->_xyfname);
+            }
+        } else {
+            $namesuffix = '+';
+        }
+        if ($this->_xytotal > $this->_xysent + $blksize) {
+            $fullproto = sprintf('%s-t%d-m%s', $proto, $timeoutSec, $namesuffix);
+        } else {
+            $fullproto = sprintf('%s-t%d%s', $proto, $timeoutSec, $namesuffix);
+        }
+
+        // backup _xyproto and clear it, to drop transfer in case of exception
+        $this->_xyproto = '';
+        $json = $this->_uploadEx($fullproto, $datablock);
+        if (strlen($json) == 0) {
+            $this->_throw(YAPI::IO_ERROR, 'failed to receive result from device');
+            return YAPI::IO_ERROR;
+        }
+        $jsonStr = YAPI::Ybin2str($json);
+        $errStr = $this->_json_get_key($json, 'err');
+        if (strlen($errStr) > 0) {
+            $this->_throw(YAPI::IO_ERROR, $errStr);
+            return YAPI::IO_ERROR;
+        }
+        $sentBytes = intVal($this->_json_get_key($json, 'sent'));
+        if ($sentBytes >= $this->_xytotal) {
+            // done, free binary buffer
+            $empty = '';
+            $this->_xyfdata = $empty;
+            return 100;
+        }
+        $this->_xyproto = $proto;
+        $this->_xysent = $sentBytes;
+        return intVal((100 * $sentBytes) / ($this->_xytotal));
+    }
+
+    /**
+     * Initiates a buffer transmit to the serial port using the standard XMODEM protocol.
+     * The function will block until the XMODEM receiver triggers the transfer,
+     * up to the specified timeout.
+     * Once the transfer is started, the function returns the current percentage
+     * of completion. The caller should then invoke method
+     * xmodemUploadMore() until it returns 100 (percent).
+     *
+     * @param string $buff : the binary buffer to send
+     * @param int $timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     *
+     * @return int  an integer in the range 0 to 100 (percentage of completion),
+     *         or a negative error code in case of failure.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function xmodemUpload(string $buff, int $timeoutSec): int
+    {
+        return $this->_xymodemQueue('xmodem', '', $buff, $timeoutSec);
+    }
+
+    /**
+     * Continues a standard XMODEM upload previously started with xmodemUpload.
+     * The function will block until the data sent has been acknowledged by receiver,
+     * up to the specified timeout, and return the current percentage of completion.
+     * It should be called continuously until it returns the 100 (percent).
+     *
+     * @param int $timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     *
+     * @return int  an integer in the range 0 to 100 (percentage of completion),
+     *         or a negative error code in case of failure.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function xmodemUploadMore(int $timeoutSec): int
+    {
+        return $this->_xymodemProcess($timeoutSec);
+    }
+
+    /**
+     * Initiates a buffer transmit to the serial port using the standard XMODEM-1k protocol.
+     * The function will block until the XMODEM receiver triggers the transfer,
+     * up to the specified timeout.
+     * Once the transfer is started, the function returns the current percentage
+     * of completion. The caller should then invoke method
+     * xmodem1kUploadMore() until it returns 100 (percent).
+     *
+     * @param string $buff : the binary buffer to send
+     * @param int $timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function xmodem1kUpload(string $buff, int $timeoutSec): int
+    {
+        return $this->_xymodemQueue('xmodem-1k', '', $buff, $timeoutSec);
+    }
+
+    /**
+     * Continues a XMODEM-1k upload previously started with xmodem1kUpload.
+     * The function will block until the data sent has been acknowledged by receiver,
+     * up to the specified timeout, and return the current percentage of completion.
+     * It should be called continuously until it returns the 100 (percent).
+     *
+     * @param int $timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     *
+     * @return int  an integer in the range 0 to 100 (percentage of completion),
+     *         or a negative error code in case of failure.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function xmodem1kUploadMore(int $timeoutSec): int
+    {
+        return $this->_xymodemProcess($timeoutSec);
+    }
+
+    /**
+     * Initiates a buffer transmit to the serial port using the standard YMODEM protocol.
+     * The function will block until the YMODEM receiver triggers the transfer,
+     * up to the specified timeout.
+     * Once the transfer is started, the function returns the current percentage
+     * of completion. The caller should then invoke method
+     * ymodemUploadMore() until it returns 100 (percent).
+     *
+     * @param string $filename : the filename associated with the data in the buffer
+     * @param string $buff : the binary buffer to send
+     * @param int $timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function ymodemUpload(string $filename, string $buff, int $timeoutSec): int
+    {
+        return $this->_xymodemQueue('ymodem', $filename, $buff, $timeoutSec);
+    }
+
+    /**
+     * Continues a YMODEM upload previously started with ymodemUpload.
+     * The function will block until the data sent has been acknowledged by receiver,
+     * up to the specified timeout, and return the current percentage of completion.
+     * It should be called continuously until it returns the 100 (percent).
+     *
+     * @param int $timeoutSec : the timeout before aborting send (e.g. 60 sec)
+     *
+     * @return int  an integer in the range 0 to 100 (percentage of completion),
+     *         or a negative error code in case of failure.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function ymodemUploadMore(int $timeoutSec): int
+    {
+        return $this->_xymodemProcess($timeoutSec);
     }
 
     /**

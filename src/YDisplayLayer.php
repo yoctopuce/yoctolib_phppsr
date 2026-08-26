@@ -92,7 +92,7 @@ class YDisplayLayer
     {
         // $res                    is a int;
         $res = YAPI::SUCCESS;
-        if (strlen($this->_cmdbuff) + strlen($cmd) >= 100) {
+        if (strlen($this->_cmdbuff) + strlen($cmd) >= 64) {
             // force flush before, to prevent overflow
             $this->flush_now();
         }
@@ -446,6 +446,18 @@ class YDisplayLayer
      */
     public function drawText(int $x, int $y, int $anchor, string $text): int
     {
+        // $textlen                is a int;
+        // $destname               is a str;
+        $textlen = strlen($text);
+        if ($textlen > 60) {
+            if ($textlen > 1000) {
+                $this->_display->_throw(YAPI::INVALID_ARGUMENT, 'text too large (max 1000 characters)');
+                return YAPI::INVALID_ARGUMENT;
+            }
+            $this->_display->flushLayers();
+            $destname = sprintf('layer%d:T%d,%d,%d,',$this->_id,$x,$y,$anchor);
+            return $this->_display->upload($destname,YAPI::Ystr2bin($text));
+        }
         return $this->command_flush(sprintf('T%d,%d,%d,%s%c',$x,$y,$anchor,$text,27));
     }
 
@@ -470,34 +482,6 @@ class YDisplayLayer
     }
 
     /**
-     * Draws a bitmap at the specified position. The bitmap is provided as a binary object,
-     * where each pixel maps to a bit, from left to right and from top to bottom.
-     * The most significant bit of each byte maps to the leftmost pixel, and the least
-     * significant bit maps to the rightmost pixel. Bits set to 1 are drawn using the
-     * layer selected pen color. Bits set to 0 are drawn using the specified background
-     * gray level, unless -1 is specified, in which case they are not drawn at all
-     * (as if transparent).
-     *
-     * @param int $x : the distance from left of layer to the left of the bitmap, in pixels
-     * @param int $y : the distance from top of layer to the top of the bitmap, in pixels
-     * @param int $w : the width of the bitmap, in pixels
-     * @param string $bitmap : a binary object
-     * @param int $bgcol : the background gray level to use for zero bits (0 = black,
-     *         255 = white), or -1 to leave the pixels unchanged
-     *
-     * @return int  YAPI::SUCCESS if the call succeeds.
-     *
-     * On failure, throws an exception or returns a negative error code.
-     * @throws YAPI_Exception on error
-     */
-    public function drawBitmap(int $x, int $y, int $w, string $bitmap, int $bgcol): int
-    {
-        // $destname               is a str;
-        $destname = sprintf('layer%d:%d,%d@%d,%d',$this->_id,$w,$bgcol,$x,$y);
-        return $this->_display->upload($destname,$bitmap);
-    }
-
-    /**
      * Draws a GIF image provided as a binary buffer at the specified position.
      * If the image drawing must be included in an animation sequence, save it
      * in the device filesystem first and use drawImage instead.
@@ -514,8 +498,91 @@ class YDisplayLayer
     public function drawGIF(int $x, int $y, string $gifimage): int
     {
         // $destname               is a str;
+        $this->_display->flushLayers();
         $destname = sprintf('layer%d:G,-1@%d,%d',$this->_id,$x,$y);
         return $this->_display->upload($destname,$gifimage);
+    }
+
+    /**
+     * Draws a bitmap at the specified position. The bitmap is provided as a binary object,
+     * where each pixel maps to a bit, from left to right and from top to bottom.
+     * The most significant bit of each byte maps to the leftmost pixel, and the least
+     * significant bit maps to the rightmost pixel. Bits set to 1 are drawn using the
+     * layer selected pen color. Bits set to 0 are drawn using the specified background
+     * color, unless NO_INK (-1) is specified, in which case they are not
+     * drawn at all (as if transparent).
+     *
+     * @param int $x : the distance from left of layer to the left of the bitmap, in pixels
+     * @param int $y : the distance from top of layer to the top of the bitmap, in pixels
+     * @param int $w : the width of the bitmap, in pixels
+     * @param string $bitmap : a binary object
+     * @param int $bgcol : the RGB background color to use for zero bits, as a 24-bit RGB value,
+     *         or one of the constants NO_INK, FG_INK or BG_INK
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function drawBitmap(int $x, int $y, int $w, string $bitmap, int $bgcol): int
+    {
+        // $destname               is a str;
+        // $r                      is a int;
+        // $g                      is a int;
+        // $b                      is a int;
+        // $rgbcol                 is a str;
+        if (($w < 0) || ($w > 512)) {
+            $this->_display->_throw(YAPI::INVALID_ARGUMENT, 'bitmap width must be in range 1->.512');
+            return YAPI::INVALID_ARGUMENT;
+        }
+        $this->_display->flushLayers();
+        if ($bgcol <= 255) {
+            if ($bgcol >= -1) {
+                // backward-compatible behaviour (gray level)
+                $rgbcol = sprintf('%d',$bgcol);
+            } else {
+                // background color or foreground color
+                if ($bgcol <= -3) {
+                    $rgbcol = '#.';
+                } else {
+                    $rgbcol = '#-';
+                }
+            }
+        } else {
+            // RGB color
+            $r = (($bgcol >> 20) & 15);
+            $g = (($bgcol >> 12) & 15);
+            $b = (($bgcol >> 4) & 15);
+            $rgbcol = sprintf('#%x%x%x',$r,$g,$b);
+        }
+        $destname = sprintf('layer%d:%d,%s@%d,%d',$this->_id,$w,$rgbcol,$x,$y);
+        return $this->_display->upload($destname,$bitmap);
+    }
+
+    /**
+     * Draws a color pixmap at the specified position. The pixmap is provided as a binary
+     * object, where each byte maps to one pixel. The 24 bit RGB value corresponding to each
+     * byte value is defined in the palette provided as extra argument.
+     * The palette maximal size is 8, and it is recommended to use the smallest possible
+     * palette size to optimize the size of data to be sent to the display.
+     * The height of the pixmap is implicitely given by the pixmap buffer size.
+     *
+     * @param int $x : the distance from left of layer to the left of the pixmap, in pixels
+     * @param int $y : the distance from top of layer to the top of the pixmap, in pixels
+     * @param int $w : the width of the pixmap, in pixels
+     * @param string $pixmap : a binary buffer where each byte maps to one pixel
+     * @param Integer[] $palette : an array of 24-bit RGB values, defining the color for each byte value in pixmap
+     *
+     * @return int  YAPI::SUCCESS if the call succeeds.
+     *
+     * On failure, throws an exception or returns a negative error code.
+     * @throws YAPI_Exception on error
+     */
+    public function drawPixmap(int $x, int $y, int $w, string $pixmap, array $palette): int
+    {
+        // $gifimage               is a bin;
+        $gifimage = $this->_display->gifEncode($pixmap, $palette, $w, false);
+        return $this->drawGIF($x, $y, $gifimage);
     }
 
     /**
@@ -594,7 +661,7 @@ class YDisplayLayer
     }
 
     /**
-     * Close the currently open polygon, fill its content the fill color currently
+     * Closes the currently open polygon, fill its content the fill color currently
      * selected for the layer, and draw its outline using the selected line color.
      *
      * @return int  YAPI::SUCCESS if the call succeeds.
@@ -623,6 +690,18 @@ class YDisplayLayer
      */
     public function consoleOut(string $text): int
     {
+        // $textlen                is a int;
+        // $destname               is a str;
+        $textlen = strlen($text);
+        if ($textlen > 60) {
+            if ($textlen > 1000) {
+                $this->_display->_throw(YAPI::INVALID_ARGUMENT, 'text too large (max 1000 characters)');
+                return YAPI::INVALID_ARGUMENT;
+            }
+            $this->_display->flushLayers();
+            $destname = sprintf('layer%d:!',$this->_id);
+            return $this->_display->upload($destname,YAPI::Ystr2bin($text));
+        }
         return $this->command_flush(sprintf('!%s%c',$text,27));
     }
 

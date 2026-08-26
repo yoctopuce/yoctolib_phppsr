@@ -11,12 +11,12 @@ namespace Yoctopuce\YoctoAPI;
  */
 class YCarbonDioxide extends YSensor
 {
-    const ABCPERIOD_INVALID = YAPI::INVALID_UINT;
+    const ABCPERIOD_INVALID = YAPI::INVALID_INT;
     const COMMAND_INVALID = YAPI::INVALID_STRING;
     //--- (end of YCarbonDioxide declaration)
 
     //--- (YCarbonDioxide attributes)
-    protected int $_abcPeriod = self::ABCPERIOD_INVALID;      // UInt31
+    protected int $_abcPeriod = self::ABCPERIOD_INVALID;      // Int
     protected string $_command = self::COMMAND_INVALID;        // Text
 
     //--- (end of YCarbonDioxide attributes)
@@ -165,7 +165,7 @@ class YCarbonDioxide extends YSensor
      */
     public function triggerForcedCalibration(float $refVal): int
     {
-        return $this->set_command(sprintf('F%dC', intval(round(1000*$refVal))));
+        return $this->set_command(sprintf('F%dC', intval(round($refVal))));
     }
 
     /**

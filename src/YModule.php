@@ -715,7 +715,12 @@ class YModule extends YFunction
      */
     public function revertFromFlash(): int
     {
-        return $this->set_persistentSettings(self::PERSISTENTSETTINGS_LOADED);
+        // $res                    is a int;
+
+        $res = $this->set_persistentSettings(self::PERSISTENTSETTINGS_LOADED);
+        if (!($res==YAPI::SUCCESS)) return $this->_throw($res,'unable to trigger revert settings',$res);
+        $this->_clearLazyCache();
+        return $res;
     }
 
     /**
